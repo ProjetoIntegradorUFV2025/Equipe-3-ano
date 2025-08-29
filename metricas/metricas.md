@@ -1,4 +1,4 @@
-# 📊 Sistema de Coleta de Métricas - Pasta Métricas
+# 📊 Métricas
 
 Esta pasta contém o sistema automatizado de coleta e análise de métricas do projeto, executado através de GitHub Actions para monitoramento contínuo do desempenho da equipe durante as sprints.
 

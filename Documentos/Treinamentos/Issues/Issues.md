@@ -1,4 +1,4 @@
-# 📝 Guia de Uso de Issues
+# 📝 Issues
 
 Este repositório utiliza **Issues do GitHub** como forma principal de acompanhamento de tarefas, bugs e melhorias. Para garantir uma boa organização, seguimos um padrão baseado em **Templates**, **Labels** e **Milestones**.
 

@@ -1,4 +1,4 @@
-# 🚀 Guia Completo Git - Fluxo de Trabalho com Branching Strategy
+# 🚀 Guia Completo Git - Fluxo de Trabalho 
 
 
 ## 🎯 **Índice Navegável**
