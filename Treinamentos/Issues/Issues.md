@@ -38,7 +38,7 @@ Se precisar criar um novo Milestone, basta clicar em **“New Milestone”** no 
 ---
 
 ## 📚 Referência
-Um **tutorial de Issue Tracking** preparado pela *Mestranda Estela Miranda* está disponível na pasta [`Treinamentos/Issues`](./).  
+Um **tutorial de Issue Tracking** preparado pela *Doutoranda Estela Miranda* está disponível na pasta [`Treinamentos/Issues`](./).  
 Esse material contém recomendações que **devem ser seguidas como padrão** para mantermos consistência no processo de desenvolvimento.
 
 ---
