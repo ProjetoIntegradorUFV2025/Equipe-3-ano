@@ -6,7 +6,6 @@ on:
     branches:
       - main  
 
-# Permissões para evitar bloqueios
 permissions:
   pull-requests: write
   issues: write
@@ -15,8 +14,6 @@ permissions:
 jobs:
   notify:
     runs-on: ubuntu-latest
-    
-    # Permissões específicas do job
     permissions:
       pull-requests: write
       issues: write
@@ -28,19 +25,9 @@ jobs:
 
       - name: Debug event information
         run: |
-          echo "📋 DEBUG INFO:"
-          echo "Event: ${{ github.event_name }}"
-          echo "Action: ${{ github.event.action }}"
-          echo "PR Number: ${{ github.event.pull_request.number }}"
-          echo "PR Title: ${{ github.event.pull_request.title }}"
-          echo "PR Merged: ${{ github.event.pull_request.merged }}"
-
-      - name: Test Discord webhook
-        uses: appleboy/discord-action@master
-        with:
-          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
-          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          message: "✅ Webhook testado - PR Action: ${{ github.event.action }}"
+          echo "📋 Event: ${{ github.event_name }}"
+          echo "📋 Action: ${{ github.event.action }}"
+          echo "📋 PR Number: ${{ github.event.pull_request.number }}"
 
       - name: Notificar PR aberto
         if: github.event_name == 'pull_request' && github.event.action == 'opened'
@@ -49,17 +36,10 @@ jobs:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           username: "GitHub Bot"
-          color: 47490
           message: |
-            🎉 **NOVO PULL REQUEST** [#${{ github.event.pull_request.number }}](<${{ github.event.pull_request.html_url }}>)
-            
-            **${{ github.event.pull_request.title }}**
-            
-            👤 **Autor:** ${{ github.event.pull_request.user.login }}
-            📁 **Repositório:** ${{ github.event.repository.name }}
-            🌿 **Branch:** ${{ github.event.pull_request.head.ref }} → main
-            
-            🔗 [Abrir PR](<${{ github.event.pull_request.html_url }}>)
+            🎉 **NOVO PR**: ${{ github.event.pull_request.title }}
+            👤 **Por:** ${{ github.event.pull_request.user.login }}
+            🔗 ${{ github.event.pull_request.html_url }}
 
       - name: Notificar PR mesclado
         if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
@@ -68,13 +48,7 @@ jobs:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           username: "GitHub Bot"
-          color: 47490
           message: |
-            🚀 **PR MERGEADO** [#${{ github.event.pull_request.number }}](<${{ github.event.pull_request.html_url }}>)
-            
-            **${{ github.event.pull_request.title }}**
-            
-            👤 **Autor:** ${{ github.event.pull_request.user.login }}
-            ✅ **Status:** Mesclado em main
-            
-            🔗 [Ver PR](<${{ github.event.pull_request.html_url }}>)
+            🚀 **PR MERGEADO**: ${{ github.event.pull_request.title }}
+            👤 **Por:** ${{ github.event.pull_request.user.login }}
+            🔗 ${{ github.event.pull_request.html_url }}
