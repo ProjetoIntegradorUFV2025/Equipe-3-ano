@@ -1,13 +1,10 @@
-name: notify
+name: Notificao PR
 
 on:
   pull_request:
     types: [opened, closed]
     branches:
       - main  
-  push:
-    branches:
-      - main 
 
 jobs:
   notify:
@@ -16,15 +13,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Passo de debug
-      - name: Debug variáveis do webhook
+      # Passo de debug (opcional, mas recomendado)
+      - name: Debug variáveis do PR
         run: |
-          echo "Webhook ID: ${{ secrets.DISCORD_WEBHOOK_ID }}"
-          echo "Webhook Token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}"
           echo "Título PR: ${{ github.event.pull_request.title }}"
           echo "Autor PR: ${{ github.event.pull_request.user.login }}"
           echo "Branch: ${{ github.event.pull_request.head.ref }}"
           echo "Mensagem PR body: ${{ github.event.pull_request.body }}"
+
+      # Teste simples de mensagem no Discord
+      - name: Test Discord webhook
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: "🚀 Teste do webhook funcionando!"
 
       # PR aberto
       - name: Send message for pull request opened
@@ -33,8 +36,8 @@ jobs:
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          color: 47490
           username: "The Bot"
+          color: 47490   # cor verde decimal
           message: |
             🎉 Novo Pull Request aberto!
 
@@ -56,8 +59,8 @@ jobs:
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          color: 47490
           username: "The Bot"
+          color: 47490
           message: |
             🚀 Pull Request mesclado na main!  
 
