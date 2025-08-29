@@ -16,13 +16,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      # Passo de debug
+      - name: Debug variáveis do webhook
+        run: |
+          echo "Webhook ID: ${{ secrets.DISCORD_WEBHOOK_ID }}"
+          echo "Webhook Token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}"
+          echo "Título PR: ${{ github.event.pull_request.title }}"
+          echo "Autor PR: ${{ github.event.pull_request.user.login }}"
+          echo "Branch: ${{ github.event.pull_request.head.ref }}"
+          echo "Mensagem PR body: ${{ github.event.pull_request.body }}"
+
+      # PR aberto
       - name: Send message for pull request opened
         if: github.event_name == 'pull_request' && github.event.action == 'opened'
         uses: appleboy/discord-action@master
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          color: "#48f442"
+          color: 47490
           username: "The Bot"
           message: |
             🎉 Novo Pull Request aberto!
@@ -38,13 +49,14 @@ jobs:
             [Ver Pull Request](${{ github.event.pull_request.html_url }})
             [Ver Repositório](${{ github.event.repository.html_url }})
 
+      # PR mesclado
       - name: Send message for merge to main 
         if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
         uses: appleboy/discord-action@master
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          color: "#48f442"
+          color: 47490
           username: "The Bot"
           message: |
             🚀 Pull Request mesclado na main!  
