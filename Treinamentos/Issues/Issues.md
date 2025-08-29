@@ -5,7 +5,7 @@ Este repositório utiliza **Issues do GitHub** como forma principal de acompanha
 ---
 
 ## 📌 Templates de Issues
-Ao abrir uma nova Issue, você deve escolher o **tipo de template** adequado, localizado na pasta [`/.github/ISSUE_TEMPLATE`](../.github/ISSUE_TEMPLATE/):
+Ao abrir uma nova Issue, você deve escolher o **tipo de template** adequado, localizado na pasta [`/.github/ISSUE_TEMPLATE`](../../.github/ISSUE_TEMPLATE/):
 
 - **Bug** 🐞 – para relatar erros ou falhas encontradas.  
 - **Feature** ✨ – para sugerir ou documentar novas funcionalidades.  
@@ -38,7 +38,7 @@ Se precisar criar um novo Milestone, basta clicar em **“New Milestone”** no 
 ---
 
 ## 📚 Referência
-Um **tutorial de Issue Tracking** preparado pela *Mestranda Estela Miranda* está disponível na pasta [`Treinamentos/Issues`](./Issues/).  
+Um **tutorial de Issue Tracking** preparado pela *Mestranda Estela Miranda* está disponível na pasta [`Treinamentos/Issues`](./).  
 Esse material contém recomendações que **devem ser seguidas como padrão** para mantermos consistência no processo de desenvolvimento.
 
 ---
