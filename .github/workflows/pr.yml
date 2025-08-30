@@ -3,6 +3,8 @@ name: Notificacao PR
 on:
   pull_request:
     types: [opened, reopened, closed, ready_for_review]
+    branches: 
+      - '**' 
 
 permissions:
   pull-requests: write
@@ -23,6 +25,7 @@ jobs:
           echo "📋 PR Number: ${{ github.event.pull_request.number }}"
           echo "📋 Base Branch: ${{ github.event.pull_request.base.ref }}"
           echo "📋 Head Branch: ${{ github.event.pull_request.head.ref }}"
+          echo "📋 Merged: ${{ github.event.pull_request.merged }}"
 
       - name: Notificar PR aberto/reaberto
         if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
@@ -38,6 +41,7 @@ jobs:
             📌 **De:** ${{ github.event.pull_request.head.ref }} 
             🎯 **Para:** ${{ github.event.pull_request.base.ref }}
             🔗 **Link:** ${{ github.event.pull_request.html_url }}
+            📊 **Estado:** ${{ github.event.pull_request.state }}
 
       - name: Notificar PR pronto para revisão
         if: github.event_name == 'pull_request' && github.event.action == 'ready_for_review'
