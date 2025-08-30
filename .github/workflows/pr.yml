@@ -2,7 +2,7 @@ name: Notificacao PR
 
 on:
   pull_request:
-    types: [opened, closed]
+    types: [opened, reopened, closed, ready_for_review]
 
 permissions:
   pull-requests: write
@@ -12,33 +12,47 @@ permissions:
 jobs:
   notify:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      issues: write
-      contents: read
-      
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Debug event information
         run: |
           echo "📋 Event: ${{ github.event_name }}"
           echo "📋 Action: ${{ github.event.action }}"
           echo "📋 PR Number: ${{ github.event.pull_request.number }}"
+          echo "📋 Base Branch: ${{ github.event.pull_request.base.ref }}"
+          echo "📋 Head Branch: ${{ github.event.pull_request.head.ref }}"
 
-      - name: Notificar PR aberto
-        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+      - name: Notificar PR aberto/reaberto
+        if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
         uses: appleboy/discord-action@master
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           username: "GitHub Bot"
           message: |
-            🎉 **NOVO PR**: ${{ github.event.pull_request.title }}
-            👤 **Por:** ${{ github.event.pull_request.user.login }}
+            🎉 **NOVO PR ABERTO** 
+            **Título:** ${{ github.event.pull_request.title }}
+            👤 **Autor:** ${{ github.event.pull_request.user.login }}
+            📌 **De:** ${{ github.event.pull_request.head.ref }} 
+            🎯 **Para:** ${{ github.event.pull_request.base.ref }}
             🔗 **Link:** ${{ github.event.pull_request.html_url }}
-            🌿 **Branch:** ${{ github.event.pull_request.head.ref }}
+
+      - name: Notificar PR pronto para revisão
+        if: github.event_name == 'pull_request' && github.event.action == 'ready_for_review'
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          username: "GitHub Bot"
+          message: |
+            📋 **PR PRONTO PARA REVISÃO**
+            **Título:** ${{ github.event.pull_request.title }}
+            👤 **Autor:** ${{ github.event.pull_request.user.login }}
+            📌 **De:** ${{ github.event.pull_request.head.ref }}
+            🎯 **Para:** ${{ github.event.pull_request.base.ref }}
+            🔗 **Link:** ${{ github.event.pull_request.html_url }}
 
       - name: Notificar PR mesclado
         if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
@@ -48,7 +62,24 @@ jobs:
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           username: "GitHub Bot"
           message: |
-            🚀 **PR MERGEADO**: ${{ github.event.pull_request.title }}
-            👤 **Por:** ${{ github.event.pull_request.user.login }}
+            🚀 **PR MERGEADO COM SUCESSO**
+            **Título:** ${{ github.event.pull_request.title }}
+            👤 **Autor:** ${{ github.event.pull_request.user.login }}
+            📌 **De:** ${{ github.event.pull_request.head.ref }}
+            🎯 **Para:** ${{ github.event.pull_request.base.ref }}
             🔗 **Link:** ${{ github.event.pull_request.html_url }}
-            🌿 **Branch:** ${{ github.event.pull_request.head.ref }}
+
+      - name: Notificar PR fechado (não mesclado)
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          username: "GitHub Bot"
+          message: |
+            ❌ **PR FECHADO (NÃO MERGEADO)**
+            **Título:** ${{ github.event.pull_request.title }}
+            👤 **Autor:** ${{ github.event.pull_request.user.login }}
+            📌 **De:** ${{ github.event.pull_request.head.ref }}
+            🎯 **Para:** ${{ github.event.pull_request.base.ref }}
+            🔗 **Link:** ${{ github.event.pull_request.html_url }}
