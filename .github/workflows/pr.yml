@@ -3,8 +3,6 @@ name: Notificacao PR
 on:
   pull_request:
     types: [opened, closed]
-    branches:
-      - main  
 
 permissions:
   pull-requests: write
@@ -39,7 +37,8 @@ jobs:
           message: |
             🎉 **NOVO PR**: ${{ github.event.pull_request.title }}
             👤 **Por:** ${{ github.event.pull_request.user.login }}
-            🔗 ${{ github.event.pull_request.html_url }}
+            🔗 **Link:** ${{ github.event.pull_request.html_url }}
+            🌿 **Branch:** ${{ github.event.pull_request.head.ref }}
 
       - name: Notificar PR mesclado
         if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
@@ -51,4 +50,5 @@ jobs:
           message: |
             🚀 **PR MERGEADO**: ${{ github.event.pull_request.title }}
             👤 **Por:** ${{ github.event.pull_request.user.login }}
-            🔗 ${{ github.event.pull_request.html_url }}
+            🔗 **Link:** ${{ github.event.pull_request.html_url }}
+            🌿 **Branch:** ${{ github.event.pull_request.head.ref }}
