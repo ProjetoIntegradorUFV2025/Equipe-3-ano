@@ -1,18 +1,55 @@
-# Equipe-3-ano
-Repositório destinado ao Projeto Desconecta
-# 🎮 (Des)conecta - Repositório de Desenvolvimento
+# 🎮 (Des)conecta - Equipe-3-ano
+Repositório contendo arquivos gerados durante o desenvolvimento do projeto **(Des)conecta**, parte do **Projeto Integrador** desenvolvido pela equipe responsável pelo 3º ano.
 
-Este repositório contém todos os arquivos desenvolvidos durante a criação do jogo **(Des)conecta**, parte do **Projeto Integrador** desenvolvido pela equipe responsável pelo 3º ano. O jogo combina gamificação com o ensino de conceitos essenciais sobre dados e informação.
+## 📁 Composição
 
-## 📁 Estrutura do Repositório
+Este repositório é composto pelas seguintes pastas principais:
 
-Este repositório documenta todo o processo de desenvolvimento do jogo, incluindo:
+- **[.github](/.github/)** - Configurações do GitHub, incluindo templates de issues e workflows de automação
 
-- Documentação de design e mecânicas
-- Assets e recursos visuais
-- Código fonte e scripts
-- Testes e iterações do projeto
-- Materiais educacionais complementares
+- **[desconecta](/desconecta/)** - Pasta principal contendo o desenvolvimento do jogo, dividida em três diretórios: **[backend](/desconecta/backend/)**, **[database](/desconecta/database/)** e **[frontend](/desconecta/frontend/)**
+
+- **[Documentos](/Documentos/)** - Pasta dedicada para documentações, incluindo o Processo, treinamentos, reuniões, design, gitflow e refinamento de sprints
+
+- **[metricas](/metricas/)** - Pasta dedicada para coleta e análise de métricas do projeto
+
+- **[Prova de Conceito](/Prova%20de%20Conceito/)** - Pasta dedicada para persistência da prova de conceito
+
+Papéis responsáveis pela atualização/alteração de cada diretório:
+
+| .github                           |
+| --------------------------------- |
+| Analista de qualidade             |
+| Gerente de configuração e mudança |
+
+| desconecta                        |
+| --------------------------------- |
+| Dev junior POO/BD                 |
+| Dev senior                        |
+| Arquiteto de software             |
+| Designer (ASOF)                   |
+| Designer de jogo                  |
+| Gerente de configuração e mudança |
+
+| Documentos                        |
+| --------------------------------- |
+| Dev senior                        |
+| Arquiteto de software             |
+| Designer (ASOF)                   |
+| Analista de qualidade             |
+| Gerente de configuração e mudança |
+
+| metricas                          |
+| --------------------------------- |
+| Analista de qualidade             |
+| Gerente de configuração e mudança |
+
+| Prova de Conceito                 |
+| --------------------------------- |
+| Arquiteto de software             |
+| Gerente de configuração e mudança |
+
+> OBS: Todos os papéis podem visualizar o conteúdo das pastas, mas apenas os indicados acima podem modificá-las.
 
 ## 📖 Sobre o (Des)conecta
 
@@ -52,6 +89,3 @@ O projeto **(Des)conecta** dialoga com as diretrizes da **Base Nacional Comum Cu
 
 - **🎯 Objeto de Conhecimento:** CODIFICAÇÃO DA INFORMAÇÃO
 - **✅ Habilidade Desenvolvida:** (EF03CO04) - Relacionar o conceito de informação com o de dados
-
-
-
