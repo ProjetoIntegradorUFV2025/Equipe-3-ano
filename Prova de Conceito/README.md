@@ -8,6 +8,6 @@ O pasta está organizada seguindo a mesma estrutura do projeto principal:
 
 ### 🖥️ **[backend](/Prova%20de%20Conceito/backend/)**
 
-### 🗄️ **[database-sql](/Prova%20de%20Conceito/database-sql/)**
+### 🗄️ **[database](/Prova%20de%20Conceito/database/)**
 
 ### 🎨 **[frontend](/Prova%20de%20Conceito/frontend/)**
