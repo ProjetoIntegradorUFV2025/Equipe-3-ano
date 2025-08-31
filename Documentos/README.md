@@ -1,12 +1,14 @@
-# Pasta Treinamentos - Capacitação da Equipe
+#  Pasta Documentos - Persistência e Versionamento
 
-Esta pasta centraliza todos os **treinamentos necessários** para que os membros da equipe do projeto **(Des)conecta** dominem as ferramentas e processos utilizados no desenvolvimento. Os materiais estão organizados conforme o nível de experiência e responsabilidade de cada membro.
+Esta pasta é responsável pela **persistência e versionamento** de todos os documentos oficiais do projeto **(Des)conecta**. Aqui mantemos o histórico completo e organizado da documentação, garantindo rastreabilidade e acesso às diferentes versões dos materiais.
 
-## 📁 Estrutura dos Treinamentos
+## 🗂️ Organização por Assuntos
 
-### 👨‍💼 Para Seniors
-- **`git/`** - Treinamento completo em Git e controle de versão
-- **`issues/`** - Gerenciamento e organização de issues no projeto
+Os documentos estão organizados em pastas específicas conforme o assunto tratado:
 
-### 👨‍🎓 Para Juniors (Desenvolvedores)
-- **`juniors/`** - Treinamentos básicos para desenvolvedores júniors
+- **`Design/`** - Documentos relacionados ao design do projeto
+- **`Processo/`** - controle de mudanças e versionamento do Processo
+- **`Treinamentos/`** - Materiais e documentos de treinamento
+- **`reuniẽes/`** - Atas, relatórios e registros de reuniões
+- **`Refinamento Sprint/`** - Documentos de refinamento das sprints
+- **`GitFlow/`** - Documentação do fluxo de trabalho com Git
