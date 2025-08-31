@@ -2,7 +2,7 @@ name: Coletar Métricas da Sprint
 
 on:
   schedule:
-    - cron: '0 0 * * 1'
+    - cron: '0 3 * * 2' 
   workflow_dispatch:
     inputs:
       sprint_number:
