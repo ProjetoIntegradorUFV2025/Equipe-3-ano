@@ -6,9 +6,14 @@ Esta pasta é responsável pela **persistência e versionamento** de todos os do
 
 Os documentos estão organizados em pastas específicas conforme o assunto tratado:
 
-- **`Design/`** - Documentos relacionados ao design do projeto
-- **`Processo/`** - controle de mudanças e versionamento do Processo
-- **`Treinamentos/`** - Materiais e documentos de treinamento
-- **`reuniẽes/`** - Atas, relatórios e registros de reuniões
-- **`Refinamento Sprint/`** - Documentos de refinamento das sprints
+- **`Dependencias/`** - Documentação de ferramentas, bibliotecas e recursos externos necessários ao projeto.
+- **`Design/`** - Documentos relacionados ao design do projeto.
 - **`GitFlow/`** - Documentação do fluxo de trabalho com Git
+- **`Processo/`** - controle de mudanças e versionamento do Processo
+- **`Refinamento Sprint/`** - Documentos de refinamento das sprints
+- **`Reuniões/`** - Atas, relatórios e registros de reuniões
+- **`Templates/`** - Modelos de documentos, padrões e diretrizes para uso no projeto.
+- **`Treinamentos/`** - Materiais e documentos de treinamento
+
+
+
