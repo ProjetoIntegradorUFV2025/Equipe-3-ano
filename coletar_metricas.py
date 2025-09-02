@@ -93,47 +93,54 @@ def get_issues(sprint_start: str, sprint_end: str) -> List[Dict]:
     return issues
 
 def get_pulls(sprint_start: str, sprint_end: str) -> List[Dict]:
-    """Coleta TODOS os PRs dentro do período, incluindo de branches deletadas"""
-    url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues'
-    all_items = []
+    """Coleta TODOS os PRs do período, incluindo branches deletadas e PRs fechados"""
+    url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/pulls'
+    pulls = []
     page = 1
     
     sprint_start_dt = datetime.strptime(sprint_start, '%Y-%m-%d')
     sprint_end_dt = datetime.strptime(sprint_end, '%Y-%m-%d')
     
-    print(f"Buscando PRs entre {sprint_start} e {sprint_end} (incluindo branches deletadas)")
+    print(f"Buscando TODOS os PRs entre {sprint_start} e {sprint_end}")
     
-    while True:
-        params = {
-            'state': 'all',
-            'since': sprint_start,
-            'per_page': 100,
-            'page': page
-        }
-        
-        response = requests.get(url, headers=HEADERS, params=params)
-        if response.status_code != 200:
-            print(f"Erro ao obter items: {response.status_code}")
-            break
-            
-        page_items = response.json()
-        if not page_items:
-            break
-            
-        for item in page_items:
-            # Captura tanto issues quanto PRs
-            created_at = datetime.strptime(item['created_at'], '%Y-%m-%dT%H:%M:%SZ')
-            
-            if sprint_start_dt <= created_at <= sprint_end_dt:
-                all_items.append(item)
-        
-        if 'next' not in response.links:
-            break
-            
-        page += 1
+    # Busca PRs por estado: open, closed, all
+    states = ['open', 'closed']
     
-    # Filtra apenas PRs (issues têm pull_request field vazio ou None)
-    pulls = [item for item in all_items if item.get('pull_request') is not None]
+    for state in states:
+        page = 1
+        while True:
+            params = {
+                'state': state,
+                'sort': 'created',
+                'direction': 'desc',
+                'per_page': 100,
+                'page': page
+            }
+            
+            response = requests.get(url, headers=HEADERS, params=params)
+            if response.status_code != 200:
+                print(f"Erro ao obter PRs {state}: {response.status_code}")
+                break
+                
+            page_pulls = response.json()
+            if not page_pulls:
+                break
+                
+            for pull in page_pulls:
+                created_at = datetime.strptime(pull['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+                
+                # Verifica se está dentro do período da sprint
+                if sprint_start_dt <= created_at <= sprint_end_dt:
+                    pulls.append(pull)
+                elif created_at < sprint_start_dt:
+                    # Para de buscar quando encontrar PRs mais antigos
+                    break
+            
+            # Verifica se precisa continuar paginando
+            if len(page_pulls) < 100:
+                break
+                
+            page += 1
     
     print(f"Total de PRs no período (incluindo branches deletadas): {len(pulls)}")
     return pulls
@@ -170,7 +177,7 @@ def calcular_metricas_individuais(sprint_start: str, sprint_end: str, usuario: s
     
     # PRs criadas pelo usuário
     prs_criadas = [pr for pr in pulls if pr['user']['login'].lower() == usuario.lower()]
-    prs_aceitas = [pr for pr in prs_criadas if pr['state'] == 'closed' and pr.get('merged_at')]
+    prs_aceitas = [pr for pr in prs_criadas if pr.get('merged_at')]
     
     # PRs revisadas pelo usuário
     prs_revisadas = 0
@@ -215,7 +222,7 @@ def calcular_metricas_equipe(sprint_start: str, sprint_end: str) -> Dict:
     issues_resolvidas = [issue for issue in issues_aceitas if issue['state'] == 'closed']
     
     # PRs aprovadas (merged)
-    prs_aprovadas = [pr for pr in pulls if pr['state'] == 'closed' and pr.get('merged_at')]
+    prs_aprovadas = [pr for pr in pulls if pr.get('merged_at')]
     
     # PRs revisadas mas sem merge (apenas code review)
     prs_revisadas_sem_merge = [pr for pr in pulls if pr['state'] == 'closed' and not pr.get('merged_at')]
