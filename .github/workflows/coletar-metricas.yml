@@ -2,7 +2,7 @@ name: Coletar Métricas da Sprint
 
 on:
   schedule:
-    - cron: '0 3 * * 2' 
+    - cron: '0 3 * * 2'
   workflow_dispatch:
     inputs:
       sprint_number:
@@ -25,6 +25,8 @@ jobs:
     steps:
     - name: Checkout código
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Importante: fetch todo o histórico
     
     - name: Configurar Python
       uses: actions/setup-python@v4
@@ -45,9 +47,12 @@ jobs:
           --sprint-end ${{ github.event.inputs.sprint_end }}
     
     - name: Commit e push dos resultados
+      env:
+        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add metricas/
         git commit -m "Atualizar métricas da sprint ${{ github.event.inputs.sprint_number }}"
-        git push
+        git remote set-url origin https://${{ github.actor }}:$PAT_TOKEN@github.com/${{ github.repository }}.git
+        git push origin HEAD:main
