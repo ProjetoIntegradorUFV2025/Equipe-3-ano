@@ -93,15 +93,15 @@ def get_issues(sprint_start: str, sprint_end: str) -> List[Dict]:
     return issues
 
 def get_pulls(sprint_start: str, sprint_end: str) -> List[Dict]:
-    """Coleta todos os PRs dentro do período da sprint"""
-    url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/pulls'
-    pulls = []
+    """Coleta TODOS os PRs dentro do período, incluindo de branches deletadas"""
+    url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/issues'
+    all_items = []
     page = 1
     
     sprint_start_dt = datetime.strptime(sprint_start, '%Y-%m-%d')
     sprint_end_dt = datetime.strptime(sprint_end, '%Y-%m-%d')
     
-    print(f"Buscando PRs entre {sprint_start} e {sprint_end}")
+    print(f"Buscando PRs entre {sprint_start} e {sprint_end} (incluindo branches deletadas)")
     
     while True:
         params = {
@@ -113,25 +113,29 @@ def get_pulls(sprint_start: str, sprint_end: str) -> List[Dict]:
         
         response = requests.get(url, headers=HEADERS, params=params)
         if response.status_code != 200:
-            print(f"Erro ao obter PRs: {response.status_code}")
+            print(f"Erro ao obter items: {response.status_code}")
             break
             
-        page_pulls = response.json()
-        if not page_pulls:
+        page_items = response.json()
+        if not page_items:
             break
             
-        for pull in page_pulls:
-            created_at = datetime.strptime(pull['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+        for item in page_items:
+            # Captura tanto issues quanto PRs
+            created_at = datetime.strptime(item['created_at'], '%Y-%m-%dT%H:%M:%SZ')
             
             if sprint_start_dt <= created_at <= sprint_end_dt:
-                pulls.append(pull)
+                all_items.append(item)
         
         if 'next' not in response.links:
             break
             
         page += 1
     
-    print(f"Total de PRs no período: {len(pulls)}")
+    # Filtra apenas PRs (issues têm pull_request field vazio ou None)
+    pulls = [item for item in all_items if item.get('pull_request') is not None]
+    
+    print(f"Total de PRs no período (incluindo branches deletadas): {len(pulls)}")
     return pulls
 
 def get_issue_events(issue_number: int) -> List[Dict]:
