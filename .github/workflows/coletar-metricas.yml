@@ -54,6 +54,8 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add metricas/
         git commit -m "Atualizar métricas da sprint ${{ github.event.inputs.sprint_number }}"
-        # Alternativa: usar header de autenticação
-        git -c http.extraHeader="Authorization: Bearer $PAT_TOKEN" push origin main
+        
+        # SOLUÇÃO DEFINITIVA - Configurar a URL remota com autenticação
+        git remote set-url origin https://${{ github.actor }}:$PAT_TOKEN@github.com/${{ github.repository }}.git
+        git push origin HEAD:main
             
