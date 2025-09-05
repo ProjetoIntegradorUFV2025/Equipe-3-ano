@@ -93,7 +93,7 @@ def get_issues(sprint_start: str, sprint_end: str) -> List[Dict]:
     return issues
 
 def get_pulls(sprint_start: str, sprint_end: str) -> List[Dict]:
-    """Coleta TODOS os PRs do período, incluindo branches deletadas e PRs fechados"""
+    """Coleta todos os PRs dentro do período da sprint"""
     url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/pulls'
     pulls = []
     page = 1
@@ -101,48 +101,37 @@ def get_pulls(sprint_start: str, sprint_end: str) -> List[Dict]:
     sprint_start_dt = datetime.strptime(sprint_start, '%Y-%m-%d')
     sprint_end_dt = datetime.strptime(sprint_end, '%Y-%m-%d')
     
-    print(f"Buscando TODOS os PRs entre {sprint_start} e {sprint_end}")
+    print(f"Buscando PRs entre {sprint_start} e {sprint_end}")
     
-    # Busca PRs por estado: open, closed, all
-    states = ['open', 'closed']
-    
-    for state in states:
-        page = 1
-        while True:
-            params = {
-                'state': state,
-                'sort': 'created',
-                'direction': 'desc',
-                'per_page': 100,
-                'page': page
-            }
+    while True:
+        params = {
+            'state': 'all',
+            'since': sprint_start,
+            'per_page': 100,
+            'page': page
+        }
+        
+        response = requests.get(url, headers=HEADERS, params=params)
+        if response.status_code != 200:
+            print(f"Erro ao obter PRs: {response.status_code}")
+            break
             
-            response = requests.get(url, headers=HEADERS, params=params)
-            if response.status_code != 200:
-                print(f"Erro ao obter PRs {state}: {response.status_code}")
-                break
-                
-            page_pulls = response.json()
-            if not page_pulls:
-                break
-                
-            for pull in page_pulls:
-                created_at = datetime.strptime(pull['created_at'], '%Y-%m-%dT%H:%M:%SZ')
-                
-                # Verifica se está dentro do período da sprint
-                if sprint_start_dt <= created_at <= sprint_end_dt:
-                    pulls.append(pull)
-                elif created_at < sprint_start_dt:
-                    # Para de buscar quando encontrar PRs mais antigos
-                    break
+        page_pulls = response.json()
+        if not page_pulls:
+            break
             
-            # Verifica se precisa continuar paginando
-            if len(page_pulls) < 100:
-                break
-                
-            page += 1
+        for pull in page_pulls:
+            created_at = datetime.strptime(pull['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+            
+            if sprint_start_dt <= created_at <= sprint_end_dt:
+                pulls.append(pull)
+        
+        if 'next' not in response.links:
+            break
+            
+        page += 1
     
-    print(f"Total de PRs no período (incluindo branches deletadas): {len(pulls)}")
+    print(f"Total de PRs no período: {len(pulls)}")
     return pulls
 
 def get_issue_events(issue_number: int) -> List[Dict]:
@@ -177,7 +166,7 @@ def calcular_metricas_individuais(sprint_start: str, sprint_end: str, usuario: s
     
     # PRs criadas pelo usuário
     prs_criadas = [pr for pr in pulls if pr['user']['login'].lower() == usuario.lower()]
-    prs_aceitas = [pr for pr in prs_criadas if pr.get('merged_at')]
+    prs_aceitas = [pr for pr in prs_criadas if pr['state'] == 'closed' and pr.get('merged_at')]
     
     # PRs revisadas pelo usuário
     prs_revisadas = 0
@@ -222,7 +211,7 @@ def calcular_metricas_equipe(sprint_start: str, sprint_end: str) -> Dict:
     issues_resolvidas = [issue for issue in issues_aceitas if issue['state'] == 'closed']
     
     # PRs aprovadas (merged)
-    prs_aprovadas = [pr for pr in pulls if pr.get('merged_at')]
+    prs_aprovadas = [pr for pr in pulls if pr['state'] == 'closed' and pr.get('merged_at')]
     
     # PRs revisadas mas sem merge (apenas code review)
     prs_revisadas_sem_merge = [pr for pr in pulls if pr['state'] == 'closed' and not pr.get('merged_at')]
@@ -404,16 +393,54 @@ def gerar_relatorio_markdown(sprint_number, sprint_start, sprint_end, metricas_e
     
     return md_content
 
+def calcular_datas_sprint_automatico():
+    """Calcula automaticamente as datas da sprint (segunda a segunda)"""
+    hoje = datetime.now()
+    
+    # Sempre pegar a sprint completa mais recente
+    # Se executado na terça, pega a sprint que terminou na segunda anterior
+    # Se executado na segunda, pega a sprint que terminou hoje
+    
+    # Encontrar a última segunda-feira
+    dias_desde_segunda = hoje.weekday()  # 0=seg, 1=ter, 2=qua, etc
+    fim_sprint = hoje - timedelta(days=dias_desde_segunda)
+    
+    # Se executado depois da segunda, ajusta para sprint anterior
+    if dias_desde_segunda > 0:
+        fim_sprint = fim_sprint - timedelta(days=7)  # Sprint anterior
+    
+    inicio_sprint = fim_sprint - timedelta(days=6)
+    
+    # Número da sprint baseado na data de fim
+    sprint_number = fim_sprint.isocalendar()[1]  # Número da semana
+    
+    return (
+        inicio_sprint.strftime('%Y-%m-%d'),
+        fim_sprint.strftime('%Y-%m-%d'),
+        sprint_number
+    )
+
 def main():
     parser = argparse.ArgumentParser(description='Coletar métricas do GitHub')
-    parser.add_argument('--sprint-start', required=True, help='Data de início da sprint (YYYY-MM-DD)')
-    parser.add_argument('--sprint-end', required=True, help='Data de fim da sprint (YYYY-MM-DD)')
-    parser.add_argument('--sprint-number', type=int, required=True, help='Número da sprint')
+    parser.add_argument('--sprint-start', nargs='?', help='Data de início da sprint (YYYY-MM-DD)')
+    parser.add_argument('--sprint-end', nargs='?', help='Data de fim da sprint (YYYY-MM-DD)')
+    parser.add_argument('--sprint-number', type=int, nargs='?', help='Número da sprint')
     
     args = parser.parse_args()
     
-    print(f"Coletando métricas para Sprint {args.sprint_number} ({args.sprint_start} a {args.sprint_end})")
+    # Debug: mostrar os argumentos recebidos
+    print(f"Argumentos recebidos: sprint-start={args.sprint_start}, sprint-end={args.sprint_end}, sprint-number={args.sprint_number}")
     
+    # Calcular automaticamente se não fornecido
+    if not args.sprint_start or not args.sprint_end:
+        print("Calculando datas automaticamente (segunda a segunda)...")
+        sprint_start, sprint_end, sprint_number = calcular_datas_sprint_automatico()
+        
+        args.sprint_start = sprint_start
+        args.sprint_end = sprint_end
+        args.sprint_number = args.sprint_number or sprint_number
+    
+    print(f"Coletando métricas para Sprint {args.sprint_number} ({args.sprint_start} a {args.sprint_end})")
     # Obter todos os colaboradores automaticamente
     colaboradores = get_collaborators()
     print(f"Colaboradores encontrados: {colaboradores}")
