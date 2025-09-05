@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout código com autenticação
+    - name: Checkout código com PAT
       uses: actions/checkout@v3
       with:
         token: ${{ secrets.PAT_TOKEN }}
@@ -40,7 +40,8 @@ jobs:
     
     - name: Executar coleta de métricas
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        REPOSITORY: ${{ github.repository }}
       run: |
         python coletar_metricas.py \
           --sprint-number ${{ github.event.inputs.sprint_number }} \
@@ -48,9 +49,11 @@ jobs:
           --sprint-end ${{ github.event.inputs.sprint_end }}
     
     - name: Commit e push dos resultados
+      env:
+        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add metricas/
-        git commit -m "Atualizar métricas da sprint ${{ github.event.inputs.sprint_number }}"
-        git push
+        git commit -m "Atualizar métricas da sprint ${{ github.event.inputs.sprint_number }}" || echo "Sem alterações para commitar"
+        git push https://$PAT_TOKEN@github.com/$REPOSITORY.git HEAD:$(echo $GITHUB_REF | cut -d'/' -f3-) || echo "Nada para push"
