@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import os
 import argparse
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Set
 
 # Configurações
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
@@ -36,7 +36,6 @@ def get_collaborators():
         
         if response.status_code != 200:
             print(f"❌ Erro ao obter colaboradores: {response.status_code}")
-            print(f"💡 Response: {response.text}")
             break
             
         page_collaborators = response.json()
@@ -51,21 +50,6 @@ def get_collaborators():
             break
             
         page += 1
-    
-    # Estratégia alternativa: buscar através de commits recentes
-    if not collaborators:
-        print("⚠️  Nenhum colaborador direto encontrado, buscando através de commits...")
-        try:
-            commits_url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/commits'
-            commits_response = requests.get(commits_url, headers=HEADERS, params={'per_page': 50})
-            
-            if commits_response.status_code == 200:
-                commits = commits_response.json()
-                for commit in commits:
-                    if commit.get('author') and commit['author']:
-                        collaborators.add(commit['author']['login'])
-        except Exception as e:
-            print(f"❌ Erro ao buscar commits: {e}")
     
     # Sempre incluir o owner
     collaborators.add(REPO_OWNER)
@@ -129,62 +113,68 @@ def get_issues(sprint_start: str, sprint_end: str) -> List[Dict]:
     return issues
 
 def get_pulls(sprint_start: str, sprint_end: str) -> List[Dict]:
-    """Coleta todos os PRs dentro do período da sprint - VERSÃO MELHORADA"""
+    """Coleta todos os PRs dentro do período da sprint - SEM DUPLICAÇÃO"""
     print(f"🔀 Buscando PRs entre {sprint_start} e {sprint_end}")
     
     sprint_start_dt = datetime.strptime(sprint_start, '%Y-%m-%d')
     sprint_end_dt = datetime.strptime(sprint_end, '%Y-%m-%d') + timedelta(days=1)
     
     all_pulls = []
+    seen_pr_numbers = set()  # 🔥 Conjunto para evitar duplicatas
     
-    # Buscar por cada estado separadamente
-    for state in ['open', 'closed', 'all']:
-        url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/pulls'
-        page = 1
-        
-        print(f"   Buscando PRs com state: {state}")
-        
-        while True:
-            params = {
-                'state': state,
-                'per_page': 100,
-                'page': page,
-                'sort': 'updated',
-                'direction': 'desc'
-            }
-            
-            response = requests.get(url, headers=HEADERS, params=params)
-            
-            if response.status_code != 200:
-                print(f"❌ Erro ao obter PRs {state}: {response.status_code}")
-                break
-                
-            page_pulls = response.json()
-            if not page_pulls:
-                break
-                
-            for pull in page_pulls:
-                created_at = datetime.strptime(pull['created_at'], '%Y-%m-%dT%H:%M:%SZ')
-                updated_at = datetime.strptime(pull['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
-                
-                # Incluir PRs criados OU atualizados durante a sprint
-                if (sprint_start_dt <= created_at <= sprint_end_dt or 
-                    sprint_start_dt <= updated_at <= sprint_end_dt):
-                    all_pulls.append(pull)
-            
-            # Parar se chegarmos em PRs muito antigos
-            oldest_pull = page_pulls[-1] if page_pulls else None
-            if oldest_pull:
-                oldest_updated = datetime.strptime(oldest_pull['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
-                if oldest_updated < sprint_start_dt:
-                    break
-            
-            if 'next' not in response.links:
-                break
-                
-            page += 1
+    # 🔥 Buscar apenas PRs com state='all' para evitar duplicação
+    url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/pulls'
+    page = 1
     
-    print(f"✅ Total de PRs no período: {len(all_pulls)}")
+    while True:
+        params = {
+            'state': 'all',  # 🔥 Apenas 'all' para evitar duplicação
+            'per_page': 100,
+            'page': page,
+            'sort': 'updated',
+            'direction': 'desc'
+        }
+        
+        response = requests.get(url, headers=HEADERS, params=params)
+        
+        if response.status_code != 200:
+            print(f"❌ Erro ao obter PRs: {response.status_code}")
+            break
+            
+        page_pulls = response.json()
+        if not page_pulls:
+            break
+            
+        for pull in page_pulls:
+            pr_number = pull['number']
+            
+            # 🔥 Evitar duplicatas
+            if pr_number in seen_pr_numbers:
+                continue
+                
+            seen_pr_numbers.add(pr_number)
+            
+            created_at = datetime.strptime(pull['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+            updated_at = datetime.strptime(pull['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
+            
+            # Incluir PRs criados OU atualizados durante a sprint
+            if (sprint_start_dt <= created_at <= sprint_end_dt or 
+                sprint_start_dt <= updated_at <= sprint_end_dt):
+                all_pulls.append(pull)
+        
+        # Parar se chegarmos em PRs muito antigos
+        oldest_pull = page_pulls[-1] if page_pulls else None
+        if oldest_pull:
+            oldest_updated = datetime.strptime(oldest_pull['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
+            if oldest_updated < sprint_start_dt:
+                break
+        
+        if 'next' not in response.links:
+            break
+            
+        page += 1
+    
+    print(f"✅ Total de PRs no período (sem duplicação): {len(all_pulls)}")
     return all_pulls
 
 def get_issue_events(issue_number: int) -> List[Dict]:
@@ -240,7 +230,7 @@ def calcular_tempo_medio_aprovacao(prs_mergeados):
     return round((tempo_total.total_seconds() / 3600) / len(prs_mergeados), 2)
 
 def calcular_metricas_individuais(sprint_start: str, sprint_end: str, usuario: str) -> Dict:
-    """Calcula métricas individuais - VERSÃO SIMPLIFICADA"""
+    """Calcula métricas individuais - VERSÃO CORRIGIDA SEM DUPLICAÇÃO"""
     
     issues = get_issues(sprint_start, sprint_end)
     pulls = get_pulls(sprint_start, sprint_end)
@@ -249,13 +239,13 @@ def calcular_metricas_individuais(sprint_start: str, sprint_end: str, usuario: s
     prs_criadas = [pr for pr in pulls if pr['user']['login'].lower() == usuario.lower()]
     prs_mergeadas = [pr for pr in prs_criadas if pr.get('merged_at')]
     
-    # PRs revisadas pelo usuário - CONTAGEM CORRETA
-    prs_revisadas = 0
+    # PRs revisadas pelo usuário - CONTAGEM CORRETA SEM DUPLICAÇÃO
+    prs_revisadas_set = set()  # 🔥 Usar conjunto para evitar duplicação
     for pr in pulls:
         reviews = get_pull_reviews(pr['number'])
         for review in reviews:
             if review['user']['login'].lower() == usuario.lower():
-                prs_revisadas += 1
+                prs_revisadas_set.add(pr['number'])  # 🔥 Usar número do PR para evitar duplicação
                 break
     
     # Issues do usuário
@@ -266,7 +256,7 @@ def calcular_metricas_individuais(sprint_start: str, sprint_end: str, usuario: s
         'Usuario': usuario,
         'PRs_Criadas': len(prs_criadas),
         'PRs_Mergeadas': len(prs_mergeadas),
-        'PRs_Revisadas': prs_revisadas,
+        'PRs_Revisadas': len(prs_revisadas_set),  # 🔥 Contagem correta sem duplicação
         'Issues_Criadas': len(issues_criadas),
         'Issues_Fechadas': len(issues_fechadas),
         'Produtividade_PRs_Percentual': round(len(prs_mergeadas) / len(prs_criadas) * 100, 2) if prs_criadas else 0,
@@ -274,10 +264,10 @@ def calcular_metricas_individuais(sprint_start: str, sprint_end: str, usuario: s
     }
 
 def calcular_metricas_equipe(sprint_start: str, sprint_end: str) -> Dict:
-    """Calcula métricas de equipe - VERSÃO SIMPLIFICADA E CORRIGIDA"""
+    """Calcula métricas de equipe - VERSÃO CORRIGIDA SEM DUPLICAÇÃO"""
     
     issues = get_issues(sprint_start, sprint_end)
-    pulls = get_pulls(sprint_start, sprint_end)
+    pulls = get_pulls(sprint_start, sprint_end)  # 🔥 Já sem duplicação
     
     # Simplificar: Issues fechadas durante a sprint
     issues_fechadas = [issue for issue in issues if issue['state'] == 'closed']
@@ -403,6 +393,7 @@ def gerar_relatorio_markdown(sprint_number, sprint_start, sprint_end, metricas_e
 
 ## 📋 Legenda das Métricas
 
+- **PRs Criadas**: Pull Requests criadas pelo usuário 📝
 - **PRs Mergeadas**: Pull Requests que foram aceitos e mergeados ✅
 - **PRs Revisadas**: Pull Requests que o usuário revisou 👀  
 - **Produtividade PRs**: Percentual de PRs criadas que foram mergeadas 📈
@@ -421,10 +412,6 @@ def gerar_relatorio_markdown(sprint_number, sprint_start, sprint_end, metricas_e
 def calcular_datas_sprint_automatico():
     """Calcula automaticamente as datas da sprint (segunda a segunda)"""
     hoje = datetime.now()
-    
-    # Sempre pegar a sprint completa mais recente
-    # Se executado na terça, pega a sprint que terminou na segunda anterior
-    # Se executado na segunda, pega a sprint que terminou hoje
     
     # Encontrar a última segunda-feira
     dias_desde_segunda = hoje.weekday()  # 0=seg, 1=ter, 2=qua, etc
@@ -452,9 +439,6 @@ def main():
     parser.add_argument('--sprint-number', type=int, nargs='?', help='Número da sprint')
     
     args = parser.parse_args()
-    
-    # Debug: mostrar os argumentos recebidos
-    print(f"Argumentos recebidos: sprint-start={args.sprint_start}, sprint-end={args.sprint_end}, sprint-number={args.sprint_number}")
     
     # Calcular automaticamente se não fornecido
     if not args.sprint_start or not args.sprint_end:
