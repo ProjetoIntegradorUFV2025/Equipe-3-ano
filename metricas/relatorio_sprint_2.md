@@ -1,15 +1,15 @@
 # 📊 Relatório de Métricas - Sprint 2
 
-**Período:** 2025-08-26 até 2025-08-31  
-**Data de geração:** 02/09/2025 01:36
+**Período:** 2025-09-01 até 2025-09-05  
+**Data de geração:** 05/09/2025 20:28
 
 ## 📈 Métricas de Equipe
 
 ### 🎯 Métricas Principais
 | Métrica | Valor |
 |---------|-------|
-| **Inicio_Sprint** | 2025-08-26 |
-| **Fim_Sprint** | 2025-08-31 |
+| **Inicio_Sprint** | 2025-09-01 |
+| **Fim_Sprint** | 2025-09-05 |
 | **Issues Aceitos** | 0 |
 | **Issues Resolvidos** | 0 |
 | **2.5 Taxa Resolucao Issues Percentual** | **0%** |
@@ -46,6 +46,7 @@
 |---------|------------|------------|--------------|---------------------|---------------|------------------|---------------------|
 | bieu-bonfim | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
 | GuilhermePianetti | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
+| DalmoRainer | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
 | melissaalanis | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
 | gabriel2036 | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
 | caioomenezes | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
