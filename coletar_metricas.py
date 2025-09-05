@@ -120,15 +120,14 @@ def get_pulls(sprint_start: str, sprint_end: str) -> List[Dict]:
     sprint_end_dt = datetime.strptime(sprint_end, '%Y-%m-%d') + timedelta(days=1)
     
     all_pulls = []
-    seen_pr_numbers = set()  # 🔥 Conjunto para evitar duplicatas
+    seen_pr_numbers = set()
     
-    # 🔥 Buscar apenas PRs com state='all' para evitar duplicação
     url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/pulls'
     page = 1
     
     while True:
         params = {
-            'state': 'all',  # 🔥 Apenas 'all' para evitar duplicação
+            'state': 'all',
             'per_page': 100,
             'page': page,
             'sort': 'updated',
@@ -148,7 +147,6 @@ def get_pulls(sprint_start: str, sprint_end: str) -> List[Dict]:
         for pull in page_pulls:
             pr_number = pull['number']
             
-            # 🔥 Evitar duplicatas
             if pr_number in seen_pr_numbers:
                 continue
                 
@@ -157,12 +155,10 @@ def get_pulls(sprint_start: str, sprint_end: str) -> List[Dict]:
             created_at = datetime.strptime(pull['created_at'], '%Y-%m-%dT%H:%M:%SZ')
             updated_at = datetime.strptime(pull['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
             
-            # Incluir PRs criados OU atualizados durante a sprint
             if (sprint_start_dt <= created_at <= sprint_end_dt or 
                 sprint_start_dt <= updated_at <= sprint_end_dt):
                 all_pulls.append(pull)
         
-        # Parar se chegarmos em PRs muito antigos
         oldest_pull = page_pulls[-1] if page_pulls else None
         if oldest_pull:
             oldest_updated = datetime.strptime(oldest_pull['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
@@ -201,36 +197,49 @@ def get_commits(pull_number: int) -> List[Dict]:
     response = requests.get(url, headers=HEADERS)
     return response.json() if response.status_code == 200 else []
 
-def calcular_tempo_medio_resolucao(issues_fechadas):
+def get_issues_com_label_accepted(issues: List[Dict]) -> List[Dict]:
+    """Filtra issues com label 'accepted'"""
+    issues_aceitas = []
+    for issue in issues:
+        labels = [label['name'].lower() for label in issue.get('labels', [])]
+        if 'accepted' in labels:
+            issues_aceitas.append(issue)
+    return issues_aceitas
+
+def get_issues_resolvidas(issues_aceitas: List[Dict]) -> List[Dict]:
+    """Filtra issues aceitas que foram resolvidas (fechadas)"""
+    return [issue for issue in issues_aceitas if issue['state'] == 'closed']
+
+def calcular_tempo_medio_resolucao(issues):
     """Calcula tempo médio de resolução de issues"""
-    if not issues_fechadas:
+    if not issues:
         return 0
     
     tempo_total = timedelta()
-    for issue in issues_fechadas:
+    for issue in issues:
         if issue.get('closed_at'):
             created_at = datetime.strptime(issue['created_at'], '%Y-%m-%dT%H:%M:%SZ')
             closed_at = datetime.strptime(issue['closed_at'], '%Y-%m-%dT%H:%M:%SZ')
             tempo_total += (closed_at - created_at)
     
-    return round((tempo_total.total_seconds() / 3600) / len(issues_fechadas), 2)
+    return round((tempo_total.total_seconds() / 3600) / len(issues), 2)
 
-def calcular_tempo_medio_aprovacao(prs_mergeados):
+def calcular_tempo_medio_aprovacao(prs):
     """Calcula tempo médio de aprovação de PRs"""
-    if not prs_mergeados:
+    if not prs:
         return 0
     
     tempo_total = timedelta()
-    for pr in prs_mergeados:
+    for pr in prs:
         if pr.get('merged_at'):
             created_at = datetime.strptime(pr['created_at'], '%Y-%m-%dT%H:%M:%SZ')
             merged_at = datetime.strptime(pr['merged_at'], '%Y-%m-%dT%H:%M:%SZ')
             tempo_total += (merged_at - created_at)
     
-    return round((tempo_total.total_seconds() / 3600) / len(prs_mergeados), 2)
+    return round((tempo_total.total_seconds() / 3600) / len(prs), 2)
 
 def calcular_metricas_individuais(sprint_start: str, sprint_end: str, usuario: str) -> Dict:
-    """Calcula métricas individuais - VERSÃO CORRIGIDA SEM DUPLICAÇÃO"""
+    """Calcula métricas individuais - COM AS MÉTRICAS 1.3, 1.4, 1.5"""
     
     issues = get_issues(sprint_start, sprint_end)
     pulls = get_pulls(sprint_start, sprint_end)
@@ -239,48 +248,71 @@ def calcular_metricas_individuais(sprint_start: str, sprint_end: str, usuario: s
     prs_criadas = [pr for pr in pulls if pr['user']['login'].lower() == usuario.lower()]
     prs_mergeadas = [pr for pr in prs_criadas if pr.get('merged_at')]
     
-    # PRs revisadas pelo usuário - CONTAGEM CORRETA SEM DUPLICAÇÃO
-    prs_revisadas_set = set()  # 🔥 Usar conjunto para evitar duplicação
+    # PRs revisadas pelo usuário (1.4)
+    prs_revisadas_set = set()
     for pr in pulls:
         reviews = get_pull_reviews(pr['number'])
         for review in reviews:
             if review['user']['login'].lower() == usuario.lower():
-                prs_revisadas_set.add(pr['number'])  # 🔥 Usar número do PR para evitar duplicação
+                prs_revisadas_set.add(pr['number'])
                 break
     
     # Issues do usuário
     issues_criadas = [issue for issue in issues if issue['user']['login'].lower() == usuario.lower()]
     issues_fechadas = [issue for issue in issues_criadas if issue['state'] == 'closed']
     
+    # Issues accepted do usuário (1.5)
+    issues_aceitas = [issue for issue in issues_criadas if any(
+        label['name'].lower() == 'accepted' for label in issue.get('labels', [])
+    )]
+    
+    # Cálculo das métricas específicas
+    produtividade_prs = round(len(prs_mergeadas) / len(prs_criadas) * 100, 2) if prs_criadas else 0  # 1.3
+    taxa_aceitacao_issues = round(len(issues_aceitas) / len(issues_criadas) * 100, 2) if issues_criadas else 0  # 1.5
+    
     return {
         'Usuario': usuario,
-        'PRs_Criadas': len(prs_criadas),
-        'PRs_Mergeadas': len(prs_mergeadas),
-        'PRs_Revisadas': len(prs_revisadas_set),  # 🔥 Contagem correta sem duplicação
-        'Issues_Criadas': len(issues_criadas),
+        # Métricas 1.3, 1.4, 1.5
+        'PRs_Criadas': len(prs_criadas),  # 1.3 denominador
+        'PRs_Aceitas': len(prs_mergeadas),  # 1.3 numerador
+        'PRs_Revisadas': len(prs_revisadas_set),  # 1.4
+        'Issues_Identificadas': len(issues_criadas),  # 1.5 denominador
+        'Issues_Aceitas': len(issues_aceitas),  # 1.5 numerador
+        
+        # Métricas calculadas
+        '1.3_Produtividade_PRs_Percentual': produtividade_prs,  # 1.3
+        '1.4_PRs_Revisadas_Count': len(prs_revisadas_set),  # 1.4
+        '1.5_Taxa_Aceitacao_Issues_Percentual': taxa_aceitacao_issues,  # 1.5
+        
+        # Métricas adicionais
         'Issues_Fechadas': len(issues_fechadas),
-        'Produtividade_PRs_Percentual': round(len(prs_mergeadas) / len(prs_criadas) * 100, 2) if prs_criadas else 0,
         'Taxa_Conclusao_Issues_Percentual': round(len(issues_fechadas) / len(issues_criadas) * 100, 2) if issues_criadas else 0
     }
 
 def calcular_metricas_equipe(sprint_start: str, sprint_end: str) -> Dict:
-    """Calcula métricas de equipe - VERSÃO CORRIGIDA SEM DUPLICAÇÃO"""
+    """Calcula métricas de equipe - COM AS MÉTRICAS 2.5, 2.7, 2.9"""
     
     issues = get_issues(sprint_start, sprint_end)
-    pulls = get_pulls(sprint_start, sprint_end)  # 🔥 Já sem duplicação
+    pulls = get_pulls(sprint_start, sprint_end)
     
-    # Simplificar: Issues fechadas durante a sprint
+    # 📊 MÉTRICAS DE ISSUES
+    issues_aceitas = get_issues_com_label_accepted(issues)
+    issues_resolvidas = get_issues_resolvidas(issues_aceitas)
     issues_fechadas = [issue for issue in issues if issue['state'] == 'closed']
     
-    # Simplificar: PRs mergeados durante a sprint
+    # 📊 MÉTRICAS DE PRs
     prs_mergeados = [pr for pr in pulls if pr.get('merged_at')]
+    prs_abertas = [pr for pr in pulls if pr['state'] == 'open']
+    prs_fechados_sem_merge = [pr for pr in pulls if pr['state'] == 'closed' and not pr.get('merged_at')]
     
-    # Métricas de comentários - CONTAGEM CORRETA
+    # 📊 MÉTRICAS DE CODE REVIEW
     total_comentarios = 0
     prs_com_revisao = 0
+    total_commits_submetidos = 0
+    commits_rejeitados = 0  # Para taxa de retrabalho
     
     for pr in pulls:
-        # Contar comentários de review
+        # Comentários de review
         comments = get_pull_comments(pr['number'])
         reviews = get_pull_reviews(pr['number'])
         
@@ -289,117 +321,182 @@ def calcular_metricas_equipe(sprint_start: str, sprint_end: str) -> Dict:
         if total_comentarios_pr > 0:
             prs_com_revisao += 1
             total_comentarios += total_comentarios_pr
-    
-    # Métricas de refatoração SIMPLIFICADAS
-    prs_com_refatoracao = 0
-    
-    for pr in prs_mergeados:
-        # Buscar commits do PR mergeado
-        commits = get_commits(pr['number'])
         
-        # Verificar se há commits de fix/refactor após o PR aberto
+        # Commits submetidos e rejeitados
+        commits = get_commits(pr['number'])
+        total_commits_submetidos += len(commits)
+        
+        # Verificar se PR foi rejeitado/refatorado (para taxa de retrabalho)
+        if pr['state'] == 'closed' and not pr.get('merged_at'):
+            # PR fechado sem merge - considerado rejeitado
+            commits_rejeitados += len(commits)
+        elif pr.get('merged_at'):
+            # PR mergeado, verificar se teve refatoração
+            if commits and len(commits) > 1:
+                commits_rejeitados += (len(commits) - 1)  # Considera commits além do primeiro como rejeitados
+    
+    # 📊 MÉTRICAS DE REFATORAÇÃO
+    prs_com_refatoracao = 0
+    for pr in prs_mergeados:
+        commits = get_commits(pr['number'])
         if commits and len(commits) > 1:
-            # Se tem mais de 1 commit, provavelmente teve refatoração
             prs_com_refatoracao += 1
     
-    # Cálculo de tempos simplificado
-    tempo_medio_resolucao = calcular_tempo_medio_resolucao(issues_fechadas)
-    tempo_medio_aprovacao = calcular_tempo_medio_aprovacao(prs_mergeados)
+    # ⏱️ CÁLCULO DE TEMPOS
+    tempo_total_resolucao = timedelta()
+    for issue in issues_resolvidas:
+        if issue.get('closed_at'):
+            created_at = datetime.strptime(issue['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+            closed_at = datetime.strptime(issue['closed_at'], '%Y-%m-%dT%H:%M:%SZ')
+            tempo_total_resolucao += (closed_at - created_at)
     
-    # Cálculos das métricas
+    tempo_total_aprovacao = timedelta()
+    for pr in prs_mergeados:
+        if pr.get('merged_at'):
+            created_at = datetime.strptime(pr['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+            merged_at = datetime.strptime(pr['merged_at'], '%Y-%m-%dT%H:%M:%SZ')
+            tempo_total_aprovacao += (merged_at - created_at)
+    
+    # 📈 CÁLCULOS DAS MÉTRICAS ESPECÍFICAS
+    taxa_retrabalho = round((commits_rejeitados / total_commits_submetidos * 100), 2) if total_commits_submetidos else 0  # Taxa de retrabalho
+    media_comentarios_revisao = round(total_comentarios / len(pulls), 2) if pulls else 0  # 2.9 parte do code review
+    
+    # Métricas 2.5, 2.7, 2.9
+    taxa_resolucao_issues = round((len(issues_resolvidas) / len(issues_aceitas) * 100), 2) if issues_aceitas else 0  # 2.5
+    tempo_medio_resolucao = round((tempo_total_resolucao.total_seconds() / 3600) / len(issues_resolvidas), 2) if issues_resolvidas else 0  # 2.7
+    tempo_medio_aprovacao = round((tempo_total_aprovacao.total_seconds() / 3600) / len(prs_mergeados), 2) if prs_mergeados else 0  # 2.9
+    
     return {
         'Inicio_Sprint': sprint_start,
         'Fim_Sprint': sprint_end,
         
-        # Métricas básicas
+        # ========== 📊 MÉTRICAS DE ISSUES ==========
         'Total_Issues': len(issues),
         'Issues_Fechadas': len(issues_fechadas),
+        'Issues_Aceitos': len(issues_aceitas),  # 2.5 denominador
+        'Issues_Resolvidos': len(issues_resolvidas),  # 2.5 numerador
+        
+        # ========== 🔀 MÉTRICAS DE PRs ==========
         'Total_PRs': len(pulls),
-        'PRs_Mergeados': len(prs_mergeados),
+        'PRs_Aprovadas': len(prs_mergeados),  # 2.9 denominador
+        'PRs_Abertas': len(prs_abertas),
+        'PRs_Fechados_Sem_Merge': len(prs_fechados_sem_merge),
         
-        # Métricas de taxa
-        'Taxa_Resolucao_Issues_Percentual': round((len(issues_fechadas) / len(issues) * 100) if issues else 0, 2),
-        'Taxa_Aprovacao_PRs_Percentual': round((len(prs_mergeados) / len(pulls) * 100) if pulls else 0, 2),
-        
-        # Métricas de tempo
-        'Tempo_Medio_Resolucao_Horas': tempo_medio_resolucao,
-        'Tempo_Medio_Aprovacao_Horas': tempo_medio_aprovacao,
-        
-        # Métricas de code review CORRIGIDAS
+        # ========== 💬 MÉTRICAS DE CODE REVIEW ==========
         'Total_Comentarios_PRs': total_comentarios,
         'PRs_Com_Revisao': prs_com_revisao,
-        'Media_Comentarios_Por_Revisao': round(total_comentarios / prs_com_revisao if prs_com_revisao else 0, 2),
+        'Media_Comentarios_Por_Revisao': media_comentarios_revisao,  # 2.9 parte
+        'Commits_Submetidos': total_commits_submetidos,
+        'Commits_Rejeitados': commits_rejeitados,
         
-        # Métricas de refatoração SIMPLIFICADAS
+        # ========== 🔄 MÉTRICAS DE QUALIDADE/REFATORAÇÃO ==========
         'PRs_Com_Refatoracao': prs_com_refatoracao,
-        'Taxa_Refatoracao_Percentual': round((prs_com_refatoracao / len(prs_mergeados) * 100) if prs_mergeados else 0, 2)
+        'Taxa_Retrabalho_Percentual': taxa_retrabalho,  # Taxa de retrabalho
+        
+        # ========== ⏱️ MÉTRICAS DE TEMPO ==========
+        'Tempo_Total_Resolucao_Horas': round(tempo_total_resolucao.total_seconds() / 3600, 2),  # 2.7 numerador
+        'Tempo_Total_Aprovacao_Horas': round(tempo_total_aprovacao.total_seconds() / 3600, 2),  # 2.9 numerador
+        
+        # ========== 🎯 MÉTRICAS ESPECÍFICAS SOLICITADAS ==========
+        '2.5_Taxa_Resolucao_Issues_Percentual': taxa_resolucao_issues,  # 2.5
+        '2.7_Tempo_Medio_Resolucao_Horas': tempo_medio_resolucao,  # 2.7
+        '2.9_Tempo_Medio_Aprovacao_Horas': tempo_medio_aprovacao  # 2.9
     }
 
 def gerar_relatorio_markdown(sprint_number, sprint_start, sprint_end, metricas_equipe, metricas_individuais):
-    """Gera relatório em formato Markdown - VERSÃO ATUALIZADA"""
+    """Gera relatório em formato Markdown - COM MÉTRICAS ESPECÍFICAS"""
     
     md_content = f"""# 📊 Relatório de Métricas - Sprint {sprint_number}
 
 **Período:** {sprint_start} até {sprint_end}  
 **Data de geração:** {datetime.now().strftime('%d/%m/%Y %H:%M')}
 
-## 📈 Métricas de Equipe
+## 🎯 MÉTRICAS INDIVIDUAIS SOLICITADAS
 
-### 📋 Visão Geral
+### 📊 1.3 - Produtividade de PRs
 | Métrica | Valor |
 |---------|-------|
-| **Inicio Sprint** | {metricas_equipe['Inicio_Sprint']} |
-| **Fim Sprint** | {metricas_equipe['Fim_Sprint']} |
-| **Total Issues** | {metricas_equipe['Total_Issues']} |
-| **Issues Fechadas** | {metricas_equipe['Issues_Fechadas']} |
-| **Total PRs** | {metricas_equipe['Total_PRs']} |
-| **PRs Mergeados** | {metricas_equipe['PRs_Mergeados']} |
+| **PRs Criadas** | {sum([u['PRs_Criadas'] for u in metricas_individuais])} |
+| **PRs Aceitas** | {sum([u['PRs_Aceitas'] for u in metricas_individuais])} |
+| **1.3 - Taxa Produtividade PRs** | **{round(sum([u['PRs_Aceitas'] for u in metricas_individuais]) / sum([u['PRs_Criadas'] for u in metricas_individuais]) * 100, 2) if sum([u['PRs_Criadas'] for u in metricas_individuais]) > 0 else 0}%** |
 
-### 📊 Taxas de Sucesso
+### 👀 1.4 - PRs Revisadas
 | Métrica | Valor |
 |---------|-------|
-| **Taxa Resolução Issues** | **{metricas_equipe['Taxa_Resolucao_Issues_Percentual']}%** |
-| **Taxa Aprovação PRs** | **{metricas_equipe['Taxa_Aprovacao_PRs_Percentual']}%** |
+| **1.4 - Total PRs Revisadas** | **{sum([u['PRs_Revisadas'] for u in metricas_individuais])}** |
 
-### ⏱️ Métricas de Tempo
+### ✅ 1.5 - Taxa Aceitação Issues
 | Métrica | Valor |
 |---------|-------|
-| **Tempo Médio Resolução** | {metricas_equipe['Tempo_Medio_Resolucao_Horas']}h |
-| **Tempo Médio Aprovação** | {metricas_equipe['Tempo_Medio_Aprovacao_Horas']}h |
+| **Issues Identificadas** | {sum([u['Issues_Identificadas'] for u in metricas_individuais])} |
+| **Issues Aceitas** | {sum([u['Issues_Aceitas'] for u in metricas_individuais])} |
+| **1.5 - Taxa Aceitação Issues** | **{round(sum([u['Issues_Aceitas'] for u in metricas_individuais]) / sum([u['Issues_Identificadas'] for u in metricas_individuais]) * 100, 2) if sum([u['Issues_Identificadas'] for u in metricas_individuais]) > 0 else 0}%** |
 
-### 💬 Métricas de Code Review
+## 🏢 MÉTRICAS DE EQUIPE SOLICITADAS
+
+### ✅ 2.5 - Taxa Resolução Issues
+| Métrica | Valor |
+|---------|-------|
+| **Issues Aceitos** | {metricas_equipe['Issues_Aceitos']} |
+| **Issues Resolvidos** | {metricas_equipe['Issues_Resolvidos']} |
+| **2.5 - Taxa Resolução Issues** | **{metricas_equipe['2.5_Taxa_Resolucao_Issues_Percentual']}%** |
+
+### ⏱️ 2.7 - Tempo Médio Resolução Issues
+| Métrica | Valor |
+|---------|-------|
+| **Tempo Total Resolução** | {metricas_equipe['Tempo_Total_Resolucao_Horas']}h |
+| **Issues Resolvidos** | {metricas_equipe['Issues_Resolvidos']} |
+| **2.7 - Tempo Médio Resolução** | **{metricas_equipe['2.7_Tempo_Medio_Resolucao_Horas']}h** |
+
+### ⏱️ 2.9 - Tempo Médio Aprovação PRs
+| Métrica | Valor |
+|---------|-------|
+| **Tempo Total Aprovação** | {metricas_equipe['Tempo_Total_Aprovacao_Horas']}h |
+| **PRs Aprovadas** | {metricas_equipe['PRs_Aprovadas']} |
+| **2.9 - Tempo Médio Aprovação** | **{metricas_equipe['2.9_Tempo_Medio_Aprovacao_Horas']}h** |
+
+## 🔄 MÉTRICAS DE QUALIDADE
+
+### 📊 Taxa de Retrabalho
+| Métrica | Valor |
+|---------|-------|
+| **Commits Submetidos** | {metricas_equipe['Commits_Submetidos']} |
+| **Commits Rejeitados** | {metricas_equipe['Commits_Rejeitados']} |
+| **Taxa de Retrabalho** | **{metricas_equipe['Taxa_Retrabalho_Percentual']}%** |
+
+### 💬 Code Review
 | Métrica | Valor |
 |---------|-------|
 | **Total Comentários** | {metricas_equipe['Total_Comentarios_PRs']} |
-| **PRs com Revisão** | {metricas_equipe['PRs_Com_Revisao']} |
-| **Média Comentários/Revisão** | {metricas_equipe['Media_Comentarios_Por_Revisao']} |
+| **PRs Analisados** | {metricas_equipe['Total_PRs']} |
+| **Nº Médio Comentários/Revisão** | **{metricas_equipe['Media_Comentarios_Por_Revisao']}** |
 
-### 🔄 Métricas de Qualidade
-| Métrica | Valor |
-|---------|-------|
-| **PRs com Refatoração** | {metricas_equipe['PRs_Com_Refatoracao']} |
-| **Taxa Refatoração** | {metricas_equipe['Taxa_Refatoracao_Percentual']}% |
+## 👥 MÉTRICAS INDIVIDUAIS DETALHADAS
 
-## 👥 Métricas Individuais
-
-| Usuário | PRs Criadas | PRs Mergeadas | PRs Revisadas | Issues Criadas | Issues Fechadas | Produtividade PRs | Taxa Conclusão Issues |
-|---------|------------|--------------|--------------|---------------|----------------|------------------|---------------------|
+| Usuário | 1.3 PRs Criadas | 1.3 PRs Aceitas | 1.3 Produtividade | 1.4 PRs Revisadas | 1.5 Issues Identificadas | 1.5 Issues Aceitas | 1.5 Taxa Aceitação |
+|---------|----------------|----------------|------------------|------------------|-------------------------|-------------------|-------------------|
 """
     
     for user in metricas_individuais:
-        md_content += f"| {user['Usuario']} | {user['PRs_Criadas']} | {user['PRs_Mergeadas']} | {user['PRs_Revisadas']} | {user['Issues_Criadas']} | {user['Issues_Fechadas']} | {user['Produtividade_PRs_Percentual']}% | {user['Taxa_Conclusao_Issues_Percentual']}% |\n"
+        md_content += f"| {user['Usuario']} | {user['PRs_Criadas']} | {user['PRs_Aceitas']} | {user['1.3_Produtividade_PRs_Percentual']}% | {user['PRs_Revisadas']} | {user['Issues_Identificadas']} | {user['Issues_Aceitas']} | {user['1.5_Taxa_Aceitacao_Issues_Percentual']}% |\n"
     
     md_content += """
 
 ## 📋 Legenda das Métricas
 
-- **PRs Criadas**: Pull Requests criadas pelo usuário 📝
-- **PRs Mergeadas**: Pull Requests que foram aceitos e mergeados ✅
-- **PRs Revisadas**: Pull Requests que o usuário revisou 👀  
-- **Produtividade PRs**: Percentual de PRs criadas que foram mergeadas 📈
-- **Taxa Conclusão Issues**: Percentual de issues criadas que foram fechadas ✅
-- **PRs com Refatoração**: PRs que tiveram mais de 1 commit (indicando ajustes) 🔄
-- **Taxa Refatoração**: Percentual de PRs mergeados que precisaram de ajustes 📊
+### 🎯 Métricas Individuais
+- **1.3 - Produtividade PRs**: Nº de PRs aceitas / Nº de PRs criadas pelo aluno
+- **1.4 - PRs Revisadas**: Nº de PRs revisadas pelo aluno  
+- **1.5 - Taxa Aceitação Issues**: Issues aceitos do aluno / Issues identificados pelo aluno
+
+### 🏢 Métricas de Equipe
+- **2.5 - Taxa Resolução Issues**: Issues resolvidos / Issues Aceitos
+- **2.7 - Tempo Médio Resolução**: Tempo total resolução / Issues resolvidos
+- **2.9 - Tempo Médio Aprovação**: Tempo total revisão / PRs aprovadas
+
+### 🔄 Qualidade
+- **Taxa de Retrabalho**: Commits rejeitados / Commits submetidos × 100
+- **Nº Médio Comentários/Revisão**: Total comentários / Total PRs analisados
 """
 
     # Salvar arquivo Markdown
@@ -413,18 +510,14 @@ def calcular_datas_sprint_automatico():
     """Calcula automaticamente as datas da sprint (segunda a segunda)"""
     hoje = datetime.now()
     
-    # Encontrar a última segunda-feira
-    dias_desde_segunda = hoje.weekday()  # 0=seg, 1=ter, 2=qua, etc
+    dias_desde_segunda = hoje.weekday()
     fim_sprint = hoje - timedelta(days=dias_desde_segunda)
     
-    # Se executado depois da segunda, ajusta para sprint anterior
     if dias_desde_segunda > 0:
-        fim_sprint = fim_sprint - timedelta(days=7)  # Sprint anterior
+        fim_sprint = fim_sprint - timedelta(days=7)
     
     inicio_sprint = fim_sprint - timedelta(days=6)
-    
-    # Número da sprint baseado na data de fim
-    sprint_number = fim_sprint.isocalendar()[1]  # Número da semana
+    sprint_number = fim_sprint.isocalendar()[1]
     
     return (
         inicio_sprint.strftime('%Y-%m-%d'),
@@ -440,26 +533,21 @@ def main():
     
     args = parser.parse_args()
     
-    # Calcular automaticamente se não fornecido
     if not args.sprint_start or not args.sprint_end:
         print("Calculando datas automaticamente (segunda a segunda)...")
         sprint_start, sprint_end, sprint_number = calcular_datas_sprint_automatico()
-        
         args.sprint_start = sprint_start
         args.sprint_end = sprint_end
         args.sprint_number = args.sprint_number or sprint_number
     
     print(f"Coletando métricas para Sprint {args.sprint_number} ({args.sprint_start} a {args.sprint_end})")
     
-    # Obter todos os colaboradores automaticamente
     colaboradores = get_collaborators()
     print(f"Colaboradores encontrados: {colaboradores}")
     
-    # Métricas de equipe
     print("Calculando métricas de equipe...")
     metricas_equipe = calcular_metricas_equipe(args.sprint_start, args.sprint_end)
     
-    # Métricas individuais
     print("Calculando métricas individuais...")
     metricas_individuais = []
     for usuario in colaboradores:
@@ -467,29 +555,34 @@ def main():
         metricas = calcular_metricas_individuais(args.sprint_start, args.sprint_end, usuario)
         metricas_individuais.append(metricas)
     
-    # Criar diretório para métricas se não existir
     os.makedirs('metricas', exist_ok=True)
     
-    # Salvar resultados em CSV
     df_equipe = pd.DataFrame([metricas_equipe])
     df_individuais = pd.DataFrame(metricas_individuais)
     
     df_equipe.to_csv(f'metricas/metricas_equipe_sprint_{args.sprint_number}.csv', index=False)
     df_individuais.to_csv(f'metricas/metricas_individuais_sprint_{args.sprint_number}.csv', index=False)
     
-    # Gerar relatório Markdown
     print("Gerando relatório em Markdown...")
     gerar_relatorio_markdown(args.sprint_number, args.sprint_start, args.sprint_end, metricas_equipe, metricas_individuais)
     
     print("="*60)
-    print("📊 RESUMO DAS MÉTRICAS:")
+    print("📊 MÉTRICAS PRINCIPAIS:")
     print("="*60)
-    print(f"📋 Issues: {metricas_equipe['Total_Issues']} total, {metricas_equipe['Issues_Fechadas']} fechadas")
-    print(f"🔀 PRs: {metricas_equipe['Total_PRs']} total, {metricas_equipe['PRs_Mergeados']} mergeados")
-    print(f"📈 Taxa Resolução: {metricas_equipe['Taxa_Resolucao_Issues_Percentual']}%")
-    print(f"📈 Taxa Aprovação: {metricas_equipe['Taxa_Aprovacao_PRs_Percentual']}%")
-    print(f"💬 Comentários: {metricas_equipe['Total_Comentarios_PRs']} em {metricas_equipe['PRs_Com_Revisao']} PRs")
-    print(f"🔄 Refatoração: {metricas_equipe['PRs_Com_Refatoracao']} PRs ({metricas_equipe['Taxa_Refatoracao_Percentual']}%)")
+    
+    print(f"\n🎯 INDIVIDUAIS:")
+    print(f"   1.3 - Produtividade PRs: {round(sum([u['PRs_Aceitas'] for u in metricas_individuais]) / sum([u['PRs_Criadas'] for u in metricas_individuais]) * 100, 2) if sum([u['PRs_Criadas'] for u in metricas_individuais]) > 0 else 0}%")
+    print(f"   1.4 - PRs Revisadas: {sum([u['PRs_Revisadas'] for u in metricas_individuais])}")
+    print(f"   1.5 - Taxa Aceitação Issues: {round(sum([u['Issues_Aceitas'] for u in metricas_individuais]) / sum([u['Issues_Identificadas'] for u in metricas_individuais]) * 100, 2) if sum([u['Issues_Identificadas'] for u in metricas_individuais]) > 0 else 0}%")
+    
+    print(f"\n🏢 EQUIPE:")
+    print(f"   2.5 - Taxa Resolução Issues: {metricas_equipe['2.5_Taxa_Resolucao_Issues_Percentual']}%")
+    print(f"   2.7 - Tempo Médio Resolução: {metricas_equipe['2.7_Tempo_Medio_Resolucao_Horas']}h")
+    print(f"   2.9 - Tempo Médio Aprovação: {metricas_equipe['2.9_Tempo_Medio_Aprovacao_Horas']}h")
+    
+    print(f"\n🔄 QUALIDADE:")
+    print(f"   Taxa de Retrabalho: {metricas_equipe['Taxa_Retrabalho_Percentual']}%")
+    print(f"   Média Comentários/Revisão: {metricas_equipe['Media_Comentarios_Por_Revisao']}")
     
     print(f"\n📁 Arquivos gerados:")
     print(f"📄 CSV: metricas/metricas_equipe_sprint_{args.sprint_number}.csv")
