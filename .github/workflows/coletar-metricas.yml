@@ -2,7 +2,7 @@ name: Coletar Métricas da Sprint
 
 on:
   schedule:
-    - cron: '0 3 * * 2'
+    - cron: '0 3 * * 2'  # Toda terça às 3AM
   workflow_dispatch:
     inputs:
       sprint_number:
@@ -22,8 +22,15 @@ jobs:
   coletar-metricas:
     runs-on: ubuntu-latest
     
+    # 🔐 DAR PERMISSÕES EXTRA PARA O GITHUB_TOKEN
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: read
+      repository-projects: read
+    
     steps:
-    - name: Checkout código com autenticação
+    - name: Checkout código com PAT
       uses: actions/checkout@v3
       with:
         token: ${{ secrets.PAT_TOKEN }}
@@ -40,17 +47,22 @@ jobs:
     
     - name: Executar coleta de métricas
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # 🔥 USAR PAT_TOKEN em vez de GITHUB_TOKEN
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        REPOSITORY: ${{ github.repository }}
       run: |
+        echo "Repositório: $REPOSITORY"
         python coletar_metricas.py \
           --sprint-number ${{ github.event.inputs.sprint_number }} \
           --sprint-start ${{ github.event.inputs.sprint_start }} \
           --sprint-end ${{ github.event.inputs.sprint_end }}
     
     - name: Commit e push dos resultados
+      env:
+        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add metricas/
-        git commit -m "Atualizar métricas da sprint ${{ github.event.inputs.sprint_number }}"
-        git push
+        git commit -m "Atualizar métricas da sprint ${{ github.event.inputs.sprint_number }}" || echo "Sem alterações para commitar"
+        git push https://$PAT_TOKEN@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
