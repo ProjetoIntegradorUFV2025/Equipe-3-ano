@@ -1,7 +1,7 @@
-# 📊 Relatório de Métricas - Sprint 2
+# 📊 Relatório de Métricas - Sprint 51
 
-**Período:** 2025-09-01 até 2025-09-05  
-**Data de geração:** 05/09/2025 20:28
+**Período:** 2025-09-01 até 2025-09-06  
+**Data de geração:** 05/09/2025 20:48
 
 ## 📈 Métricas de Equipe
 
@@ -9,7 +9,7 @@
 | Métrica | Valor |
 |---------|-------|
 | **Inicio_Sprint** | 2025-09-01 |
-| **Fim_Sprint** | 2025-09-05 |
+| **Fim_Sprint** | 2025-09-06 |
 | **Issues Aceitos** | 0 |
 | **Issues Resolvidos** | 0 |
 | **2.5 Taxa Resolucao Issues Percentual** | **0%** |
@@ -51,6 +51,7 @@
 | gabriel2036 | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
 | caioomenezes | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
 | Eufrausino | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
+| Analucia26 | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
 | amandacmelo | 0 | 0 | 0 | 0 | 0 | 0% | 0% |
 
 
