@@ -1,0 +1,9 @@
+CREATE DATABASE IF NOT EXISTS teste;
+USE teste;
+
+CREATE TABLE aluno (
+    id_aluno INT PRIMARY KEY AUTO_INCREMENT,
+    apelido VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    pontuacao INT DEFAULT 0
+);
