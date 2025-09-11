@@ -4,7 +4,6 @@ package ufv.desconecta.Desconecta;
 
 public class AcessoBDAluno {
 
-    private Boolean conexao;
 
     private Boolean inserirAluno(Aluno aluno){
         return true;
@@ -26,13 +25,6 @@ public class AcessoBDAluno {
         return true;
     }
 
-    private void conectar(){
-        this.conexao = true;
-    }
-
-    private void desconectar(){
-        this.conexao = false;
-    }
 
 
 
