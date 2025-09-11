@@ -1,0 +1,11 @@
+![[prova-conceito.png]]
+
+Este diagrama é divido em 7 nós (usando a terminologia utilizada pela ferramenta [astah](https://astah.net/)). Partindo do canto superior esquerdo, temos o nó Back-end que contempla as classes usadas para implementação da API usada na aplicação da prova de conceito. Dentro desse nó, as classes implementadas são definidas como artefatos e se conectam entre si de acordo com a dependência que cada classe possui entre si. Importante destacar que a classe repositorioContador se liga diretamente ao nó Banco de Dados Remoto em função da JPA utilizada nesta classe. Além disso, para apresentar as tecnologias usadas por esse nó, achei válido adicionar um novo nó apresentado os artefatos relacionados a frameworks, dependências e bibliotecas utilizados pelo back-end.
+
+Descendo para o canto inferior esquerdo, temos o nó Front-end, similar ao nó Back-end guarda os artefatos responsáveis pelas telas apresentadas ao usuário. Assim, como no Back-end, também há um nó contemplando os artefatos relacionados a frameworks, dependências e bibliotecas pelo front-end. É importante destacar que a comunicação entre front-end e back-end é feita via API RESTful desenvolvida no back-end.
+
+O nó infra consiste no funcionamento do Docker, por esta razão inseri neste nó o arquivo docker-compose.yaml que orquestra o funcionamento do front-end, back-end e a conexão com o banco de dados fazendo uso de um arquivo .env que fica restrito à equipe de desenvolvimento. Para construir o ambiente de desenvolvimento, o  Docker fazer uso dos Dockerfile presentes tanto na pasta back-end quanto na pasta front-end desta prova de conceito.
+
+O nó Banco de Dados Remoto representa o banco de dados remoto utilizado para esta edição do projeto integrador, este recebe os dados do usuário a partir das requisições feitas do front-end para o back-end e o back-end realiza as consultas necessárias conforme as requisições efetuadas.
+
+Por fim, o nó Máquina Usuário se relaciona com nó front-end pois, o front-end é com o que o usuário interage. Pensei em conectá-lo também ao  nó de Banco de Dados Remoto em função dos dados serem oriundos deste nó, mesmo que eles apenas cheguem até este nó após percorrer todo o trajeto do front-end para o back-end e enfim chegar ao banco de dados.
