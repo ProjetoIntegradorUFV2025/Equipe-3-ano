@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import TelaInicial from "./components/TelaInicial";
+import TelaCadastro from "./components/TelaCadastro";
+import TelaLogin from "./components/TelaLogin";
 
 function App() {
   const [tela, setTela] = useState("inicial");
@@ -12,8 +14,18 @@ function App() {
           irParaCadastro={() => setTela("cadastro")}
         />
       )}
-      {tela === "login" && <h1 className="text-3xl">Tela de Login</h1>}
-      {tela === "cadastro" && <h1 className="text-3xl">Tela de Cadastro</h1>}
+      {tela === "login" && (
+        <TelaLogin
+          voltarParaInicial={() => setTela("inicial")}
+          irParaCadastro={() => setTela("cadastro")}
+        />
+      )}
+      {tela === "cadastro" && (
+        <TelaCadastro
+          voltarParaInicial={() => setTela("inicial")}
+          irParaLogin={() => setTela("login")}
+        />
+      )}
     </>
   );
 }
