@@ -1,58 +1,76 @@
 package ufv.desconecta.Desconecta;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Service;
 
-@Entity
-@Table(name = "TB_Aluno")
-@NoArgsConstructor
-@AllArgsConstructor
+
+@Service
 public class AcessoBDAluno {
+    private final RepositorioAluno repositorioAluno;
 
-    @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long PK_Aluno;
-
-    @Column(nullable = false)
-    private String apelido;
-
-    @Column(nullable = false)   
-    private String senha;
-
-    @Column(nullable = false)
-    private Long id;
-
-    @Column(nullable = false)
-    private String progresso;
+    public AcessoBDAluno(RepositorioAluno repo) {
+        this.repositorioAluno = repo;
+    }
 
 
 
 
 
     public Boolean inserirAluno(Aluno aluno){
-        return true;
+        try {
+            // Verifica se já existe um aluno com o mesmo apelido
+            if (verificarApelidoExistente(aluno.getApelido())) {
+                return false; // Não pode inserir - apelido já existe
+            }
+            
+            // Salva o aluno no banco de dados
+            repositorioAluno.save(aluno);
+            return true; // Inserção bem-sucedida
+            
+        } catch (Exception e) {
+            // Em caso de erro na inserção
+            return false;
+        }
     }
 
     public Aluno buscarApelido(String apelido){
-
-        
+        try {
+            // Busca o aluno pelo apelido
+            return repositorioAluno.findAll().stream()
+                    .filter(aluno -> aluno.getApelido().equals(apelido))
+                    .findFirst()
+                    .orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    public Boolean verificarConexao(){
-        return true;
-    }
-
-    public Boolean verficarApelidoExistente(String apelido){
-        return false;
+    public Boolean verificarApelidoExistente(String apelido){
+        try {
+            // Busca todos os alunos e verifica se algum tem o apelido informado
+            return repositorioAluno.findAll().stream()
+                    .anyMatch(aluno -> aluno.getApelido().equals(apelido));
+        } catch (Exception e) {
+            // Em caso de erro, assume que não existe
+            return false;
+        }
     }
 
     public Boolean apagarAluno(String apelido){
-        return true;
+        try {
+            // Busca o aluno pelo apelido
+            Aluno aluno = buscarApelido(apelido);
+            
+            if (aluno != null) {
+                // Remove o aluno do banco de dados
+                repositorioAluno.delete(aluno);
+                return true;
+            }
+            
+            return false; // Aluno não encontrado
+            
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 
