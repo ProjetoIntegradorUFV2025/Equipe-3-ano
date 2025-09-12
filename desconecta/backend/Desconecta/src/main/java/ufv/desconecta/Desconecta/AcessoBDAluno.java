@@ -34,11 +34,8 @@ public class AcessoBDAluno {
 
     public Aluno buscarApelido(String apelido){
         try {
-            // Busca o aluno pelo apelido
-            return repositorioAluno.findAll().stream()
-                    .filter(aluno -> aluno.getApelido().equals(apelido))
-                    .findFirst()
-                    .orElse(null);
+            // Usa método otimizado do repositório
+            return repositorioAluno.findByApelido(apelido).orElse(null);
         } catch (Exception e) {
             return null;
         }
@@ -46,9 +43,8 @@ public class AcessoBDAluno {
 
     public Boolean verificarApelidoExistente(String apelido){
         try {
-            // Busca todos os alunos e verifica se algum tem o apelido informado
-            return repositorioAluno.findAll().stream()
-                    .anyMatch(aluno -> aluno.getApelido().equals(apelido));
+            // Usa método otimizado do repositório
+            return repositorioAluno.existsByApelido(apelido);
         } catch (Exception e) {
             // Em caso de erro, assume que não existe
             return false;

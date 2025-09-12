@@ -1,19 +1,19 @@
 package ufv.desconecta.Desconecta;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/aluno")
 @CrossOrigin(origins = "*") // permitir requisições do React
-@AllArgsConstructor
-@NoArgsConstructor
 public class ControladorAluno {
     
+    private final AcessoBDAluno acessoBDAluno;
+    
     @Autowired
-    private AcessoBDAluno acessoBDAluno;
+    public ControladorAluno(AcessoBDAluno acessoBDAluno) {
+        this.acessoBDAluno = acessoBDAluno;
+    }
 
     public Boolean validarDadosAluno(String apelido, String senha){
         if(apelido == null || apelido.isEmpty() || senha == null || senha.isEmpty()){
@@ -23,9 +23,8 @@ public class ControladorAluno {
     }
 
     @PostMapping("/cadastro")
-    public Boolean realizarCadastro(@RequestParam String apelido, @RequestParam String senha){
-        if(validarDadosAluno(apelido, senha)){
-            Aluno aluno = new Aluno(apelido, senha);
+    public Boolean realizarCadastro(@RequestBody Aluno aluno){
+        if(validarDadosAluno(aluno.getApelido(), aluno.getSenha())){
             return acessoBDAluno.inserirAluno(aluno);
         } else {
             return false;
@@ -33,10 +32,10 @@ public class ControladorAluno {
     }
 
     @PostMapping("/login")
-    public Boolean autenticarAluno(@RequestParam String apelido, @RequestParam String senha){
-        if(validarDadosAluno(apelido, senha)){
-            Aluno aluno = acessoBDAluno.buscarApelido(apelido);
-            return (aluno != null && aluno.getSenha().equals(senha));
+    public Boolean autenticarAluno(@RequestBody Aluno loginData){
+        if(validarDadosAluno(loginData.getApelido(), loginData.getSenha())){
+            Aluno aluno = acessoBDAluno.buscarApelido(loginData.getApelido());
+            return (aluno != null && aluno.getSenha().equals(loginData.getSenha()));
         }
         return false;
     }
