@@ -2,19 +2,21 @@ import React, { useState } from 'react';
 import fundoTelaLogin from '../assets/fundo-tela-login.png';
 import logoDesconecta from "../assets/Titulo nome do jogo.png";
 import mascoteImg from "../assets/Dadinho sentado segurando quebra-cabeca.png";
+import popupErroEntrar from '../assets/popup-erro-entrar.png';
 
 // --- Componente Principal: Tela de Login ---
 // Tela de login com fundo e dois campos de entrada centralizados
 const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
   const [apelido, setApelido] = useState('');
   const [senha, setSenha] = useState('');
+  const [mostrarPopupErro, setMostrarPopupErro] = useState(false);
 
   const handleLogin = async () => {
     console.log('Dados do login:', { apelido, senha });
     
     // Validação básica
     if (!apelido || !senha) {
-      alert('Por favor, preencha todos os campos!');
+      setMostrarPopupErro(true);
       return;
     }
 
@@ -57,14 +59,14 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
           // Aqui você pode redirecionar para a próxima tela do jogo
           // Por exemplo: irParaJogo();
         } else {
-          alert('Apelido ou senha incorretos. Tente novamente.');
+          setMostrarPopupErro(true);
         }
       } else {
-        alert('Erro na comunicação com o servidor.');
+        setMostrarPopupErro(true);
       }
     } catch (error) {
       console.error('Erro ao realizar login:', error);
-      alert('Erro ao conectar com o servidor. Verifique sua conexão.');
+      setMostrarPopupErro(true);
     }
   };
 
@@ -163,6 +165,35 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
           </span>
         </div>
       </div>
+
+      {/* POPUP DE ERRO - Com botão X para fechar */}
+      {mostrarPopupErro && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="relative">
+            {/* Botão X para fechar - BOLINHA COM FONTE GROSSA */}
+            <button
+              onClick={() => setMostrarPopupErro(false)}
+              className="absolute w-12 h-12 rounded-full text-white font-black text-2xl z-10 hover:opacity-80 hover:scale-105 transition-all duration-300 flex items-center justify-center shadow-lg border-2 border-white"
+              style={{ 
+                backgroundColor: '#563066',
+                /* ← POSIÇÃO HORIZONTAL: altere este valor */
+                right: '716px',   /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
+                /* ← POSIÇÃO VERTICAL: altere este valor */
+                top: '96px'      /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
+              }}
+            >
+              ✕
+            </button>
+            
+            {/* Imagem do popup */}
+            <img 
+              src={popupErroEntrar} 
+              alt="Erro ao entrar" 
+              className="w-[64rem] h-96 object-contain"
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 };

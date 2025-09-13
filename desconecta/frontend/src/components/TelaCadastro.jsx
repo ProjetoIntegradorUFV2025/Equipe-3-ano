@@ -2,57 +2,46 @@ import React, { useState } from 'react';
 import fundoTelaLogin from '../assets/fundo-tela-login.png';
 import logoDesconecta from "../assets/Titulo nome do jogo.png";
 import mascoteImg from "../assets/Dadinho sentado segurando quebra-cabeca.png";
+import popupErroCadastro from '../assets/popup-erro-cadastro.png';
 
 // --- Componente Principal: Tela de Cadastro ---
 // Tela de cadastro com fundo e dois campos de entrada centralizados
 const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
   const [apelido, setApelido] = useState('');
   const [senha, setSenha] = useState('');
+  const [mostrarPopup, setMostrarPopup] = useState(false);
 
   const handleCadastro = async () => {
     console.log('Dados do cadastro:', { apelido, senha });
     
-    // Validação básica
+    // Validação simples
     if (!apelido || !senha) {
-      alert('Por favor, preencha todos os campos!');
+      setMostrarPopup(true);
       return;
     }
 
     try {
-      // Dados que serão enviados para o backend
-      const dadosAluno = {
-        apelido: apelido,
-        senha: senha
-      };
-
-      // Requisição para o endpoint de cadastro
       const response = await fetch('http://localhost:8080/api/aluno/cadastro', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(dadosAluno)
+        body: JSON.stringify({
+          apelido: apelido,
+          senha: senha
+        }),
       });
 
-      // Verificar se a requisição foi bem-sucedida
       if (response.ok) {
-        const resultado = await response.json();
-        if (resultado === true) {
-          alert('Cadastro realizado com sucesso!');
-          // Limpar os campos após sucesso
-          setApelido('');
-          setSenha('');
-          // Opcionalmente, redirecionar para tela de login
-          // irParaLogin();
-        } else {
-          alert('Erro ao realizar cadastro. Tente novamente.');
-        }
+        console.log('Cadastro realizado com sucesso!');
+        irParaLogin(); // Redireciona para a tela de login
       } else {
-        alert('Erro na comunicação com o servidor.');
+        console.error('Erro no cadastro');
+        setMostrarPopup(true);
       }
     } catch (error) {
-      console.error('Erro ao realizar cadastro:', error);
-      alert('Erro ao conectar com o servidor. Verifique sua conexão.');
+      console.error('Erro na requisição:', error);
+      setMostrarPopup(true);
     }
   };
 
@@ -66,15 +55,6 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: `url(${fundoTelaLogin})` }}
     >
-      {/* --- IMAGEM DO MASCOTE (canto inferior esquerdo) --- */}
-        <div className="absolute -bottom-20 left-9 p-4">
-          <img
-            src={mascoteImg}
-            alt="Mascote do Jogo"
-            className="w-[320px] scale-x-[-1]"
-          />
-        </div>
-
       {/* --- LOGO (Posicionada Independentemente no Topo) --- */}
         <div
           className="absolute"
@@ -88,6 +68,16 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
             src={logoDesconecta}
             alt="Logo Desconecta"
             className="w-[1100px] max-w-[80vw]"
+          />
+        </div>
+
+      
+      {/* --- IMAGEM DO MASCOTE (canto inferior esquerdo) --- */}
+        <div className="absolute -bottom-20 left-9 p-4">
+          <img
+            src={mascoteImg}
+            alt="Mascote do Jogo"
+            className="w-[320px] scale-x-[-1]"
           />
         </div>
 
@@ -118,6 +108,35 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
             className="px-8 py-4 bg-white text-gray-800 font-bold text-2xl rounded-full shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
           />
         </div>
+
+        {/* POPUP DE ERRO - Com botão X para fechar */}
+        {mostrarPopup && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+            <div className="relative">
+              {/* Botão X para fechar - BOLINHA COM FONTE GROSSA */}
+              <button
+                onClick={() => setMostrarPopup(false)}
+                className="absolute w-12 h-12 rounded-full text-white font-black text-2xl z-10 hover:opacity-80 hover:scale-105 transition-all duration-300 flex items-center justify-center shadow-lg border-2 border-white"
+                style={{ 
+                  backgroundColor: '#563066',
+                  /* ← POSIÇÃO HORIZONTAL: altere este valor */
+                  right: '716px',   /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
+                  /* ← POSIÇÃO VERTICAL: altere este valor */
+                  top: '96px'      /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
+                }}
+              >
+                ✕
+              </button>
+              
+              {/* Imagem do popup */}
+              <img 
+                src={popupErroCadastro} 
+                alt="Erro no cadastro" 
+                className="w-[64rem] h-96 object-contain"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Container separado para o botão com posicionamento independente */}
         <div 
