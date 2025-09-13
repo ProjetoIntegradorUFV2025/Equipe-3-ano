@@ -9,7 +9,7 @@ const TelaInicial = ({ irParaLogin, irParaCadastro }) => {
 
   return (
     <main
-      className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
+      className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative overflow-hidden"
       style={{
         backgroundImage: `url(${bgImg})`,
       }}
@@ -28,8 +28,6 @@ const TelaInicial = ({ irParaLogin, irParaCadastro }) => {
         className="absolute"
         style={{
           top: "2%",
-          // Para AJUSTAR A POSIÇÃO, mude o 'left'.
-          // 50% é o centro. Valores maiores movem para a direita.
           left: "68%",
           transform: "translateX(-50%)",
         }}
@@ -37,7 +35,6 @@ const TelaInicial = ({ irParaLogin, irParaCadastro }) => {
         <img
           src={logoDesconecta}
           alt="Logo Desconecta"
-          // Para AJUSTAR O TAMANHO, mude a classe abaixo.
           className="w-[1100px] max-w-[80vw]"
         />
       </div>
@@ -46,7 +43,6 @@ const TelaInicial = ({ irParaLogin, irParaCadastro }) => {
       <div
         className="absolute flex flex-col items-center gap-16"
         style={{
-          // Para AJUSTAR A ALTURA, mude o 'top'.
           top: "60%",
           left: "70%",
           transform: "translate(-50%, -50%)",
@@ -73,5 +69,4 @@ const TelaInicial = ({ irParaLogin, irParaCadastro }) => {
 };
 
 export default TelaInicial;
-
 
