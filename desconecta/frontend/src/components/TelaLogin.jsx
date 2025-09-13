@@ -5,7 +5,7 @@ import mascoteImg from "../assets/Dadinho sentado segurando quebra-cabeca.png";
 
 // --- Componente Principal: Tela de Login ---
 // Tela de login com fundo e dois campos de entrada centralizados
-const TelaLogin = ({ voltarParaInicial, irParaCadastro }) => {
+const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
   const [apelido, setApelido] = useState('');
   const [senha, setSenha] = useState('');
 
@@ -17,6 +17,18 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro }) => {
       alert('Por favor, preencha todos os campos!');
       return;
     }
+
+    // --- MODO DE TESTE ---
+    // Se o apelido for "teste" e a senha "123", o login é bem-sucedido
+    // e a chamada para a API é ignorada.
+    if (apelido === 'teste' && senha === '123') {
+      alert('Login de teste realizado com sucesso!');
+      setApelido('');
+      setSenha('');
+      irParaJogo(); // Navega para a próxima tela
+      return; // Para a execução da função aqui
+    } 
+    
 
     try {
       // Dados que serão enviados para o backend
