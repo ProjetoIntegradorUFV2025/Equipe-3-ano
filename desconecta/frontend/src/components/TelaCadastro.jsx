@@ -108,7 +108,8 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
             placeholder="Nome"
             value={apelido}
             onChange={(e) => setApelido(e.target.value)}
-            className="px-8 py-4 bg-white text-gray-800 font-bold text-2xl rounded-full shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
+            className="px-8 py-4 text-gray-800 font-bold text-2xl rounded-2xl shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
+            style={{ backgroundColor: '#dbedee' }}
           />
           
           {/* Campo Senha */}
@@ -117,7 +118,8 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
             placeholder="Senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            className="px-8 py-4 bg-white text-gray-800 font-bold text-2xl rounded-full shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
+            className="px-8 py-4 text-gray-800 font-bold text-2xl rounded-2xl shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
+            style={{ backgroundColor: '#dbedee' }}
           />
         </div>
 
