@@ -1,48 +1,69 @@
-import React from 'react';
-import fundoTelaLogin from '../assets/fundo-tela-login.png';
+import React from "react";
+import mascoteImg from "../assets/Dadinho sentado segurando quebra-cabeca.png";
+import bgImg from "../assets/fundo-tela-login.png";
+import logoDesconecta from "../assets/Titulo nome do jogo.png";
 
-// --- Componente Principal: Tela Inicial ---
-// Tela inicial com fundo e dois botões centralizados
 const TelaInicial = ({ irParaLogin, irParaCadastro }) => {
-  const handleEntrar = () => {
-    console.log('Navegando para a tela de Login...');
-    irParaLogin(); // Chama a função passada pelo App.jsx
-  };
-
-  const handleCadastrar = () => {
-    console.log('Navegando para a tela de Cadastro...');
-    irParaCadastro(); // Chama a função passada pelo App.jsx
-  };
+  const handleEntrar = () => irParaLogin();
+  const handleCadastrar = () => irParaCadastro();
 
   return (
-    <main 
+    <main
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
-      style={{ backgroundImage: `url(${fundoTelaLogin})` }}
+      style={{
+        backgroundImage: `url(${bgImg})`,
+      }}
     >
-      <div 
-        className="absolute flex flex-col gap-24"
-        style={{ 
-          top: '40%',    /* ← MOVER VERTICALMENTE: altere este valor */
-          left: '50%',   /* ← MOVER HORIZONTALMENTE: altere este valor */
-          transform: 'translate(0%, 20%)' /* ← Mantém centralizado no ponto */
+      {/* --- IMAGEM DO MASCOTE (canto inferior esquerdo) --- */}
+      <div className="absolute -bottom-20 left-0 p-4">
+        <img
+          src={mascoteImg}
+          alt="Mascote do Jogo"
+          className="w-[320px] scale-x-[-1]"
+        />
+      </div>
+
+      {/* --- LOGO (Posicionada Independentemente no Topo) --- */}
+      <div
+        className="absolute"
+        style={{
+          top: "2%",
+          // Para AJUSTAR A POSIÇÃO, mude o 'left'.
+          // 50% é o centro. Valores maiores movem para a direita.
+          left: "68%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <img
+          src={logoDesconecta}
+          alt="Logo Desconecta"
+          // Para AJUSTAR O TAMANHO, mude a classe abaixo.
+          className="w-[1100px] max-w-[80vw]"
+        />
+      </div>
+
+      {/* --- BOTÕES (Posicionados Independentemente) --- */}
+      <div
+        className="absolute flex flex-col items-center gap-16"
+        style={{
+          // Para AJUSTAR A ALTURA, mude o 'top'.
+          top: "60%",
+          left: "70%",
+          transform: "translate(-50%, -50%)",
         }}
       >
         <button
           onClick={handleEntrar}
-          className="px-40 py-7 text-white font-bold text-5xl rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
-          style={{ backgroundColor: '#563066' }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+          className="w-[600px] py-7 text-white font-bold text-5xl rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
+          style={{ backgroundColor: "#563066" }}
         >
           Entrar
         </button>
-        
+
         <button
           onClick={handleCadastrar}
-          className="px-40 py-7 text-white font-bold text-5xl rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
-          style={{ backgroundColor: '#563066' }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+          className="w-[600px] py-7 text-white font-bold text-5xl rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
+          style={{ backgroundColor: "#563066" }}
         >
           Cadastrar
         </button>
@@ -52,4 +73,5 @@ const TelaInicial = ({ irParaLogin, irParaCadastro }) => {
 };
 
 export default TelaInicial;
+
 
