@@ -3,6 +3,7 @@ import fundoTelaLogin from '../assets/fundo-tela-login.png';
 import logoDesconecta from "../assets/Titulo nome do jogo.png";
 import mascoteImg from "../assets/Dadinho sentado segurando quebra-cabeca.png";
 import popupErroCadastro from '../assets/popup-erro-cadastro.png';
+import popupCadastroSucesso from '../assets/popup-cadastro-sucesso.png';
 
 // --- Componente Principal: Tela de Cadastro ---
 // Tela de cadastro com fundo e dois campos de entrada centralizados
@@ -10,6 +11,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
   const [apelido, setApelido] = useState('');
   const [senha, setSenha] = useState('');
   const [mostrarPopup, setMostrarPopup] = useState(false);
+  const [mostrarPopupSucesso, setMostrarPopupSucesso] = useState(false);
 
   const handleCadastro = async () => {
     console.log('Dados do cadastro:', { apelido, senha });
@@ -34,7 +36,15 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
 
       if (response.ok) {
         console.log('Cadastro realizado com sucesso!');
-        irParaLogin(); // Redireciona para a tela de login
+        setMostrarPopupSucesso(true); // Mostra popup de sucesso
+        // Limpa os campos
+        setApelido('');
+        setSenha('');
+        // Aguarda um tempo antes de redirecionar (opcional)
+        setTimeout(() => {
+          setMostrarPopupSucesso(false);
+          irParaLogin(); // Redireciona para a tela de login
+        }, 3000); // 3 segundos
       } else {
         console.error('Erro no cadastro');
         setMostrarPopup(true);
@@ -108,6 +118,38 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
             className="px-8 py-4 bg-white text-gray-800 font-bold text-2xl rounded-full shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
           />
         </div>
+
+        {/* POPUP DE SUCESSO - Com botão X para fechar */}
+        {mostrarPopupSucesso && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+            <div className="relative">
+              {/* Botão X para fechar - BOLINHA COM FONTE GROSSA */}
+              <button
+                onClick={() => {
+                  setMostrarPopupSucesso(false);
+                  irParaLogin(); // Redireciona ao fechar
+                }}
+                className="absolute w-12 h-12 rounded-full text-white font-black text-2xl z-10 hover:opacity-80 hover:scale-105 transition-all duration-300 flex items-center justify-center shadow-lg border-2 border-white"
+                style={{ 
+                  backgroundColor: '#563066',
+                  /* ← POSIÇÃO HORIZONTAL: altere este valor */
+                  right: '716px',   /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
+                  /* ← POSIÇÃO VERTICAL: altere este valor */
+                  top: '96px'      /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
+                }}
+              >
+                ✕
+              </button>
+              
+              {/* Imagem do popup de sucesso */}
+              <img 
+                src={popupCadastroSucesso} 
+                alt="Cadastro realizado com sucesso" 
+                className="w-[64rem] h-96 object-contain"
+              />
+            </div>
+          </div>
+        )}
 
         {/* POPUP DE ERRO - Com botão X para fechar */}
         {mostrarPopup && (
