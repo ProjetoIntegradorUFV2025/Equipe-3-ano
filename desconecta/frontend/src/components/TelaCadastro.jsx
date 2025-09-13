@@ -35,12 +35,18 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
       });
 
       if (response.ok) {
-        console.log('Cadastro realizado com sucesso!');
-        setMostrarPopupSucesso(true); // Mostra popup de sucesso
-        // Limpa os campos
-        setApelido('');
-        setSenha('');
-        // Popup só fecha quando usuário clicar no X
+        const resultado = await response.json(); // Pega o valor booleano retornado
+        if (resultado === true) {
+          console.log('Cadastro realizado com sucesso!');
+          setMostrarPopupSucesso(true); // Mostra popup de sucesso
+          // Limpa os campos
+          setApelido('');
+          setSenha('');
+          // Popup só fecha quando usuário clicar no X
+        } else {
+          console.error('Erro no cadastro - Apelido já existe ou dados inválidos');
+          setMostrarPopup(true); // Mostra popup de erro quando retorna false
+        }
       } else {
         console.error('Erro no cadastro');
         setMostrarPopup(true);
@@ -178,7 +184,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
                 style={{ 
                   backgroundColor: '#563066',
                   /* ← POSIÇÃO HORIZONTAL: altere este valor */
-                  right: '716px',   /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
+                  right: '600px',   /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
                   /* ← POSIÇÃO VERTICAL: altere este valor */
                   top: '96px'      /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
                 }}

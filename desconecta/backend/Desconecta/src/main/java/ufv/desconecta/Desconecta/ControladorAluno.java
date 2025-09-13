@@ -25,6 +25,10 @@ public class ControladorAluno {
     @PostMapping("/cadastro")
     public Boolean realizarCadastro(@RequestBody Aluno aluno){
         if(validarDadosAluno(aluno.getApelido(), aluno.getSenha())){
+            // Verifica se o apelido já existe antes de tentar inserir
+            if(acessoBDAluno.verificarApelidoExistente(aluno.getApelido())){
+                return false; // Apelido já existe, retorna false
+            }
             return acessoBDAluno.inserirAluno(aluno);
         } else {
             return false;
