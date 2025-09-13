@@ -40,11 +40,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
         // Limpa os campos
         setApelido('');
         setSenha('');
-        // Aguarda um tempo antes de redirecionar (opcional)
-        setTimeout(() => {
-          setMostrarPopupSucesso(false);
-          irParaLogin(); // Redireciona para a tela de login
-        }, 3000); // 3 segundos
+        // Popup só fecha quando usuário clicar no X
       } else {
         console.error('Erro no cadastro');
         setMostrarPopup(true);
@@ -119,10 +115,20 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
           />
         </div>
 
-        {/* POPUP DE SUCESSO - Com botão X para fechar */}
+        {/* POPUP DE SUCESSO - POSICIONAMENTO LIVRE */}
         {mostrarPopupSucesso && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-            <div className="relative">
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-50">
+            <div 
+              className="absolute"
+              style={{
+                /* ← POSIÇÃO HORIZONTAL: altere este valor */
+                left: '50%',     /* Opções: '10%', '30%', '50%', '70%', '90%' */
+                /* ← POSIÇÃO VERTICAL: altere este valor */
+                top: '50%',      /* Opções: '10%', '30%', '50%', '70%', '90%' */
+                /* ← CENTRALIZAÇÃO: ajuste conforme necessário */
+                transform: 'translate(-50%, -50%)'  /* -50% = centralizado, 0% = canto */
+              }}
+            >
               {/* Botão X para fechar - BOLINHA COM FONTE GROSSA */}
               <button
                 onClick={() => {
@@ -133,28 +139,38 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
                 style={{ 
                   backgroundColor: '#563066',
                   /* ← POSIÇÃO HORIZONTAL: altere este valor */
-                  right: '716px',   /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
+                  right: '616px',   /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
                   /* ← POSIÇÃO VERTICAL: altere este valor */
-                  top: '96px'      /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
+                  top: '144px'      /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
                 }}
               >
                 ✕
               </button>
               
-              {/* Imagem do popup de sucesso */}
+              {/* Imagem do popup de sucesso - TAMANHO AUMENTADO */}
               <img 
                 src={popupCadastroSucesso} 
                 alt="Cadastro realizado com sucesso" 
-                className="w-[64rem] h-96 object-contain"
+                className="w-[72rem] h-[28rem] object-contain"
               />
             </div>
           </div>
         )}
 
-        {/* POPUP DE ERRO - Com botão X para fechar */}
+        {/* POPUP DE ERRO - POSICIONAMENTO LIVRE */}
         {mostrarPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-            <div className="relative">
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-50">
+            <div 
+              className="absolute"
+              style={{
+                /* ← POSIÇÃO HORIZONTAL: altere este valor */
+                left: '50%',     /* Opções: '10%', '30%', '50%', '70%', '90%' */
+                /* ← POSIÇÃO VERTICAL: altere este valor */
+                top: '50%',      /* Opções: '10%', '30%', '50%', '70%', '90%' */
+                /* ← CENTRALIZAÇÃO: ajuste conforme necessário */
+                transform: 'translate(-50%, -50%)'  /* -50% = centralizado, 0% = canto */
+              }}
+            >
               {/* Botão X para fechar - BOLINHA COM FONTE GROSSA */}
               <button
                 onClick={() => setMostrarPopup(false)}
