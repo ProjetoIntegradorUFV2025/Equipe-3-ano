@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import fundoTelaLogin from '../assets/fundo-tela-login.png';
+import logoDesconecta from "../assets/Titulo nome do jogo.png";
+import mascoteImg from "../assets/Dadinho sentado segurando quebra-cabeca.png";
 
 // --- Componente Principal: Tela de Cadastro ---
 // Tela de cadastro com fundo e dois campos de entrada centralizados
@@ -64,6 +66,31 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: `url(${fundoTelaLogin})` }}
     >
+      {/* --- IMAGEM DO MASCOTE (canto inferior esquerdo) --- */}
+        <div className="absolute -bottom-20 left-9 p-4">
+          <img
+            src={mascoteImg}
+            alt="Mascote do Jogo"
+            className="w-[320px] scale-x-[-1]"
+          />
+        </div>
+
+      {/* --- LOGO (Posicionada Independentemente no Topo) --- */}
+        <div
+          className="absolute"
+          style={{
+            top: "2%",
+            left: "68%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          <img
+            src={logoDesconecta}
+            alt="Logo Desconecta"
+            className="w-[1100px] max-w-[80vw]"
+          />
+        </div>
+
       {/* Container específico para as caixas de texto com posicionamento personalizado */}
       <div 
         className="absolute flex flex-col gap-12 max-w-xs items-center"

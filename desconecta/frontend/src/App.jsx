@@ -3,6 +3,7 @@ import TelaInicial from "./components/TelaInicial";
 import TelaCadastro from "./components/TelaCadastro";
 import TelaLogin from "./components/TelaLogin";
 
+
 function App() {
   const [tela, setTela] = useState("inicial");
 

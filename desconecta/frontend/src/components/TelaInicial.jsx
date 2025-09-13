@@ -15,7 +15,7 @@ const TelaInicial = ({ irParaLogin, irParaCadastro }) => {
       }}
     >
       {/* --- IMAGEM DO MASCOTE (canto inferior esquerdo) --- */}
-      <div className="absolute -bottom-20 left-0 p-4">
+      <div className="absolute -bottom-20 left-9 p-4">
         <img
           src={mascoteImg}
           alt="Mascote do Jogo"
