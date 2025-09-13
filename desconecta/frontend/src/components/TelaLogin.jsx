@@ -24,7 +24,7 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
     // Se o apelido for "teste" e a senha "123", o login é bem-sucedido
     // e a chamada para a API é ignorada.
     if (apelido === 'teste' && senha === '123') {
-      alert('Login de teste realizado com sucesso!');
+      console.log('Login de teste realizado com sucesso!');
       setApelido('');
       setSenha('');
       irParaJogo(); // Navega para a próxima tela
@@ -52,12 +52,12 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
       if (response.ok) {
         const resultado = await response.json();
         if (resultado === true) {
-          alert('Login realizado com sucesso!');
+          console.log('Login realizado com sucesso!');
           // Limpar os campos após sucesso
           setApelido('');
           setSenha('');
-          // Aqui você pode redirecionar para a próxima tela do jogo
-          // Por exemplo: irParaJogo();
+          // Redireciona diretamente para a tela do jogo
+          irParaJogo();
         } else {
           setMostrarPopupErro(true);
         }
