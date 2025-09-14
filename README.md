@@ -16,6 +16,7 @@ Este repositório é composto pelas seguintes pastas principais:
 - **[Prova de Conceito](/Prova%20de%20Conceito/)** - Pasta dedicada para persistência da prova de conceito
 
 Papéis responsáveis pela atualização/alteração de cada diretório:
+<div align="center">
 
 | .github                           |
 | --------------------------------- |
@@ -38,17 +39,19 @@ Papéis responsáveis pela atualização/alteração de cada diretório:
 | Designer (ASOF)                   |
 | Analista de qualidade             |
 | Gerente de configuração e mudança |
+| Gerente de Processo e Líder       |
 
 | metricas                          |
 | --------------------------------- |
 | Analista de qualidade             |
 | Gerente de configuração e mudança |
+| Gerente de Processo               |
 
 | Prova de Conceito                 |
 | --------------------------------- |
 | Arquiteto de software             |
 | Gerente de configuração e mudança |
-
+</div>
 > OBS: Todos os papéis podem visualizar o conteúdo das pastas, mas apenas os indicados acima podem modificá-las.
 
 ## 📖 Sobre o (Des)conecta
