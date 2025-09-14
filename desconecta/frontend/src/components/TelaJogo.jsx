@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import fundoTelaLogin from '../assets/fundo-da-tela-inicial.png';
+import fundoTelaLogin from '../assets/Fundo-da-tela-inicial.png';
 import tiuloSaducao from '../assets/Titulo saudações.png';
 import mascoteImg from "../assets/Dadinho Pulando.png";
 import { GamepadIcon, StarIcon } from './ui/botoes';

@@ -64,7 +64,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
 
   return (
     <main 
-      className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
+      className="h-screen w-full bg-cover bg-center bg-no-repeat relative overflow-hidden"
       style={{ backgroundImage: `url(${fundoTelaLogin})` }}
     >
       {/* --- LOGO (Posicionada Independentemente no Topo) --- */}
