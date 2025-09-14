@@ -1,4 +1,4 @@
-# Pasta Gitflow - Fluxo de Trabalho do Projeto
+# Pasta GerenciaConfiguração- Fluxo de Trabalho do Projeto
 
 Esta pasta contém a documentação completa sobre o **gitflow** utilizado no repositório do projeto **(Des)conecta**. Aqui você encontrará as diretrizes, procedimentos e atualizações relacionadas ao nosso fluxo de trabalho com Git.
 
