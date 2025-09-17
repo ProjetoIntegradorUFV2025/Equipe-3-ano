@@ -1,0 +1,504 @@
+import React, { useState } from 'react';
+import fundoTrilha from '../assets/imgTelaTrilha/fundoTrilha.png';
+import ilhaDadolandia from '../assets/imgTelaTrilha/Ilha-Dadolandia.png';
+import ilhaHistoria from '../assets/imgTelaTrilha/Ilha-história.png';
+import ilhaCiencias from '../assets/imgTelaTrilha/Ilha-Ciencias.png';
+import ilhaGeografia from '../assets/imgTelaTrilha/Ilha-geografia.png';
+import ilhaMatematica from '../assets/imgTelaTrilha/Ilha-Matematica.png';
+import popupJogarIlha from '../assets/imgTelaTrilha/popup-jogar-ilha.png';
+import TelaJogoCiencia from './TelaJogoCiencia';
+
+// --- Componente: Tela Trilha ---
+const TelaTrilha = ({ onVoltar }) => {
+  const [progressoAluno, setProgressoAluno] = useState(0);
+  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha' ou 'ciencia'
+  const [popupCienciaAberto, setPopupCienciaAberto] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  const handleContar = () => {
+    setProgressoAluno(progressoAluno + 1);
+  };
+
+  const handleResetarContador = () => {
+    setProgressoAluno(0);
+  };
+
+  const handleAbrirPopupCiencia = () => {
+    setPopupCienciaAberto(true);
+  };
+
+  const handleFecharPopupCiencia = () => {
+    setPopupCienciaAberto(false);
+  };
+
+  const handleIrParaCiencia = () => {
+    setPopupCienciaAberto(false);
+    setTelaAtiva('ciencia');
+  };
+
+  const handleVoltarTrilha = () => {
+    setTelaAtiva('trilha');
+  };
+
+  // Funções para arrastar
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - e.currentTarget.offsetLeft);
+    setScrollLeft(e.currentTarget.scrollLeft);
+    e.currentTarget.style.cursor = 'grabbing';
+  };
+
+  const handleMouseLeave = (e) => {
+    setIsDragging(false);
+    e.currentTarget.style.cursor = 'grab';
+  };
+
+  const handleMouseUp = (e) => {
+    setIsDragging(false);
+    e.currentTarget.style.cursor = 'grab';
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - e.currentTarget.offsetLeft;
+    const walk = (x - startX) * 2; // Multiplicador para sensibilidade
+    e.currentTarget.scrollLeft = scrollLeft - walk;
+  };
+
+  // CSS inline para esconder barra de scroll
+  const scrollStyle = {
+    backgroundColor: '#4a919e',
+    scrollbarWidth: 'none', // Firefox
+    msOverflowStyle: 'none', // Internet Explorer 10+
+    cursor: 'grab',
+    userSelect: 'none', // Previne seleção de texto durante arraste
+  };
+
+  // Adicionar regra CSS para WebKit browsers
+  const styleSheet = document.styleSheets[0] || document.head.appendChild(document.createElement('style')).sheet;
+  const webkitScrollbarRule = `
+    .min-h-screen::-webkit-scrollbar {
+      display: none;
+    }
+  `;
+  
+  // Verificar se a regra já foi adicionada
+  if (!document.querySelector('#webkit-scrollbar-style')) {
+    const style = document.createElement('style');
+    style.id = 'webkit-scrollbar-style';
+    style.textContent = webkitScrollbarRule;
+    document.head.appendChild(style);
+  }
+
+  // Se estiver na tela de ciência, renderizar TelaJogoCiencia
+  if (telaAtiva === 'ciencia') {
+    return <TelaJogoCiencia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+  }
+
+  return (
+    <main
+      className="min-h-screen overflow-x-auto overflow-y-hidden relative"
+      style={scrollStyle}
+      onMouseDown={handleMouseDown}
+      onMouseLeave={handleMouseLeave}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
+    >
+      {/* Container estendido horizontalmente */}
+      <div 
+        className="flex relative"
+        style={{ 
+          width: '133.33vw', // Volta ao tamanho original para preencher completamente
+          height: '100vh', // Altura fixa da viewport
+          backgroundImage: `url(${fundoTrilha})`, 
+          backgroundSize: 'cover', // Cobre toda a área
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center center',
+          backgroundAttachment: 'local' // Melhor performance em mobile
+        }}
+      >
+        {/* Botões fixos no topo (sempre visíveis) */}
+        <div className="fixed flex gap-2 sm:gap-4 z-10" style={{
+          top: 'min(32px, 4vh)',
+          left: 'min(32px, 4vw)'
+        }}>
+          {/* Botão de Voltar */}
+          <button
+            onClick={onVoltar}
+            className="flex items-center gap-1 sm:gap-2 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
+            style={{ 
+              backgroundColor: '#563066',
+              padding: 'min(12px, 2vh) min(24px, 3vw)',
+              fontSize: 'min(20px, 2.5vw)'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+          >
+            ← Voltar
+          </button>
+
+          {/* Botão Contar */}
+          <button
+            onClick={handleContar}
+            className="flex items-center gap-1 sm:gap-2 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
+            style={{ 
+              backgroundColor: '#563066',
+              padding: 'min(12px, 2vh) min(24px, 3vw)',
+              fontSize: 'min(20px, 2.5vw)'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+          >
+            Progresso: {progressoAluno}
+          </button>
+
+          {/* Botão Resetar */}
+          <button
+            onClick={handleResetarContador}
+            className="flex items-center gap-1 sm:gap-2 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
+            style={{ 
+              backgroundColor: '#563066',
+              padding: 'min(12px, 2vh) min(24px, 3vw)',
+              fontSize: 'min(20px, 2.5vw)'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+          >
+            🔄 Resetar
+          </button>
+        </div>
+
+        {/* PRIMEIRA SEÇÃO (0-66.67vw) - Dadolandia, Ciências e Matemática */}
+        <div className="h-full relative flex-shrink-0" style={{ width: '66.67vw' }}>
+          {/* Botão Redondo com Ilha Ciências */}
+          <div className="absolute flex flex-col items-center justify-center" 
+            style={{ 
+              top: '30%', 
+              left: '50%', 
+              transform: 'translate(-45%, -40%)' 
+            }}>
+            <button
+              onClick={progressoAluno >= 1 ? handleAbrirPopupCiencia : undefined}
+              disabled={progressoAluno < 1}
+              className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
+                progressoAluno >= 1 
+                  ? 'hover:scale-110 cursor-pointer' 
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+              style={{ 
+                width: 'min(240px, 30vw)',
+                height: 'min(240px, 30vw)',
+                backgroundImage: `url(${ilhaCiencias})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: '#563066',
+                borderColor: '#dbedee'
+              }}
+              onMouseEnter={(e) => {
+                if (progressoAluno >= 1) {
+                  e.target.style.backgroundColor = '#4a2857';
+                  e.target.style.borderColor = '#dbedee';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#563066';
+                e.target.style.borderColor = '#dbedee';
+              }}
+            />
+            <div className={`bg-white rounded-full shadow-lg ${
+              progressoAluno < 1 ? 'opacity-50' : ''
+            }`} style={{
+              marginTop: 'min(16px, 2vh)',
+              padding: 'min(12px, 1.5vh) min(24px, 3vw)'
+            }}>
+              <span style={{
+                fontSize: 'min(18px, 2.3vw)',
+                fontWeight: 'bold',
+                color: '#1f2937'
+              }}>Ciências</span>
+            </div>
+          </div>
+
+          {/* Botão Redondo com Ilha Dadolandia */}
+          <div className="absolute flex flex-col items-center justify-center" 
+            style={{ 
+              top: '70%', 
+              left: '25%', 
+              transform: 'translate(-70%, -30%)' 
+            }}>
+            <button
+              onClick={() => console.log('Ilha Dadolandia clicada!')}
+              className="rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 border-8"
+              style={{ 
+                width: 'min(240px, 30vw)',
+                height: 'min(240px, 30vw)',
+                backgroundImage: `url(${ilhaDadolandia})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: '#563066',
+                borderColor: '#dbedee'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#4a2857';
+                e.target.style.borderColor = '#dbedee';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#563066';
+                e.target.style.borderColor = '#dbedee';
+              }}
+            />
+            <div className="bg-white rounded-full shadow-lg" style={{
+              marginTop: 'min(16px, 2vh)',
+              padding: 'min(12px, 1.5vh) min(24px, 3vw)'
+            }}>
+              <span style={{
+                fontSize: 'min(18px, 2.3vw)',
+                fontWeight: 'bold',
+                color: '#1f2937'
+              }}>Dadolandia</span>
+            </div>
+          </div>
+
+          {/* Botão Redondo com Ilha Matemática */}
+          <div className="absolute flex flex-col items-center justify-center" 
+            style={{ 
+              top: '70%', 
+              left: '75%', 
+              transform: 'translate(30%, -110%)' 
+            }}>
+            <button
+              onClick={progressoAluno >= 2 ? () => console.log('Ilha Matemática clicada!') : undefined}
+              disabled={progressoAluno < 2}
+              className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
+                progressoAluno >= 2 
+                  ? 'hover:scale-110 cursor-pointer' 
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+              style={{ 
+                width: 'min(240px, 30vw)',
+                height: 'min(240px, 30vw)',
+                backgroundImage: `url(${ilhaMatematica})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: '#563066',
+                borderColor: '#dbedee'
+              }}
+              onMouseEnter={(e) => {
+                if (progressoAluno >= 2) {
+                  e.target.style.backgroundColor = '#4a2857';
+                  e.target.style.borderColor = '#dbedee';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#563066';
+                e.target.style.borderColor = '#dbedee';
+              }}
+            />
+            <div className={`bg-white rounded-full shadow-lg ${
+              progressoAluno < 2 ? 'opacity-50' : ''
+            }`} style={{
+              marginTop: 'min(16px, 2vh)',
+              padding: 'min(12px, 1.5vh) min(24px, 3vw)'
+            }}>
+              <span style={{
+                fontSize: 'min(18px, 2.3vw)',
+                fontWeight: 'bold',
+                color: '#1f2937'
+              }}>Matemática</span>
+            </div>
+          </div>
+        </div>
+
+        {/* SEGUNDA SEÇÃO (66.67vw-133.33vw) - Geografia e História */}
+        <div className="h-full relative flex-shrink-0" style={{ width: '66.67vw' }}>
+          {/* Botão Redondo com Ilha Geografia */}
+          <div className="absolute flex flex-col items-center justify-center" 
+            style={{ 
+              top: '50%', 
+              left: '30%', 
+              transform: 'translate(-30%, -15%)' 
+            }}>
+            <button
+              onClick={progressoAluno >= 3 ? () => console.log('Ilha Geografia clicada!') : undefined}
+              disabled={progressoAluno < 3}
+              className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
+                progressoAluno >= 3 
+                  ? 'hover:scale-110 cursor-pointer' 
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+              style={{ 
+                width: 'min(240px, 30vw)',
+                height: 'min(240px, 30vw)',
+                backgroundImage: `url(${ilhaGeografia})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: '#563066',
+                borderColor: '#dbedee'
+              }}
+              onMouseEnter={(e) => {
+                if (progressoAluno >= 3) {
+                  e.target.style.backgroundColor = '#4a2857';
+                  e.target.style.borderColor = '#dbedee';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#563066';
+                e.target.style.borderColor = '#dbedee';
+              }}
+            />
+            <div className={`bg-white rounded-full shadow-lg ${
+              progressoAluno < 3 ? 'opacity-50' : ''
+            }`} style={{
+              marginTop: 'min(16px, 2vh)',
+              padding: 'min(12px, 1.5vh) min(24px, 3vw)'
+            }}>
+              <span style={{
+                fontSize: 'min(18px, 2.3vw)',
+                fontWeight: 'bold',
+                color: '#1f2937'
+              }}>Geografia</span>
+            </div>
+          </div>
+
+          {/* Botão Redondo com Ilha História */}
+          <div className="absolute flex flex-col items-center justify-center" 
+            style={{ 
+              top: '50%', 
+              left: '70%', 
+              transform: 'translate(20%, 20%)' 
+            }}>
+            <button
+              onClick={progressoAluno >= 4 ? () => console.log('Ilha História clicada!') : undefined}
+              disabled={progressoAluno < 4}
+              className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
+                progressoAluno >= 4 
+                  ? 'hover:scale-110 cursor-pointer' 
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+              style={{ 
+                width: 'min(240px, 30vw)',
+                height: 'min(240px, 30vw)',
+                backgroundImage: `url(${ilhaHistoria})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: '#563066',
+                borderColor: '#dbedee'
+              }}
+              onMouseEnter={(e) => {
+                if (progressoAluno >= 4) {
+                  e.target.style.backgroundColor = '#4a2857';
+                  e.target.style.borderColor = '#dbedee';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#563066';
+                e.target.style.borderColor = '#dbedee';
+              }}
+            />
+            <div className={`bg-white rounded-full shadow-lg ${
+              progressoAluno < 4 ? 'opacity-50' : ''
+            }`} style={{
+              marginTop: 'min(16px, 2vh)',
+              padding: 'min(12px, 1.5vh) min(24px, 3vw)'
+            }}>
+              <span style={{
+                fontSize: 'min(18px, 2.3vw)',
+                fontWeight: 'bold',
+                color: '#1f2937'
+              }}>História</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Popup de Confirmação para Ilha da Ciência */}
+      {popupCienciaAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="relative"
+            style={{
+              backgroundImage: `url(${popupJogarIlha})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              width: 'min(600px, 90vw)',
+              height: 'min(500px, 90vh)',
+              aspectRatio: '6/5'
+            }}
+          >
+            {/* Botão X para fechar - Posição original responsiva */}
+            <button
+              onClick={handleFecharPopupCiencia}
+              className="absolute text-white rounded-full flex items-center justify-center font-bold transition-colors duration-200 shadow-lg"
+              style={{ 
+                backgroundColor: '#563066',
+                top: 'min(160px, 32%)',
+                left: 'min(24px, 4%)',
+                width: 'min(64px, 10.7vw)',
+                height: 'min(64px, 10.7vw)',
+                fontSize: 'min(24px, 4vw)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+            >
+              X
+            </button>
+
+            {/* Botões Sim e Não - Posição original responsiva */}
+            <div 
+              className="absolute flex"
+              style={{
+                bottom: 'min(64px, 12.8%)',
+                left: 'min(180px, 40%)',
+                transform: 'translateX(-50%)',
+                gap: 'min(120px, 25%)'
+              }}
+            >
+              {/* Botão Sim */}
+              <button
+                onClick={handleIrParaCiencia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Sim
+              </button>
+
+              {/* Botão Não */}
+              <button
+                onClick={handleFecharPopupCiencia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+};
+
+export default TelaTrilha;
