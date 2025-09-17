@@ -143,17 +143,13 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
                   setMostrarPopupSucesso(false);
                   irParaLogin(); // Redireciona ao fechar
                 }}
-                className="absolute rounded-full text-white font-black z-10 hover:opacity-80 hover:scale-105 transition-all duration-300 flex items-center justify-center shadow-lg border-2 border-white"
+                className="absolute w-12 h-12 rounded-full text-white font-black text-2xl z-10 hover:opacity-80 hover:scale-105 transition-all duration-300 flex items-center justify-center shadow-lg border-2 border-white"
                 style={{ 
                   backgroundColor: '#563066',
                   /* ← POSIÇÃO HORIZONTAL: altere este valor */
-                  right: 'min(620px, 40vw)',   /* Movido para a direita (valor menor) */
+                  right: '616px',   /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
                   /* ← POSIÇÃO VERTICAL: altere este valor */
-                  top: 'min(180px, 22vh)',     /* Movido para baixo (valor maior) */
-                  /* ← TAMANHOS RESPONSIVOS */
-                  width: 'min(48px, 6vw)',
-                  height: 'min(48px, 6vw)',
-                  fontSize: 'min(24px, 3vw)'
+                  top: '144px'      /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
                 }}
               >
                 ✕
@@ -186,17 +182,13 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
               {/* Botão X para fechar - BOLINHA COM FONTE GROSSA */}
               <button
                 onClick={() => setMostrarPopup(false)}
-                className="absolute rounded-full text-white font-black z-10 hover:opacity-80 hover:scale-105 transition-all duration-300 flex items-center justify-center shadow-lg border-2 border-white"
+                className="absolute w-12 h-12 rounded-full text-white font-black text-2xl z-10 hover:opacity-80 hover:scale-105 transition-all duration-300 flex items-center justify-center shadow-lg border-2 border-white"
                 style={{ 
                   backgroundColor: '#563066',
                   /* ← POSIÇÃO HORIZONTAL: altere este valor */
-                  right: 'min(600px, 37vw)',   /* Responsivo: mantém posição em telas menores */
+                  right: '600px',   /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
                   /* ← POSIÇÃO VERTICAL: altere este valor */
-                  top: 'min(96px, 12vh)',      /* Responsivo: mantém posição em telas menores */
-                  /* ← TAMANHOS RESPONSIVOS */
-                  width: 'min(48px, 6vw)',
-                  height: 'min(48px, 6vw)',
-                  fontSize: 'min(24px, 3vw)'
+                  top: '96px'      /* Valores: -16px, -8px, 0px, 8px, 16px, etc. */
                 }}
               >
                 ✕
