@@ -38,7 +38,7 @@ public class ProgressoAluno {
         this.pontuacaoTotalAluno = pontuacaoTotalAluno;
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         // Testando a criação de um ProgressoAluno
         ProgressoAluno progresso = new ProgressoAluno(5908);
         System.out.println("ID do ProgressoAluno: " + progresso.getId());
@@ -61,6 +61,6 @@ public class ProgressoAluno {
         if (!progresso.getIlha().isEmpty()) {
             System.out.println("Nome da primeira ilha: " + progresso.getIlha().get(0).getNomeIlha()); // Esperado: MATEMATICA
         }
-    }
+    } */
 }
 
