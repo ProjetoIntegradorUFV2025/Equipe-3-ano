@@ -1,37 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import MenuNavegacao from './ui/MenuNavegacao';
+import TelaPontuacao from './TelaPontuacao';
 
-// Importar todas as imagens estaticamente
-import img1 from '../assets/HisotiaCiencia/HistoriaBiologia_1.png';
-import img2 from '../assets/HisotiaCiencia/HistoriaBiologia_2.png';
-import img3 from '../assets/HisotiaCiencia/HistoriaBiologia_3.png';
-import img4 from '../assets/HisotiaCiencia/HistoriaBiologia_4.png';
-import img5 from '../assets/HisotiaCiencia/HistoriaBiologia_5.png';
-import img6 from '../assets/HisotiaCiencia/HistoriaBiologia_6.png';
-import img7 from '../assets/HisotiaCiencia/HistoriaBiologia_7.png';
-import img8 from '../assets/HisotiaCiencia/HistoriaBiologia_8.png';
-import img9 from '../assets/HisotiaCiencia/HistoriaBiologia_9.png';
-import img10 from '../assets/HisotiaCiencia/HistoriaBiologia_10.png';
-import img11 from '../assets/HisotiaCiencia/HistoriaBiologia_11.png';
-import img12 from '../assets/HisotiaCiencia/HistoriaBiologia_12.png';
-import img13 from '../assets/HisotiaCiencia/HistoriaBiologia_13.png';
-import img14 from '../assets/HisotiaCiencia/HistoriaBiologia_14.png';
-import img15 from '../assets/HisotiaCiencia/HistoriaBiologia_15.png';
-import img16 from '../assets/HisotiaCiencia/HistoriaBiologia_16.png';
-import img17 from '../assets/HisotiaCiencia/HistoriaBiologia_17.png';
-import img18 from '../assets/HisotiaCiencia/HistoriaBiologia_18.png';
-import img19 from '../assets/HisotiaCiencia/HistoriaBiologia_19.png';
-import img20 from '../assets/HisotiaCiencia/HistoriaBiologia_20.png';
-import img21 from '../assets/HisotiaCiencia/HistoriaBiologia_21.png';
-import img22 from '../assets/HisotiaCiencia/HistoriaBiologia_22.png';
-import img23 from '../assets/HisotiaCiencia/HistoriaBiologia_23.png';
-import img24 from '../assets/HisotiaCiencia/HistoriaBiologia_24.png';
+// Importar imagem da seta
+import arrowLeftCircle from '../assets/Arrow - Left Circle.png';
+
+// Importar todas as imagens estaticamente da pasta HistoriaCiencia
+import img1 from '../assets/HistoriaCiencia/Quadro 1.gif';
+import img2 from '../assets/HistoriaCiencia/Quadro 2.gif';
+import img3 from '../assets/HistoriaCiencia/Quadro 3.gif';
+import img4 from '../assets/HistoriaCiencia/Quadro 4.gif';
+import img5 from '../assets/HistoriaCiencia/Quadro 5.gif';
+import img6 from '../assets/HistoriaCiencia/Quadro 6.gif';
+import img7 from '../assets/HistoriaCiencia/Quadro 7.gif';
+import img8 from '../assets/HistoriaCiencia/Quadro 8.gif';
+import img9 from '../assets/HistoriaCiencia/Quadro 9.gif';
+import img10 from '../assets/HistoriaCiencia/Quadro 10.gif';
+import img11 from '../assets/HistoriaCiencia/Quadro 11.gif';
+import img12 from '../assets/HistoriaCiencia/Quadro 12.gif';
+import img13 from '../assets/HistoriaCiencia/Quadro 13.gif';
+import img14 from '../assets/HistoriaCiencia/Quadro 14.gif';
+import img15 from '../assets/HistoriaCiencia/Quadro 15.gif';
+import img16 from '../assets/HistoriaCiencia/Quadro 16.gif';
+import img17 from '../assets/HistoriaCiencia/Quadro 17.gif';
+import img18 from '../assets/HistoriaCiencia/Quadro 18.gif';
+import img19 from '../assets/HistoriaCiencia/Quadro 19.gif';
+import img20 from '../assets/HistoriaCiencia/Quadro 20.gif';
+import img21 from '../assets/HistoriaCiencia/Quadro 21.gif';
+import img22 from '../assets/HistoriaCiencia/Quadro 22.gif';
+import img23 from '../assets/HistoriaCiencia/Quadro 23.gif';
+import img28 from '../assets/HistoriaCiencia/Quadro 28.gif';
 
 // Array com todas as imagens em ordem (filtra apenas as que foram importadas com sucesso)
 const imagens = [
   img1, img2, img3, img4, img5, img6, img7, img8, img9, img10,
   img11, img12, img13, img14, img15, img16, img17, img18, img19, img20,
-  img21, img22, img23, img24
+  img21, img22, img23, img28
 ].filter(img => img !== undefined);
 
 // --- Componente: Tela Jogo Ciência ---
@@ -39,6 +43,7 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
   const [imagemAtual, setImagemAtual] = useState(0);
   const [podeNavegar, setPodeNavegar] = useState(true);
   const [tempoRestante, setTempoRestante] = useState(0);
+  const [mostrarPontuacao, setMostrarPontuacao] = useState(false);
 
   // Debug: verificar se as imagens foram carregadas
   console.log('Total de imagens carregadas:', imagens.length);
@@ -73,6 +78,9 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
     if (podeNavegar && imagemAtual < imagens.length - 1) {
       setImagemAtual(prev => prev + 1);
       iniciarTimer();
+    } else if (podeNavegar && imagemAtual === imagens.length - 1) {
+      // Última imagem - redirecionar para TelaPontuacao
+      setMostrarPontuacao(true);
     }
   };
 
@@ -82,6 +90,11 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
       // Não inicia timer para voltar - deixa livre
     }
   };
+
+  // Se deve mostrar a tela de pontuação, renderizar TelaPontuacao
+  if (mostrarPontuacao) {
+    return <TelaPontuacao onVoltarTrilha={onVoltarTrilha} onVoltarMenu={onVoltarMenu} />;
+  }
 
   return (
     <main className="min-h-screen bg-black relative overflow-hidden">
@@ -123,28 +136,34 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
       <button
         onClick={imagemAnterior}
         disabled={imagens.length === 0 || imagemAtual === 0}
-        className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-800 rounded-full shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20 flex items-center justify-center"
+        className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-transparent hover:scale-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20 flex items-center justify-center"
         style={{
-          width: 'min(40px, 5vw)',
-          height: 'min(40px, 5vw)',
-          fontSize: 'min(30px, 4vw)'
+          width: 'min(100px, 12vw)',
+          height: 'min(100px, 12vw)'
         }}
       >
-        ‹
+        <img 
+          src={arrowLeftCircle} 
+          alt="Seta anterior" 
+          className="w-full h-full object-contain transform scale-x-[-1]"
+        />
       </button>
 
       {/* Botão Próximo - Extremo direito */}
       <button
         onClick={proximaImagem}
-        disabled={imagens.length === 0 || imagemAtual === imagens.length - 1 || !podeNavegar}
-        className="fixed right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-800 rounded-full shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20 flex items-center justify-center"
+        disabled={imagens.length === 0 || !podeNavegar}
+        className="fixed right-4 top-1/2 transform -translate-y-1/2 bg-transparent hover:scale-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20 flex items-center justify-center"
         style={{
-          width: 'min(40px, 5vw)',
-          height: 'min(40px, 5vw)',
-          fontSize: 'min(30px, 4vw)'
+          width: 'min(100px, 12vw)',
+          height: 'min(100px, 12vw)'
         }}
       >
-        ›
+        <img 
+          src={arrowLeftCircle} 
+          alt="Seta próxima" 
+          className="w-full h-full object-contain"
+        />
       </button>
     </main>
   );
