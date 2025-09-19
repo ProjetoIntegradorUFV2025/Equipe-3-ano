@@ -1,6 +1,7 @@
-package ufv.desconecta.Desconecta;
+package ufv.desconecta.Desconecta.repository;
 
 import org.springframework.stereotype.Service;
+import ufv.desconecta.Desconecta.model.Aluno;
 
 
 @Service
@@ -21,11 +22,11 @@ public class AcessoBDAluno {
             if (verificarApelidoExistente(aluno.getApelido())) {
                 return false; // Não pode inserir - apelido já existe
             }
-            
+
             // Salva o aluno no banco de dados
             repositorioAluno.save(aluno);
             return true; // Inserção bem-sucedida
-            
+
         } catch (Exception e) {
             // Em caso de erro na inserção
             return false;

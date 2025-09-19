@@ -1,7 +1,12 @@
-package ufv.desconecta.Desconecta;
+package ufv.desconecta.Desconecta.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ufv.desconecta.Desconecta.EnumNomeIlha;
+import ufv.desconecta.Desconecta.model.Aluno;
+import ufv.desconecta.Desconecta.model.Ilha;
+import ufv.desconecta.Desconecta.model.ProgressoAluno;
+import ufv.desconecta.Desconecta.repository.AcessoBDAluno;
 
 @RestController
 @RequestMapping("/api/aluno")
@@ -29,6 +34,18 @@ public class ControladorAluno {
             if(acessoBDAluno.verificarApelidoExistente(aluno.getApelido())){
                 return false; // Apelido já existe, retorna false
             }
+            ProgressoAluno novoProgresso = new ProgressoAluno();
+            novoProgresso.setPontuacaoTotalAluno(0);
+
+            Ilha ilhaInicial = new Ilha();
+            ilhaInicial.setNomeIlha(EnumNomeIlha.DADOLANDIA);
+            ilhaInicial.setEstado(true);
+            ilhaInicial.setFoiJogada(false);
+
+            novoProgresso.setAluno(aluno);
+            novoProgresso.setIlha(ilhaInicial);
+
+
             return acessoBDAluno.inserirAluno(aluno);
         } else {
             return false;
