@@ -3,18 +3,31 @@ import fundoTelaLogin from '../assets/Fundo-da-tela-inicial.png';
 import tiuloSaducao from '../assets/Titulo saudações.png';
 import mascoteImg from "../assets/Dadinho Pulando.png";
 import { GamepadIcon, StarIcon } from './ui/botoes';
+import TelaTrilha from './TelaTrilha';
 
 // --- Componente Principal: Tela de Jogo ---
 const TelaJogo = () => {
+  const [telaAtiva, setTelaAtiva] = useState('menu'); // 'menu' ou 'jogo'
+
   const handleJogar = () => {
-    // Adicione a lógica para iniciar o jogo aqui
-    alert("Iniciando o jogo...");
+    setTelaAtiva('jogo');
+  };
+
+  const handleVoltarMenu = () => {
+    setTelaAtiva('menu');
   };
 
   const handleVerPontuacao = () => {
     // Adicione a lógica para mostrar a pontuação aqui
     alert("Mostrando a pontuação...");
   };
+
+  // Se estiver na tela de jogo, renderizar TelaTrilha
+  if (telaAtiva === 'jogo') {
+    return <TelaTrilha onVoltar={handleVoltarMenu} />;
+  }
+
+  // Renderizar tela de menu (original)
 
   return (
     <main
