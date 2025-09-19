@@ -8,6 +8,7 @@ import ilhaMatematica from '../assets/imgTelaTrilha/Ilha-Matematica.png';
 import popupJogarIlha from '../assets/imgTelaTrilha/popup-jogar-ilha.png';
 import TelaJogoCiencia from './TelaJogoCiencia';
 
+
 // --- Componente: Tela Trilha ---
 const TelaTrilha = ({ onVoltar }) => {
   const [progressoAluno, setProgressoAluno] = useState(0);
