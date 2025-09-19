@@ -39,7 +39,7 @@ public class AcessoBDProgressoAluno {
         progresso.setAluno(aluno); // vincula o aluno
 
         progresso.setPontuacaoTotalAluno(0);
-        progresso.setIlhas(null); // ou new ArrayList<>() se quiser iniciar vazia
+        progresso.setIlha(null); // será definida posteriormente quando necessário
 
         // Persiste no banco
         entityManager.persist(progresso);

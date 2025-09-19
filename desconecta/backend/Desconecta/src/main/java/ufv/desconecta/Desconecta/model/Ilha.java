@@ -31,8 +31,8 @@ public class Ilha {
         return EnumNomeIlha.values()[idIlha];
     }
 
-    // várias ilhas para um progressoAluno
-    @ManyToOne
-    @JoinColumn(name = "PK_ProgressoAluno") // FK para ProgressoAluno
+    // relacionamento OneToOne com ProgressoAluno
+    @OneToOne
+    @JoinColumn(name = "PK_ProgressoAluno")
     private ProgressoAluno progressoAluno;
 }

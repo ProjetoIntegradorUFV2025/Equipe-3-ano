@@ -3,7 +3,6 @@ package ufv.desconecta.Desconecta.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import ufv.desconecta.Desconecta.model.ProgressoAluno;
 
 @Entity
 @Table(name = "TB_Aluno")
@@ -21,8 +20,7 @@ public class Aluno {
     @Column(nullable = false)
     private String senha;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "FK_ProgressoAluno", referencedColumnName = "PK_ProgressoAluno")
+    @OneToOne(mappedBy = "aluno", cascade = CascadeType.ALL)
     private ProgressoAluno progresso;
 
     public Aluno(String apelido, String senha) {

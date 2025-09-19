@@ -43,7 +43,7 @@ public class ControladorAluno {
             ilhaInicial.setFoiJogada(false);
 
             novoProgresso.setAluno(aluno);
-            novoProgresso.addIlha(ilhaInicial);
+            novoProgresso.setIlha(ilhaInicial);
 
 
             return acessoBDAluno.inserirAluno(aluno);
