@@ -29,6 +29,12 @@ public class ControladorProgressoAluno {
         return acessoBDProgressoAluno.getProgressoAluno(idAluno);
     }
 
+    @GetMapping("/id/{idAluno}")
+    public Long recuperarIdProgressoAluno(@PathVariable int idAluno){
+        ProgressoAluno progresso = acessoBDProgressoAluno.getProgressoAluno(idAluno);
+        return progresso != null ? progresso.getPK_ProgressoAluno() : null;
+    }
+
 
 
     @PostMapping("/calcular/{idAluno}")
@@ -36,4 +42,5 @@ public class ControladorProgressoAluno {
         acessoBDProgressoAluno.armazenarPontuacaoAluno(idAluno, 100); // Exemplo de pontuação implentar depois
         return 0;
     }
+
 }

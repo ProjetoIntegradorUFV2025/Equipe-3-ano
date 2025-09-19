@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import fundoTrilha from '../assets/imgTelaTrilha/fundoTrilha.png';
 import ilhaDadolandia from '../assets/imgTelaTrilha/Ilha-Dadolandia.png';
 import ilhaHistoria from '../assets/imgTelaTrilha/Ilha-história.png';
@@ -7,24 +7,72 @@ import ilhaGeografia from '../assets/imgTelaTrilha/Ilha-geografia.png';
 import ilhaMatematica from '../assets/imgTelaTrilha/Ilha-Matematica.png';
 import popupJogarIlha from '../assets/imgTelaTrilha/popup-jogar-ilha.png';
 import TelaJogoCiencia from './TelaJogoCiencia';
+import useAlunoLogado from '../hooks/useAlunoLogado';
 
 
 // --- Componente: Tela Trilha ---
 const TelaTrilha = ({ onVoltar }) => {
-  const [progressoAluno, setProgressoAluno] = useState(0);
+  const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
   const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha' ou 'ciencia'
   const [popupCienciaAberto, setPopupCienciaAberto] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [carregandoProgresso, setCarregandoProgresso] = useState(true);
 
-  const handleContar = () => {
-    setProgressoAluno(progressoAluno + 1);
+  const { alunoId, isLogado } = useAlunoLogado();
+
+  // Função para buscar a posição da ilha do aluno
+  const buscarPosicaoIlha = async () => {
+    if (!alunoId || !isLogado) {
+      setCarregandoProgresso(false);
+      return;
+    }
+
+    try {
+      setCarregandoProgresso(true);
+      
+      // Primeiro, buscar o ID do progresso do aluno usando o ID do aluno
+      const responseIdProgresso = await fetch(`http://localhost:8080/api/progresso-aluno/id/${alunoId}`);
+      
+      if (responseIdProgresso.ok) {
+        const idProgressoAluno = await responseIdProgresso.json();
+        
+        if (idProgressoAluno) {
+          // Agora buscar a posição da ilha usando o ID do progresso
+          const responsePosicao = await fetch(`http://localhost:8080/api/ilhas/posicao-ilha/${idProgressoAluno}`);
+          
+          if (responsePosicao.ok) {
+            const posicaoIlha = await responsePosicao.json();
+            setPosicaoIlhaAtual(posicaoIlha);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar progresso:', error);
+    } finally {
+      setCarregandoProgresso(false);
+    }
   };
 
-  const handleResetarContador = () => {
-    setProgressoAluno(0);
-  };
+  // useEffect para carregar o progresso quando o componente for montado
+  useEffect(() => {
+    if (alunoId && isLogado) {
+      buscarPosicaoIlha();
+    }
+  }, [alunoId, isLogado]);
+
+  // useEffect para verificar se houve atualização do progresso e recarregar
+  useEffect(() => {
+    const progressoAtualizado = localStorage.getItem('progressoAtualizado');
+    if (progressoAtualizado === 'true') {
+      // Remove a flag e recarrega o progresso
+      localStorage.removeItem('progressoAtualizado');
+      if (alunoId && isLogado) {
+        buscarPosicaoIlha();
+      }
+    }
+  }, [telaAtiva]); // Executa quando volta para a tela da trilha
 
   const handleAbrirPopupCiencia = () => {
     setPopupCienciaAberto(true);
@@ -99,6 +147,25 @@ const TelaTrilha = ({ onVoltar }) => {
     return <TelaJogoCiencia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
   }
 
+  // Se o aluno não estiver logado, mostrar mensagem
+  if (!isLogado) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Você precisa estar logado para acessar a trilha
+          </h2>
+          <button
+            onClick={onVoltar}
+            className="px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            Voltar ao Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main
       className="min-h-screen overflow-x-auto overflow-y-hidden relative"
@@ -140,36 +207,6 @@ const TelaTrilha = ({ onVoltar }) => {
           >
             ← Voltar
           </button>
-
-          {/* Botão Contar */}
-          <button
-            onClick={handleContar}
-            className="flex items-center gap-1 sm:gap-2 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
-            style={{ 
-              backgroundColor: '#563066',
-              padding: 'min(12px, 2vh) min(24px, 3vw)',
-              fontSize: 'min(20px, 2.5vw)'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
-          >
-            Progresso: {progressoAluno}
-          </button>
-
-          {/* Botão Resetar */}
-          <button
-            onClick={handleResetarContador}
-            className="flex items-center gap-1 sm:gap-2 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
-            style={{ 
-              backgroundColor: '#563066',
-              padding: 'min(12px, 2vh) min(24px, 3vw)',
-              fontSize: 'min(20px, 2.5vw)'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
-          >
-            🔄 Resetar
-          </button>
         </div>
 
         {/* PRIMEIRA SEÇÃO (0-66.67vw) - Dadolandia, Ciências e Matemática */}
@@ -182,10 +219,10 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(-45%, -40%)' 
             }}>
             <button
-              onClick={progressoAluno >= 1 ? handleAbrirPopupCiencia : undefined}
-              disabled={progressoAluno < 1}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 1) ? handleAbrirPopupCiencia : undefined}
+              disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 1}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
-                progressoAluno >= 1 
+                (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 1)
                   ? 'hover:scale-110 cursor-pointer' 
                   : 'opacity-50 cursor-not-allowed'
               }`}
@@ -199,7 +236,7 @@ const TelaTrilha = ({ onVoltar }) => {
                 borderColor: '#dbedee'
               }}
               onMouseEnter={(e) => {
-                if (progressoAluno >= 1) {
+                if (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 1) {
                   e.target.style.backgroundColor = '#4a2857';
                   e.target.style.borderColor = '#dbedee';
                 }
@@ -210,7 +247,7 @@ const TelaTrilha = ({ onVoltar }) => {
               }}
             />
             <div className={`bg-white rounded-full shadow-lg ${
-              progressoAluno < 1 ? 'opacity-50' : ''
+              (posicaoIlhaAtual === null || posicaoIlhaAtual < 1) ? 'opacity-50' : ''
             }`} style={{
               marginTop: 'min(16px, 2vh)',
               padding: 'min(12px, 1.5vh) min(24px, 3vw)'
@@ -271,10 +308,10 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(30%, -110%)' 
             }}>
             <button
-              onClick={progressoAluno >= 2 ? () => console.log('Ilha Matemática clicada!') : undefined}
-              disabled={progressoAluno < 2}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? () => console.log('Ilha Matemática clicada!') : undefined}
+              disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 2}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
-                progressoAluno >= 2 
+                (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2)
                   ? 'hover:scale-110 cursor-pointer' 
                   : 'opacity-50 cursor-not-allowed'
               }`}
@@ -288,7 +325,7 @@ const TelaTrilha = ({ onVoltar }) => {
                 borderColor: '#dbedee'
               }}
               onMouseEnter={(e) => {
-                if (progressoAluno >= 2) {
+                if (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) {
                   e.target.style.backgroundColor = '#4a2857';
                   e.target.style.borderColor = '#dbedee';
                 }
@@ -299,7 +336,7 @@ const TelaTrilha = ({ onVoltar }) => {
               }}
             />
             <div className={`bg-white rounded-full shadow-lg ${
-              progressoAluno < 2 ? 'opacity-50' : ''
+              (posicaoIlhaAtual === null || posicaoIlhaAtual < 2) ? 'opacity-50' : ''
             }`} style={{
               marginTop: 'min(16px, 2vh)',
               padding: 'min(12px, 1.5vh) min(24px, 3vw)'
@@ -323,10 +360,10 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(-30%, -15%)' 
             }}>
             <button
-              onClick={progressoAluno >= 3 ? () => console.log('Ilha Geografia clicada!') : undefined}
-              disabled={progressoAluno < 3}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3) ? () => console.log('Ilha Geografia clicada!') : undefined}
+              disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 3}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
-                progressoAluno >= 3 
+                (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3)
                   ? 'hover:scale-110 cursor-pointer' 
                   : 'opacity-50 cursor-not-allowed'
               }`}
@@ -340,7 +377,7 @@ const TelaTrilha = ({ onVoltar }) => {
                 borderColor: '#dbedee'
               }}
               onMouseEnter={(e) => {
-                if (progressoAluno >= 3) {
+                if (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3) {
                   e.target.style.backgroundColor = '#4a2857';
                   e.target.style.borderColor = '#dbedee';
                 }
@@ -351,7 +388,7 @@ const TelaTrilha = ({ onVoltar }) => {
               }}
             />
             <div className={`bg-white rounded-full shadow-lg ${
-              progressoAluno < 3 ? 'opacity-50' : ''
+              (posicaoIlhaAtual === null || posicaoIlhaAtual < 3) ? 'opacity-50' : ''
             }`} style={{
               marginTop: 'min(16px, 2vh)',
               padding: 'min(12px, 1.5vh) min(24px, 3vw)'
@@ -372,10 +409,10 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(20%, 20%)' 
             }}>
             <button
-              onClick={progressoAluno >= 4 ? () => console.log('Ilha História clicada!') : undefined}
-              disabled={progressoAluno < 4}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4) ? () => console.log('Ilha História clicada!') : undefined}
+              disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 4}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
-                progressoAluno >= 4 
+                (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4)
                   ? 'hover:scale-110 cursor-pointer' 
                   : 'opacity-50 cursor-not-allowed'
               }`}
@@ -389,7 +426,7 @@ const TelaTrilha = ({ onVoltar }) => {
                 borderColor: '#dbedee'
               }}
               onMouseEnter={(e) => {
-                if (progressoAluno >= 4) {
+                if (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4) {
                   e.target.style.backgroundColor = '#4a2857';
                   e.target.style.borderColor = '#dbedee';
                 }
@@ -400,7 +437,7 @@ const TelaTrilha = ({ onVoltar }) => {
               }}
             />
             <div className={`bg-white rounded-full shadow-lg ${
-              progressoAluno < 4 ? 'opacity-50' : ''
+              (posicaoIlhaAtual === null || posicaoIlhaAtual < 4) ? 'opacity-50' : ''
             }`} style={{
               marginTop: 'min(16px, 2vh)',
               padding: 'min(12px, 1.5vh) min(24px, 3vw)'

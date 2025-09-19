@@ -60,7 +60,7 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
 
   const iniciarTimer = () => {
     setPodeNavegar(false);
-    setTempoRestante(3);
+    setTempoRestante(0);
     
     const timer = setInterval(() => {
       setTempoRestante(prev => {
@@ -93,7 +93,8 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
 
   // Se deve mostrar a tela de pontuação, renderizar TelaPontuacao
   if (mostrarPontuacao) {
-    return <TelaPontuacao onVoltarTrilha={onVoltarTrilha} onVoltarMenu={onVoltarMenu} />;
+    // Ciências corresponde ao enum posição 1 (0=DADOLANDIA, 1=CIENCIAS, 2=GEOGRAFIA, 3=MATEMATICA, 4=HISTORIA)
+    return <TelaPontuacao onVoltarTrilha={onVoltarTrilha} onVoltarMenu={onVoltarMenu} ilhaCompletada={1} />;
   }
 
   return (

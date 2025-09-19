@@ -46,4 +46,10 @@ public class AcessoBDProgressoAluno {
 
     }
 
+    // Método para salvar/atualizar o progresso do aluno
+    @Transactional
+    public ProgressoAluno salvarProgressoAluno(ProgressoAluno progresso) {
+        return entityManager.merge(progresso);
+    }
+
 }

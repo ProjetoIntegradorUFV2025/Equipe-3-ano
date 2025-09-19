@@ -53,12 +53,14 @@ public class ControladorAluno {
     }
 
     @PostMapping("/login")
-    public Boolean autenticarAluno(@RequestBody Aluno loginData){
+    public Long autenticarAluno(@RequestBody Aluno loginData){
         if(validarDadosAluno(loginData.getApelido(), loginData.getSenha())){
             Aluno aluno = acessoBDAluno.buscarApelido(loginData.getApelido());
-            return (aluno != null && aluno.getSenha().equals(loginData.getSenha()));
+            if(aluno != null && aluno.getSenha().equals(loginData.getSenha())){
+                return aluno.getPK_Aluno(); // Retorna o ID do aluno
+            }
         }
-        return false;
+        return 0L; // Retorna 0 para falha na autenticação
     }
 
     @GetMapping("/buscar/{apelido}")
