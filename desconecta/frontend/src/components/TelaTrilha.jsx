@@ -7,13 +7,14 @@ import ilhaGeografia from '../assets/imgTelaTrilha/Ilha-geografia.png';
 import ilhaMatematica from '../assets/imgTelaTrilha/Ilha-Matematica.png';
 import popupJogarIlha from '../assets/imgTelaTrilha/popup-jogar-ilha.png';
 import TelaJogoCiencia from './TelaJogoCiencia';
+import TelaPontuacao from './TelaPontuacao';
 import useAlunoLogado from '../hooks/useAlunoLogado';
 
 
 // --- Componente: Tela Trilha ---
 const TelaTrilha = ({ onVoltar }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
-  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha' ou 'ciencia'
+  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'ciencia', ou 'pontuacao'
   const [popupCienciaAberto, setPopupCienciaAberto] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -91,6 +92,10 @@ const TelaTrilha = ({ onVoltar }) => {
     setTelaAtiva('trilha');
   };
 
+  const handleIrParaPontuacao = () => {
+    setTelaAtiva('pontuacao');
+  };
+
   // Funções para arrastar
   const handleMouseDown = (e) => {
     setIsDragging(true);
@@ -145,6 +150,11 @@ const TelaTrilha = ({ onVoltar }) => {
   // Se estiver na tela de ciência, renderizar TelaJogoCiencia
   if (telaAtiva === 'ciencia') {
     return <TelaJogoCiencia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+  }
+
+  // Se estiver na tela de pontuação, renderizar TelaPontuacao
+  if (telaAtiva === 'pontuacao') {
+    return <TelaPontuacao onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} ilhaCompletada={0} />;
   }
 
   // Se o aluno não estiver logado, mostrar mensagem
@@ -268,7 +278,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(-70%, -30%)' 
             }}>
             <button
-              onClick={() => console.log('Ilha Dadolandia clicada!')}
+              onClick={handleIrParaPontuacao}
               className="rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 border-8"
               style={{ 
                 width: 'min(240px, 30vw)',
