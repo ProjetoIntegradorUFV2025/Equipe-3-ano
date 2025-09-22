@@ -74,10 +74,10 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
   }, [alunoId, isLogado]);
   return (
     <main 
-      className="min-h-screen relative overflow-hidden"
+      className="min-h-screen relative overflow-hidden w-full"
       style={{
         backgroundImage: `url(${fundoPontuacao})`,
-        backgroundSize: 'cover',
+        backgroundSize: '100%',
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat'
       }}
@@ -90,9 +90,9 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
       />
 
       {/* Conteúdo da tela de pontuação */}
-      <div className="w-full h-screen flex items-end justify-center pb-4">
+      <div className="w-full h-screen flex items-end justify-center pb-3">
         <div className="text-white">
-          <div className="text-5xl font-sans font-bold leading-relaxed mb-16">
+          <div className="text-5xl font-sans font-bold leading-relaxed mb-2">
             <div className="mb-2 text-left">Tempo ...................... {tempoSegundos}</div>
             <div className="mb-4 text-left">Tentativas ................. {tentativas}</div>
             <div className="text-5xl font-bold text-center" style={{ color: '#feeb6c' }}>+{pontos} pontos</div>
@@ -102,7 +102,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
           <div className="text-center">
             <button
               onClick={handleVoltarTrilha}
-              className="text-white font-bold py-6 px-16 rounded-full text-3xl transition-all duration-300 transform hover:scale-105 shadow-2xl"
+              className="text-white font-bold px-16 rounded-full text-3xl transition-all duration-300 transform hover:scale-105 shadow-2xl"
               style={{ 
                 backgroundColor: '#f93d6e',
                 ':hover': { backgroundColor: '#e02a5b' }

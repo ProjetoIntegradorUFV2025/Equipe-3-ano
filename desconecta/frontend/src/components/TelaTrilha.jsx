@@ -187,9 +187,9 @@ const TelaTrilha = ({ onVoltar }) => {
     >
       {/* Container estendido horizontalmente */}
       <div 
-        className="flex relative"
+        className="flex relative w-screen h-screen"
         style={{ 
-          width: '133.33vw', // Volta ao tamanho original para preencher completamente
+          width: '134.33vw', // Volta ao tamanho original para preencher completamente
           height: '100vh', // Altura fixa da viewport
           backgroundImage: `url(${fundoTrilha})`, 
           backgroundSize: 'cover', // Cobre toda a área
@@ -271,44 +271,57 @@ const TelaTrilha = ({ onVoltar }) => {
           </div>
 
           {/* Botão Redondo com Ilha Dadolandia */}
-          <div className="absolute flex flex-col items-center justify-center" 
-            style={{ 
-              top: '70%', 
-              left: '25%', 
-              transform: 'translate(-70%, -30%)' 
-            }}>
-            <button
-              onClick={handleIrParaPontuacao}
-              className="rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 border-8"
-              style={{ 
-                width: 'min(240px, 30vw)',
-                height: 'min(240px, 30vw)',
-                backgroundImage: `url(${ilhaDadolandia})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundColor: '#563066',
-                borderColor: '#dbedee'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#4a2857';
-                e.target.style.borderColor = '#dbedee';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = '#563066';
-                e.target.style.borderColor = '#dbedee';
-              }}
-            />
-            <div className="bg-white rounded-full shadow-lg" style={{
-              marginTop: 'min(16px, 2vh)',
-              padding: 'min(12px, 1.5vh) min(24px, 3vw)'
-            }}>
-              <span style={{
-                fontSize: 'min(18px, 2.3vw)',
-                fontWeight: 'bold',
-                color: '#1f2937'
-              }}>Dadolandia</span>
-            </div>
-          </div>
+          <div
+  className="absolute flex flex-col items-center justify-center"
+  style={{
+    top: '65%',
+    left: '25%',
+    transform: 'translate(-70%, -30%)'
+  }}
+>
+  {/* Botão redondo */}
+  <button
+    onClick={handleIrParaPontuacao}
+    className="rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 border-8"
+    style={{
+      width: 'min(240px, 30vw)',
+      height: 'min(240px, 30vw)',
+      backgroundImage: `url(${ilhaDadolandia})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundColor: '#563066',
+      borderColor: '#dbedee'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = '#4a2857';
+      e.currentTarget.style.borderColor = '#dbedee';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = '#563066';
+      e.currentTarget.style.borderColor = '#dbedee';
+    }}
+  />
+
+  {/* Texto ao lado ou abaixo */}
+  <div
+    className="bg-white rounded-full shadow-lg"
+    style={{
+      marginTop: 'min(3px, 3vh)', // empurra para baixo do botão
+      marginLeft: '12px',          // empurra um pouco para a direita
+      padding: 'min(5px, 1.5vh) min(24px, 3vw)'
+    }}
+  >
+    <span
+      style={{
+        fontSize: 'min(18px, 2.3vw)',
+        fontWeight: 'bold',
+        color: '#1f2937'
+      }}
+    >
+      Dadolandia
+    </span>
+  </div>
+</div>
 
           {/* Botão Redondo com Ilha Matemática */}
           <div className="absolute flex flex-col items-center justify-center" 
@@ -414,8 +427,8 @@ const TelaTrilha = ({ onVoltar }) => {
           {/* Botão Redondo com Ilha História */}
           <div className="absolute flex flex-col items-center justify-center" 
             style={{ 
-              top: '50%', 
-              left: '70%', 
+              top: '40%', 
+              left: '65%', 
               transform: 'translate(20%, 20%)' 
             }}>
             <button
