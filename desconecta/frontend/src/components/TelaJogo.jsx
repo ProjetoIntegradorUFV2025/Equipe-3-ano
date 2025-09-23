@@ -3,18 +3,37 @@ import fundoTelaLogin from '../assets/Fundo-da-tela-inicial.png';
 import tiuloSaducao from '../assets/Titulo saudações.png';
 import mascoteImg from "../assets/Dadinho Pulando.png";
 import { GamepadIcon, StarIcon } from './ui/botoes';
+import TelaTrilha from './TelaTrilha';
 
 // --- Componente Principal: Tela de Jogo ---
 const TelaJogo = () => {
+  const [telaAtiva, setTelaAtiva] = useState('menu'); // 'menu' ou 'jogo'
+  const [carregandoJogo, setCarregandoJogo] = useState(false);
+
   const handleJogar = () => {
-    // Adicione a lógica para iniciar o jogo aqui
-    alert("Iniciando o jogo...");
+    setCarregandoJogo(true);
+    // Pequeno delay para garantir transição suave
+    setTimeout(() => {
+      setTelaAtiva('jogo');
+      setCarregandoJogo(false);
+    }, 100);
+  };
+
+  const handleVoltarMenu = () => {
+    setTelaAtiva('menu');
   };
 
   const handleVerPontuacao = () => {
     // Adicione a lógica para mostrar a pontuação aqui
     alert("Mostrando a pontuação...");
   };
+
+  // Se estiver na tela de jogo, renderizar TelaTrilha
+  if (telaAtiva === 'jogo') {
+    return <TelaTrilha onVoltar={handleVoltarMenu} />;
+  }
+
+  // Renderizar tela de menu (original)
 
   return (
     <main
@@ -65,14 +84,15 @@ const TelaJogo = () => {
         {/* Botão Jogar */}
         <button
           onClick={handleJogar}
+          disabled={carregandoJogo}
           // 2. Corrigi a largura do botão aqui
-          className="flex items-center  w-[500px] gap-4 py-6 text-white font-bold text-4xl rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 whitespace-nowrap"
-          style={{ backgroundColor: '#563066' }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+          className="flex items-center  w-[500px] gap-4 py-6 text-white font-bold text-4xl rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          style={{ backgroundColor: carregandoJogo ? '#4a2857' : '#563066' }}
+          onMouseEnter={(e) => !carregandoJogo && (e.target.style.backgroundColor = '#4a2857')}
+          onMouseLeave={(e) => !carregandoJogo && (e.target.style.backgroundColor = '#563066')}
         >
           <GamepadIcon />
-          <span>Jogar</span>
+          <span>{carregandoJogo ? 'Carregando...' : 'Jogar'}</span>
         </button>
 
         {/* Botão Ver Pontuação */}

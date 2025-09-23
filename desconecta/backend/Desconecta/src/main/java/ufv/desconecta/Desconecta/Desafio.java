@@ -1,5 +1,5 @@
 package ufv.desconecta.Desconecta;
 
-public class ProgressoAluno {
+public class Desafio {
     
 }
