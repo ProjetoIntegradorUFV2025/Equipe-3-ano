@@ -50,15 +50,22 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
 
       // Verificar se a requisição foi bem-sucedida
       if (response.ok) {
-        const resultado = await response.json();
-        if (resultado === true) {
-          console.log('Login realizado com sucesso!');
+        const alunoId = await response.json();
+        if (alunoId !== 0) {
+          console.log('Login realizado com sucesso! ID do aluno:', alunoId);
+          
+          // Armazenar o ID do aluno no localStorage para uso em outras telas
+          localStorage.setItem('alunoId', alunoId.toString());
+          localStorage.setItem('alunoApelido', apelido); // Também guardar o apelido para referência
+          
           // Limpar os campos após sucesso
           setApelido('');
           setSenha('');
+          
           // Redireciona diretamente para a tela do jogo
           irParaJogo();
         } else {
+          console.log('Credenciais inválidas');
           setMostrarPopupErro(true);
         }
       } else {
