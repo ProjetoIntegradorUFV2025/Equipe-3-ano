@@ -70,7 +70,7 @@ jobs:
             🔗 **Link:** ${{ github.event.pull_request.html_url }}
 
       - name: Notificar PR fechado (não mesclado)
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && (github.event.pull_request.merged == false || github.event.pull_request.merged == null)
         uses: appleboy/discord-action@master
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
