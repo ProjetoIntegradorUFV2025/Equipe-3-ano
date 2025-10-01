@@ -3,7 +3,11 @@ import MenuNavegacao from './ui/MenuNavegacao';
 import TelaPontuacao from './TelaPontuacao';
 
 // Importar imagem de fundo
-import fundoConecta from '../assets/HistoriaCiencia/JogoCiencia/Fundo-conecta.png';
+import fundoConecta from '../assets/HistoriaCiencia/JogoCiencia/Background.png';
+
+// Importar letreiro e texto conecta
+import letreirosConecta from '../assets/HistoriaCiencia/JogoCiencia/LetreiroConectaPNG.png';
+import textoConecta from '../assets/HistoriaCiencia/JogoCiencia/TextoConectaPNG.png';
 
 // Importar imagens dos botões
 import imagemSapo from '../assets/HistoriaCiencia/JogoCiencia/Sapo.png';
@@ -104,37 +108,52 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
         posicao="top-right"
       />
 
-      {/* Display da string em tempo real */}
-      <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-6 py-3 rounded-lg shadow-lg z-30">
-        <div className="text-center">
-          <p className="text-sm font-medium mb-1">Sequência Selecionada (letras):</p>
-          <p className="text-xl font-bold font-mono tracking-wider">
-            {stringPosicoes || 'Nenhuma seleção'}
-          </p>
-          <p className={`text-xs mt-1 ${botoesClicados.size === 3 ? 'text-yellow-300' : 'text-gray-300'}`}>
-            {botoesClicados.size}/3 itens selecionados
-            {botoesClicados.size === 3 && (
-              <span className="block text-yellow-300 font-medium">Limite máximo atingido!</span>
-            )}
-          </p>
-        </div>
-      </div>
+{/* Letreiro e Texto Conecta - CORRIGIDO COM POSICIONAMENTO */}
+<div className="absolute top-16 sm:top-20 md:top-24 lg:top-28 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-10 px-4">
+  {/* Letreiro Conecta - MUITO MAIOR */}
+  <div className="mb-3">
+    <img 
+      src={letreirosConecta} 
+      alt="Letreiro Conecta"
+      className="max-w-full h-auto object-contain w-64 sm:w-72 md:w-80 lg:w-96 xl:w-[28rem] 2xl:w-[32rem]"
+      //                                        256px  288px   320px   384px     448px        512px
+      style={{
+        filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))'
+      }}
+    />
+  </div>
+
+  {/* Texto Conecta - MUITO MAIOR */}
+  <div>
+    <img 
+      src={textoConecta} 
+      alt="Texto Conecta"
+      className="max-w-full h-auto object-contain w-80 sm:w-96 md:w-[28rem] lg:w-[32rem] xl:w-[36rem] 2xl:w-[40rem]"
+      //                                        320px  384px     448px        512px        576px        640px
+      style={{
+        filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
+      }}
+    />
+  </div>
+</div>
 
       {/* Conteúdo da tela ConectaCiencia - Matriz de botões 3x4 */}
       <div className="w-full h-screen flex items-end justify-center pb-2 px-4">
-        <div className="grid grid-cols-4 gap-x-1 gap-y-2 sm:gap-x-2 sm:gap-y-3 place-items-center">
+        <div className="grid grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 place-items-center max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl 2xl:max-w-3xl">
           {/* Gerar 12 botões (3 linhas x 4 colunas) com imagens */}
-          {botoesData.map((botao, index) => (
-            <button
-              key={index}
-              onClick={() => handleBotaoClick(index)}
-              className="bg-transparent transition-all duration-300 transform hover:scale-105 active:scale-95 p-0 overflow-hidden relative"
-              style={{ 
-                width: '180px',
-                height: '180px',
-                border: 'none',
-                outline: 'none'
-              }}
+          {/* BOTÕES AGORA RESPONSIVOS - Remover style fixo */}
+{botoesData.map((botao, index) => (
+  <button
+    key={index}
+    onClick={() => handleBotaoClick(index)}
+    className="bg-transparent transition-all duration-300 transform hover:scale-105 active:scale-95 p-0 overflow-hidden relative
+               w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 xl:w-40 xl:h-40 2xl:w-40 2xl:h-40"
+    // ↑ REMOVER O STYLE FIXO E USAR APENAS CLASSES TAILWIND
+    style={{ 
+      border: 'none',
+      outline: 'none'
+      // width e height removidos!
+    }}
             >
               <div className="relative w-full h-full">
                 <img 
@@ -142,8 +161,6 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
                   alt={botao.nome}
                   className="w-full h-full object-contain block"
                   style={{
-                    width: '180px',
-                    height: '180px',
                     border: 'none',
                     outline: 'none'
                   }}
@@ -152,12 +169,12 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
                     e.target.style.display = 'none';
                   }}
                 />
-                {/* Máscara verde clara que segue os contornos da imagem */}
+                {/* Máscara roxa que segue os contornos da imagem - corrigida para responsividade */}
                 {botoesClicados.has(index) && (
                   <div 
-                    className="absolute inset-0 transition-opacity duration-300"
+                    className="absolute inset-0 transition-opacity duration-300 rounded-sm"
                     style={{
-                      backgroundColor: 'rgba(86, 48, 102, 0.4)', // Roxo com 40% de transparência
+                      backgroundColor: 'rgba(86, 48, 102, 0.5)',
                       maskImage: `url(${botao.imagem})`,
                       WebkitMaskImage: `url(${botao.imagem})`,
                       maskSize: 'contain',
