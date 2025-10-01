@@ -21,4 +21,20 @@ public class AcessoBDConecta {
                         c.getRespostaCerta4()))
                 .orElse(Collections.emptyList());
     }
+
+    public Boolean atualizarRespostaCerta(int PK_Conecta, String novaResposta, int idResposta) {
+       if(idResposta < 1 || idResposta > 4) {
+           return false; // ID inválido
+       }
+         return repositorioConecta.findById((long) PK_Conecta).map(conecta -> {
+              switch (idResposta) {
+                case 1 -> conecta.setRespostaCerta1(novaResposta);
+                case 2 -> conecta.setRespostaCerta2(novaResposta);
+                case 3 -> conecta.setRespostaCerta3(novaResposta);
+                case 4 -> conecta.setRespostaCerta4(novaResposta);
+              }
+              repositorioConecta.save(conecta);
+              return true;
+         }).orElse(false); // Retorna false se o conecta não foi encontrado
+    }
 }

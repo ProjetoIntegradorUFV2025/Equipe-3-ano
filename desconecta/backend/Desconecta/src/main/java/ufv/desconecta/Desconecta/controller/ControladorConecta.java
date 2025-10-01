@@ -31,4 +31,17 @@ public class ControladorConecta {
             return "Resposta incorreta. Tente novamente.";
         }
     }
+    @PutMapping("/atualizar/{id}")
+    public Boolean atualizarRespostaCerta(
+            @PathVariable("id") int PK_Conecta,
+            @RequestParam("novaResposta") String novaResposta,
+            @RequestParam("idResposta") int idResposta) {
+        System.out.println("ID Resposta: " + idResposta);
+        System.out.println("Nova Resposta: " + novaResposta);
+        System.out.println("PK_Conecta: " + PK_Conecta);
+        return acessoBDConecta.atualizarRespostaCerta(PK_Conecta, novaResposta, idResposta);
+    }
+
+
+
 }
