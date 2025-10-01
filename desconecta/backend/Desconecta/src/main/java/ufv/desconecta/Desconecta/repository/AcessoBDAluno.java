@@ -6,6 +6,7 @@ import ufv.desconecta.Desconecta.model.Aluno;
 
 @Service
 public class AcessoBDAluno {
+
     private final RepositorioAluno repositorioAluno;
 
     public AcessoBDAluno(RepositorioAluno repo) {
