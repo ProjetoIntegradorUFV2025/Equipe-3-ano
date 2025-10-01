@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MenuNavegacao from './ui/MenuNavegacao';
 import TelaPontuacao from './TelaPontuacao';
+import ConectaCiencia from './ConectaCiencia';
 
 // Importar imagem da seta
 import arrowLeftCircle from '../assets/Arrow - Left Circle.png';
@@ -44,6 +45,7 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
   const [podeNavegar, setPodeNavegar] = useState(true);
   const [tempoRestante, setTempoRestante] = useState(0);
   const [mostrarPontuacao, setMostrarPontuacao] = useState(false);
+  const [mostrarConectaCiencia, setMostrarConectaCiencia] = useState(false);
 
   // Debug: verificar se as imagens foram carregadas
   console.log('Total de imagens carregadas:', imagens.length);
@@ -79,8 +81,8 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
       setImagemAtual(prev => prev + 1);
       iniciarTimer();
     } else if (podeNavegar && imagemAtual === imagens.length - 1) {
-      // Última imagem - redirecionar para TelaPontuacao
-      setMostrarPontuacao(true);
+      // Última imagem - redirecionar para ConectaCiencia
+      setMostrarConectaCiencia(true);
     }
   };
 
@@ -90,6 +92,11 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
       // Não inicia timer para voltar - deixa livre
     }
   };
+
+  // Se deve mostrar a tela ConectaCiencia, renderizar ConectaCiencia
+  if (mostrarConectaCiencia) {
+    return <ConectaCiencia onVoltarTrilha={onVoltarTrilha} onVoltarMenu={onVoltarMenu} />;
+  }
 
   // Se deve mostrar a tela de pontuação, renderizar TelaPontuacao
   if (mostrarPontuacao) {
@@ -165,6 +172,20 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
           alt="Seta próxima" 
           className="w-full h-full object-contain"
         />
+      </button>
+
+      {/* Botão para ir direto para ConectaCiencia */}
+      <button
+        onClick={() => setMostrarConectaCiencia(true)}
+        className="fixed bottom-8 right-8 bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl z-20 border-2 border-purple-400"
+        style={{ 
+          backgroundColor: '#7C3AED',
+          boxShadow: '0 10px 30px rgba(124, 58, 237, 0.3)'
+        }}
+        onMouseEnter={(e) => e.target.style.backgroundColor = '#6D28D9'}
+        onMouseLeave={(e) => e.target.style.backgroundColor = '#7C3AED'}
+      >
+        🎯 Ir para o Jogo
       </button>
     </main>
   );
