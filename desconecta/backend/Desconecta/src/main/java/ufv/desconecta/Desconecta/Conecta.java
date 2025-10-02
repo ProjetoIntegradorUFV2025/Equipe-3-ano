@@ -1,3 +1,5 @@
+package ufv.desconecta.Desconecta;
+
 public class Conecta {
     private int idConecta;
     private String respostaCerta1;
