@@ -9,6 +9,12 @@ import fundoConecta from '../assets/HistoriaCiencia/JogoCiencia/Background.png';
 import letreirosConecta from '../assets/HistoriaCiencia/JogoCiencia/LetreiroConectaPNG.png';
 import textoConecta from '../assets/HistoriaCiencia/JogoCiencia/TextoConectaPNG.png';
 
+// Importar botão confirma
+import botaoresolvido from '../assets/HistoriaCiencia/JogoCiencia/Botao-confirma.png';
+
+// Importar popup de erro
+import popupErro from '../assets/HistoriaCiencia/JogoCiencia/Pop-up-erros.png';
+
 // Importar imagens dos botões
 import imagemSapo from '../assets/HistoriaCiencia/JogoCiencia/Sapo.png';
 import imagemCasco from '../assets/HistoriaCiencia/JogoCiencia/Casco.png';
@@ -23,20 +29,34 @@ import imagemLeite from '../assets/HistoriaCiencia/JogoCiencia/Leite.png';
 import imagemBico from '../assets/HistoriaCiencia/JogoCiencia/Bico.png';
 import imagemCobra from '../assets/HistoriaCiencia/JogoCiencia/Cobra.png';
 
+// Importar imagens de resolvidoção
+import imagemSaporesolvido from '../assets/HistoriaCiencia/JogoCiencia/Sapo-resolvido.png';
+import imagemCascoresolvido from '../assets/HistoriaCiencia/JogoCiencia/Casco-resolvido.png';
+import imagemGirinoresolvido from '../assets/HistoriaCiencia/JogoCiencia/Girino-resolvido.png';
+import imagemPenaresolvido from '../assets/HistoriaCiencia/JogoCiencia/Pena-resolvido.png';
+import imagemPeloresolvido from '../assets/HistoriaCiencia/JogoCiencia/Pelo-resolvido.png';
+import imagemPassarinhoresolvido from '../assets/HistoriaCiencia/JogoCiencia/Passarinho-resolvido.png';
+import imagemCoelhoresolvido from '../assets/HistoriaCiencia/JogoCiencia/Coelho-resolvido.png';
+import imagemOvosSaporesolvido from '../assets/HistoriaCiencia/JogoCiencia/Ovos-resolvido.png';
+import imagemEscamasresolvido from '../assets/HistoriaCiencia/JogoCiencia/Escamas-resolvido.png';
+import imagemLeiteresolvido from '../assets/HistoriaCiencia/JogoCiencia/Leite-resolvido.png';
+import imagemBicoresolvido from '../assets/HistoriaCiencia/JogoCiencia/Bico-resolvido.png';
+import imagemCobraresolvido from '../assets/HistoriaCiencia/JogoCiencia/Cobra-resolvida.png';
+
 // Array com as imagens e nomes dos botões em ordem
 const botoesData = [
-  { nome: 'Sapo', imagem: imagemSapo },
-  { nome: 'Casco', imagem: imagemCasco },
-  { nome: 'Girino', imagem: imagemGirino },
-  { nome: 'Pena', imagem: imagemPena },
-  { nome: 'Pelo', imagem: imagemPelo },
-  { nome: 'Passarinho', imagem: imagemPassarinho },
-  { nome: 'Coelho', imagem: imagemCoelho },
-  { nome: 'Ovos Sapo', imagem: imagemOvosSapo },
-  { nome: 'Escamas', imagem: imagemEscamas },
-  { nome: 'Leite', imagem: imagemLeite },
-  { nome: 'Bico', imagem: imagemBico },
-  { nome: 'Cobra', imagem: imagemCobra }
+  { nome: 'Sapo', imagem: imagemSapo, imagemresolvido: imagemSaporesolvido },
+  { nome: 'Casco', imagem: imagemCasco, imagemresolvido: imagemCascoresolvido },
+  { nome: 'Girino', imagem: imagemGirino, imagemresolvido: imagemGirinoresolvido },
+  { nome: 'Pena', imagem: imagemPena, imagemresolvido: imagemPenaresolvido },
+  { nome: 'Pelo', imagem: imagemPelo, imagemresolvido: imagemPeloresolvido },
+  { nome: 'Passarinho', imagem: imagemPassarinho, imagemresolvido: imagemPassarinhoresolvido },
+  { nome: 'Coelho', imagem: imagemCoelho, imagemresolvido: imagemCoelhoresolvido },
+  { nome: 'Ovos Sapo', imagem: imagemOvosSapo, imagemresolvido: imagemOvosSaporesolvido },
+  { nome: 'Escamas', imagem: imagemEscamas, imagemresolvido: imagemEscamasresolvido },
+  { nome: 'Leite', imagem: imagemLeite, imagemresolvido: imagemLeiteresolvido },
+  { nome: 'Bico', imagem: imagemBico, imagemresolvido: imagemBicoresolvido },
+  { nome: 'Cobra', imagem: imagemCobra, imagemresolvido: imagemCobraresolvido }
 ];
 
 // --- Componente: Conecta Ciência ---
@@ -44,6 +64,11 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
   const [mostrarPontuacao, setMostrarPontuacao] = React.useState(false);
   const [botoesClicados, setBotoesClicados] = React.useState(new Set());
   const [stringPosicoes, setStringPosicoes] = React.useState('');
+  const [respostaCorreta, setRespostaCorreta] = React.useState(false);
+  const [mostrarresolvidocao, setMostrarresolvidocao] = React.useState(false);
+  const [botoesCorretos, setBotoesCorretos] = React.useState(new Set());
+  const [respostasCorretas, setRespostasCorretas] = React.useState(0);
+  const [mostrarPopupErro, setMostrarPopupErro] = React.useState(false);
 
   // Função para ir para a tela de pontuação
   const irParaPontuacao = () => {
@@ -57,6 +82,11 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
 
   // Função para lidar com cliques nos botões
   const handleBotaoClick = (index) => {
+    // Não permite clique em botões que já estão corretos
+    if (botoesCorretos.has(index)) {
+      return; // Botão bloqueado, não responde a cliques
+    }
+    
     const novosBotoesClicados = new Set(botoesClicados);
     const letra = indiceParaLetra(index);
     
@@ -146,18 +176,20 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
   <button
     key={index}
     onClick={() => handleBotaoClick(index)}
-    className="bg-transparent transition-all duration-300 transform hover:scale-105 active:scale-95 p-0 overflow-hidden relative
-               w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 xl:w-40 xl:h-40 2xl:w-40 2xl:h-40"
-    // ↑ REMOVER O STYLE FIXO E USAR APENAS CLASSES TAILWIND
+    className="bg-transparent transition-all duration-300 transform hover:scale-105 active:scale-95 p-0 overflow-hidden relative w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 xl:w-40 xl:h-40 2xl:w-40 2xl:h-40"
     style={{ 
       border: 'none',
-      outline: 'none'
-      // width e height removidos!
+      outline: 'none',
+      cursor: botoesCorretos.has(index) ? 'default' : 'pointer'
     }}
             >
               <div className="relative w-full h-full">
                 <img 
-                  src={botao.imagem} 
+                  src={
+                    respostaCorreta && mostrarresolvidocao && botoesCorretos.has(index)
+                      ? botao.imagemresolvido
+                      : botao.imagem
+                  }
                   alt={botao.nome}
                   className="w-full h-full object-contain block"
                   style={{
@@ -166,10 +198,15 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
                   }}
                   onError={(e) => {
                     console.error(`Erro ao carregar imagem: ${botao.nome}`);
-                    e.target.style.display = 'none';
+                    // Se a imagem -resolvido.png não existir, volta para a original
+                    if (e.target.src.includes('-resolvido.png')) {
+                      e.target.src = botao.imagem;
+                    } else {
+                      e.target.style.display = 'none';
+                    }
                   }}
                 />
-                {/* Máscara roxa que segue os contornos da imagem - corrigida para responsividade */}
+                {/* Máscara roxa translúcida que segue os contornos da imagem */}
                 {botoesClicados.has(index) && (
                   <div 
                     className="absolute inset-0 transition-opacity duration-300 rounded-sm"
@@ -193,25 +230,104 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
         </div>
       </div>
 
-      {/* Botão no canto inferior esquerdo */}
+      {/* Botão resolvidor com Imagem - Lado Direito */}
       <button
-        onClick={() => {
-          // Ordenar a string alfabeticamente
-          const stringOrdenada = stringPosicoes.split('').sort().join('');
-          console.log('String original:', stringPosicoes);
-          console.log('String ordenada:', stringOrdenada);
-          // Aqui você pode enviar a stringOrdenada para o backend
-          //irParaPontuacao();
+        onClick={async () => {
+          if (botoesClicados.size !== 3) return;
+          
+          try {
+            // Ordenar a string alfabeticamente
+            const stringOrdenada = stringPosicoes.split('').sort().join('');
+            console.log('Enviando resposta:', stringOrdenada);
+            
+            // Fazer requisição para API
+            const response = await fetch(`http://localhost:8080/api/conecta/verificar/1?resposta=${stringOrdenada}`);
+            const resultado = await response.text();
+            
+            console.log('Resposta da API:', resultado);
+            
+            if (resultado === 'True') {
+              setRespostaCorreta(true);
+              setMostrarresolvidocao(true);
+              
+              // ACUMULAR botões corretos - não substituir, adicionar aos existentes
+              const novosBotoesCorretos = new Set(botoesCorretos);
+              botoesClicados.forEach(index => novosBotoesCorretos.add(index));
+              setBotoesCorretos(novosBotoesCorretos);
+              
+              // Incrementar contador de respostas corretas
+              const novasRespostasCorretas = respostasCorretas + 1;
+              setRespostasCorretas(novasRespostasCorretas);
+              
+              console.log('Resposta correta! Mostrando imagens de resolvidoção.');
+              console.log(`Respostas corretas: ${novasRespostasCorretas}/4`);
+              
+              // Se chegou a 4 respostas corretas, ir para a tela de pontuação
+              if (novasRespostasCorretas >= 4) {
+                setTimeout(() => {
+                  setMostrarPontuacao(true);
+                }, 1500); // Aguarda 1.5 segundos para mostrar a imagem resolvida antes de ir para pontuação
+              }
+            } else {
+              console.log('Resposta incorreta.');
+              // Mostrar popup de erro
+              setMostrarPopupErro(true);
+              // Ocultar popup após 2 segundos
+              setTimeout(() => {
+                setMostrarPopupErro(false);
+              }, 2000);
+            }
+            
+            // Desselecionar todos os botões após enviar resposta
+            setBotoesClicados(new Set());
+            setStringPosicoes('');
+          } catch (error) {
+            console.error('Erro ao enviar resposta:', error);
+          }
         }}
-        className="fixed bottom-8 left-8 bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl z-20"
+        disabled={botoesClicados.size !== 3}
+        className={`fixed bottom-8 right-8 bg-transparent border-none p-0 transition-all duration-300 transform hover:scale-105 active:scale-95 z-20 ${
+          botoesClicados.size !== 3 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+        }`}
         style={{ 
-          backgroundColor: '#563066',
+          outline: 'none'
         }}
-        onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
-        onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
       >
-        Enviar Resposta
+        <img 
+          src={botaoresolvido} 
+          alt="resolvidor Resposta"
+          className="w-auto h-auto object-contain"
+          style={{
+            maxWidth: '100%',
+            height: 'auto',
+            filter: botoesClicados.size !== 3 ? 'grayscale(100%) brightness(0.5)' : 'none'
+          }}
+          onError={(e) => {
+            console.error('Erro ao carregar imagem do botão resolvido');
+            e.target.style.display = 'none';
+          }}
+        />
       </button>
+
+      {/* Popup de Erro */}
+      {mostrarPopupErro && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setMostrarPopupErro(false)}
+        >
+          <div className="relative">
+            <img 
+              src={popupErro} 
+              alt="Erro - Resposta Incorreta"
+              className="max-w-[70vw] max-h-[70vh] object-contain"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMostrarPopupErro(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 };

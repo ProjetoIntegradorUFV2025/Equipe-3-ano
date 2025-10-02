@@ -22,13 +22,13 @@ public class ControladorConecta {
 
         if (respostasCertas.isEmpty()) {
             // ID não encontrado
-            return "Conecta não encontrado";
+            return "False";
         }
 
         if (respostasCertas.contains(respostaAluno)) {
-            return "Resposta correta!";
+            return "True";
         } else {
-            return "Resposta incorreta. Tente novamente.";
+            return "False";
         }
     }
     @PutMapping("/atualizar/{id}")
