@@ -138,9 +138,9 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
         posicao="top-right"
       />
 
-{/* Letreiro e Texto Conecta - CORRIGIDO COM POSICIONAMENTO */}
+{/* Letreiro e Texto Conecta */}
 <div className="absolute top-16 sm:top-20 md:top-24 lg:top-28 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-10 px-4">
-  {/* Letreiro Conecta - MUITO MAIOR */}
+  {/* Letreiro Conecta */}
   <div className="mb-3">
     <img 
       src={letreirosConecta} 
@@ -153,7 +153,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
     />
   </div>
 
-  {/* Texto Conecta - MUITO MAIOR */}
+  {/* Texto Conecta  */}
   <div>
     <img 
       src={textoConecta} 
