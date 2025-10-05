@@ -139,13 +139,13 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
       />
 
 {/* Letreiro e Texto Conecta */}
-<div className="absolute top-16 sm:top-20 md:top-24 lg:top-28 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-10 px-4">
+<div className="absolute top-16 transform scale-y-90 sm:top-20 md:top-24 lg:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-10 px-4">
   {/* Letreiro Conecta */}
   <div className="mb-3">
     <img 
       src={letreirosConecta} 
       alt="Letreiro Conecta"
-      className="max-w-full h-auto object-contain w-64 sm:w-72 md:w-80 lg:w-96 xl:w-[28rem] 2xl:w-[32rem]"
+      className="max-w-full w-44 sm:w-72 md:w-80 lg:w-96 xl:w-[28rem] 2xl:w-[32rem]"
       //                                        256px  288px   320px   384px     448px        512px
       style={{
         filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))'
@@ -168,8 +168,8 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
 </div>
 
       {/* Conteúdo da tela ConectaCiencia - Matriz de botões 3x4 */}
-      <div className="w-full h-screen flex items-end justify-center pb-2 px-4">
-        <div className="grid grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 place-items-center max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl 2xl:max-w-3xl">
+      <div className="w-full h-screen pt-6 ml-6 transform translate-x-80 translate-y-24 scale-y-90">
+        <div className="grid grid-cols-4 gap-0.5 sm:gap-3 md:gap-4 lg:gap-1 xl:gap-6 place-items-center max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl 2xl:max-w-3xl">
           {/* Gerar 12 botões (3 linhas x 4 colunas) com imagens */}
           {/* BOTÕES AGORA RESPONSIVOS - Remover style fixo */}
 {botoesData.map((botao, index) => (
