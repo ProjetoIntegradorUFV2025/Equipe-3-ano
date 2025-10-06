@@ -49,13 +49,6 @@
 
 ## 🔄 MÉTRICAS DE QUALIDADE
 
-### 📊 Taxa de Retrabalho
-| Métrica | Valor |
-|---------|-------|
-| **Commits Submetidos** | 95 |
-| **Commits Rejeitados** | 83 |
-| **Taxa de Retrabalho** | **87.37%** |
-
 ### 💬 Code Review
 | Métrica | Valor |
 |---------|-------|
