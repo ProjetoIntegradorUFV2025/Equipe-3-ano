@@ -2,8 +2,11 @@ import React, { useEffect } from 'react';
 import MenuNavegacao from './ui/MenuNavegacao';
 import useAlunoLogado from '../hooks/useAlunoLogado';
 
-// Importar imagem de fundo
-import fundoPontuacao from '../assets/fundo-tela-pontuacao.png';
+// Assets para o fundo
+import fundoPontuacao from '../assets/fundo-pontuacao.png';
+import estrelas from '../assets/Estrela.png'
+import parabens from '../assets/parabens.png'
+import dadinhoConfete from '../assets/dadinhoConfete.png'
 
 // --- Componente: Tela Pontuação ---
 const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => {
@@ -82,6 +85,21 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
         backgroundRepeat: 'no-repeat'
       }}
     >
+      <img
+        src={estrelas}
+        className="absolute center left-1/2 transform -translate-x-1/2 translate-y-4 w-96 scale-y-105"
+      />
+
+      <img
+        src={parabens}
+        className="absolute center left-1/2 transform -translate-x-1/2 translate-y-44 w-96 scale-y-105"
+      />
+
+      <img
+        src={dadinhoConfete}
+        className="absolute bottom transform translate-x-4 translate-y-56 w-96"
+      />
+
       {/* Menu de Navegação Reutilizável */}
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
@@ -95,7 +113,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
           <div className="text-5xl font-sans font-bold leading-relaxed mb-2">
             <div className="mb-2 text-left">Tempo ...................... {tempoSegundos}</div>
             <div className="mb-4 text-left">Tentativas ................. {tentativas}</div>
-            <div className="text-5xl font-bold text-center" style={{ color: '#feeb6c' }}>+{pontos} pontos</div>
+            <div className="text-5xl font-bold text-center mb-5" style={{ color: '#feeb6c' }}>+{pontos} pontos</div>
           </div>
           
           {/* Botão Concluir */}

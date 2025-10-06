@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 
+// Importar imagem de fundo do menu
+import menuBarraFundo from '../../assets/Menu-barra.png';
+
+// Importar imagens dos botões do menu lateral
+import menuVoltarTrilha from '../../assets/MenuLateral/MenuVoltarTrilha.png';
+import menuPontuacao from '../../assets/MenuLateral/MenuPontuacao.png';
+import menuSair from '../../assets/MenuLateral/MenuSair.png';
+import menuTutorial from '../../assets/MenuLateral/MenuTutorial.png';
+
 // --- Componente: Menu de Navegação Reutilizável ---
 const MenuNavegacao = ({ 
   onVoltarTrilha, 
-  onVoltarMenu, 
-  mostrarVoltarTrilha = true, 
-  mostrarVoltarMenu = true,
-  posicao = "top-right" // "top-right", "top-left", "bottom-right", "bottom-left"
+  onVoltarMenu,
+  onSairConta,
+  posicao = "top-right", // "top-right", "top-left", "bottom-right", "bottom-left"
+  distanciaDoTopo = 180 // Distância regulável do topo do background do menu
 }) => {
   const [menuAberto, setMenuAberto] = useState(false);
 
@@ -79,53 +88,149 @@ const MenuNavegacao = ({
           </div>
         </button>
 
-        {/* Menu Lateral */}
+        {/* Menu com Imagem de Fundo */}
         {menuAberto && (
           <div 
-            className="fixed top-0 right-0 h-full w-1/4 z-50 transform transition-transform duration-300 ease-in-out rounded-l-2xl"
-            style={{ backgroundColor: '#563066' }}
+            className="fixed top-0 right-0 h-full w-1/3 z-50 transform transition-transform duration-300 ease-in-out"
+            style={{
+              backgroundImage: `url(${menuBarraFundo})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header do menu */}
-            <div className="p-6 border-b" style={{ borderColor: '#4a2857' }}>
-              <h3 className="text-xl font-bold text-white">Menu de Navegação</h3>
-            </div>
-            
-            {/* Lista de opções */}
-            <div className="py-4">
-              {mostrarVoltarTrilha && onVoltarTrilha && (
-                <button
-                  onClick={() => {
-                    onVoltarTrilha();
-                    setMenuAberto(false);
-                  }}
-                  className="w-full px-6 py-4 text-left text-white text-lg transition-colors duration-200 border-b flex items-center"
-                  style={{ 
-                    borderColor: '#4a2857',
-                    backgroundColor: 'transparent'
-                  }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                >
-                  <span className="mr-3">🏝️</span>
-                  Voltar à Trilha
-                </button>
-              )}
-              {mostrarVoltarMenu && onVoltarMenu && (
-                <button
-                  onClick={() => {
-                    onVoltarMenu();
-                    setMenuAberto(false);
-                  }}
-                  className="w-full px-6 py-4 text-left text-white text-lg transition-colors duration-200 flex items-center"
-                  style={{ backgroundColor: 'transparent' }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                >
-                  <span className="mr-3">🏠</span>
-                  Menu Principal
-                </button>
-              )}
+            {/* Container dos botões com distância regulável do topo */}
+            <div 
+              className="flex flex-col space-y-4 px-6"
+              style={{ marginTop: `${distanciaDoTopo}px` }}
+            >
+              {/* Botão 1: Voltar à Trilha */}
+              <button
+                onClick={() => {
+                  if (onVoltarTrilha) onVoltarTrilha();
+                  setMenuAberto(false);
+                }}
+                className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
+                style={{ 
+                  backgroundColor: 'transparent',
+                  border: '2px solid transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = 'transparent';
+                }}
+              >
+                <img 
+                  src={menuVoltarTrilha} 
+                  alt="Voltar à Trilha" 
+                  className="w-16 h-17 mr-4"
+                />
+                Voltar à Trilha
+              </button>
+
+              {/* Botão 2: Tela de Pontuação (não implementado) */}
+              <button
+                onClick={() => {
+                  // Ainda não implementado
+                  console.log('Tela de pontuação ainda não implementada');
+                  setMenuAberto(false);
+                }}
+                className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
+                style={{ 
+                  backgroundColor: 'transparent',
+                  border: '2px solid transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = 'transparent';
+                }}
+              >
+                <img 
+                  src={menuPontuacao} 
+                  alt="Pontuação" 
+                  className="w-16 h-16 mr-4"
+                />
+                Pontuação
+              </button>
+
+              {/* Botão 3: Sair da Conta */}
+              <button
+                onClick={() => {
+                  // Fazer logout do jogador
+                  // Limpar dados de autenticação do localStorage/sessionStorage
+                  localStorage.removeItem('authToken');
+                  localStorage.removeItem('userSession');
+                  localStorage.removeItem('playerData');
+                  sessionStorage.clear();
+                  
+                  // Chamar função de callback se fornecida
+                  if (onSairConta) onSairConta();
+                  
+                  // Fechar menu
+                  setMenuAberto(false);
+                  
+                  // Redirecionar para tela inicial (recarregar página para resetar estado)
+                  window.location.href = '/';
+                }}
+                className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
+                style={{ 
+                  backgroundColor: 'transparent',
+                  border: '2px solid transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = 'transparent';
+                }}
+              >
+                <img 
+                  src={menuSair} 
+                  alt="Sair da Conta" 
+                  className="w-16 h-16 mr-4"
+                />
+                Sair da Conta
+              </button>
+
+              {/* Botão 4: Ver Tutorial (não implementado) */}
+              <button
+                onClick={() => {
+                  // Ainda não implementado
+                  console.log('Tutorial ainda não implementado');
+                  setMenuAberto(false);
+                }}
+                className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
+                style={{ 
+                  backgroundColor: 'transparent',
+                  border: '2px solid transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.borderColor = 'transparent';
+                }}
+              >
+                <img 
+                  src={menuTutorial} 
+                  alt="Ver Tutorial" 
+                  className="w-16 h-16 mr-4"
+                />
+                Ver Tutorial
+              </button>
             </div>
           </div>
         )}
