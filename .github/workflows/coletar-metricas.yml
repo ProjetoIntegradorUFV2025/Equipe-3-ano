@@ -1,8 +1,6 @@
 name: Coletar Métricas da Sprint
 
 on:
-  schedule:
-    - cron: '0 3 * * 2'  # Toda terça às 3AM
   workflow_dispatch:
     inputs:
       sprint_number:
