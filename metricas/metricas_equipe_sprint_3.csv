@@ -1,0 +1,2 @@
+Inicio_Sprint,Fim_Sprint,Total_Issues,Issues_Fechadas,Issues_Aceitos,Issues_Resolvidos,Total_PRs,PRs_Aprovadas,PRs_Abertas,PRs_Fechados_Sem_Merge,Total_Comentarios_PRs,PRs_Com_Revisao,Media_Comentarios_Por_Revisao,Commits_Submetidos,Commits_Rejeitados,PRs_Com_Refatoracao,Taxa_Retrabalho_Percentual,Tempo_Total_Resolucao_Horas,Tempo_Total_Aprovacao_Horas,2.5_Taxa_Resolucao_Issues_Percentual,2.7_Tempo_Medio_Resolucao_Horas,2.9_Tempo_Medio_Aprovacao_Horas
+2025-09-29,2025-10-07,5,5,4,4,23,10,1,12,18,18,0.78,95,83,8,87.37,360.24,245.27,100.0,90.06,24.53
