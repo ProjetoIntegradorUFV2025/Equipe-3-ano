@@ -168,7 +168,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
 </div>
 
       {/* Conteúdo da tela ConectaCiencia - Matriz de botões 3x4 */}
-      <div className="w-full h-screen pt-6 ml-6 transform translate-x-80 translate-y-24 scale-y-90">
+      <div className="w-full h-screen pt-6 flex justify-center items-start translate-y-24 scale-y-90">
         <div className="grid grid-cols-4 gap-0.5 sm:gap-3 md:gap-4 lg:gap-1 xl:gap-6 place-items-center max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl 2xl:max-w-3xl">
           {/* Gerar 12 botões (3 linhas x 4 colunas) com imagens */}
           {/* BOTÕES AGORA RESPONSIVOS - Remover style fixo */}
