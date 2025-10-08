@@ -111,38 +111,21 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
     if (botoesClicados.has(index)) {
       // Se já foi clicado, remove da seleção
       novosBotoesClicados.delete(index);
-      
-      // Remove o índice da string (remove o número e a vírgula associada)
-      let novaString = stringIndices;
-      if (novaString.includes(`,${index},`)) {
-        // Remove do meio da string
-        novaString = novaString.replace(`,${index},`, ',');
-      } else if (novaString.startsWith(`${index},`)) {
-        // Remove do início da string
-        novaString = novaString.replace(`${index},`, '');
-      } else if (novaString.endsWith(`,${index}`)) {
-        // Remove do final da string
-        novaString = novaString.replace(`,${index}`, '');
-      } else if (novaString === `${index}`) {
-        // É o único elemento
-        novaString = '';
-      }
-      setStringIndices(novaString);
     } else {
       // Se não foi clicado, adiciona à seleção
       novosBotoesClicados.add(index);
-      
-      // Adiciona o índice à string
-      if (stringIndices === '') {
-        setStringIndices(`${index}`);
-      } else {
-        setStringIndices(prev => `${prev},${index}`);
-      }
     }
     
+    // Reconstroi a string sempre de forma ordenada
+    const indicesOrdenados = Array.from(novosBotoesClicados).sort((a, b) => a - b);
+    const novaStringOrdenada = indicesOrdenados.join(',');
+    
     setBotoesClicados(novosBotoesClicados);
+    setStringIndices(novaStringOrdenada);
+    
     console.log(`Botão ${index} ${botoesClicados.has(index) ? 'desmarcado' : 'marcado'}`);
     console.log(`Total selecionados: ${novosBotoesClicados.size}`);
+    console.log(`String ordenada: ${novaStringOrdenada}`);
   };
 
   return (
@@ -181,7 +164,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
           <img 
             src={fundoCacaPalavra} 
             alt="Fundo Caça Palavras"
-            className="max-w-full h-auto object-contain w-80 sm:w-96 md:w-[28rem] lg:w-[32rem] xl:w-[36rem] 2xl:w-[40rem]"
+            className="max-w-full h-auto object-contain w-96 sm:w-[28rem] md:w-[32rem] lg:w-[36rem] xl:w-[44rem] 2xl:w-[48rem]"
             style={{
               filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
             }}
@@ -242,13 +225,13 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
-          width: '180px',
-          height: '130px'
+          width: '220px',
+          height: '160px'
         }}
       >
         {/* Texto de pontuação */}
         <div className="w-full h-full flex items-center justify-center">
-          <div className="text-3xl font-bold" style={{ color: '#257894' }}>
+          <div className="text-7xl font-bold" style={{ color: '#257894' }}>
             {palavrasEncontradas}/{totalPalavras}
           </div>
         </div>
