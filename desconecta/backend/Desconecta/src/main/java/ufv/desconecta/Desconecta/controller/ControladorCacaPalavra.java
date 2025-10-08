@@ -21,12 +21,13 @@ public class ControladorCacaPalavra {
         List<String> respostas = acessoBDCacaPalavras.getRespostas(Pk_CacaPalavras);
         System.out.println(tentativa);
         System.out.println(respostas);
+
         if(respostas.isEmpty()){
-            return "Erro no acesso ao banco de dados.";
+            return "False";
         } else if (respostas.contains(tentativa)) {
-            return  "Resposta está correta.";
+            return  "True";
         }
-        return "Resposta está incorreta.";
+        return "False";
     }
 
     @GetMapping("/getList/{id}")
