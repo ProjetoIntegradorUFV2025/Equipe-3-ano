@@ -219,14 +219,18 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
 
   return (
     <main 
-      className="min-h-screen relative overflow-hidden w-full"
+      // className="min-h-screen relative overflow-hidden w-full"
+      className="min-h-screen w-full relative flex flex-col items-center justify-center overflow-hidden"
       style={{
         backgroundImage: `url(${fundoGeografia})`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center center',
+        backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
     >
+
+    <div className="flex flex-col items-center justify-between" style={{ height: '95vh' }}>
+
       {/* Menu de Navegação Reutilizável */}
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
@@ -234,35 +238,29 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
         posicao="top-right"
       />
 
-      {/* Letreiro e Fundo Caça Palavras */}
-      <div className="absolute top-16 transform scale-y-90 sm:top-20 md:top-24 lg:top-6 left-1/2 -translate-x-1/2 flex flex-col items-center z-10 px-4">
-        {/* Letreiro Caça Palavras */}
-        <div className="mb-3">
-          <img 
-            src={letreiroCacaPalavras} 
-            alt="Letreiro Caça Palavras"
-            className="max-w-full w-44 sm:w-72 md:w-80 lg:w-96 xl:w-[28rem] 2xl:w-[32rem]"
-            style={{
-              filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))'
-            }}
-          />
-        </div>
 
-        {/* Fundo Caça Palavras */}
-        <div>
-          <img 
-            src={fraseCacaPalavra} 
-            alt="Fundo Caça Palavras"
-            className="max-w-full h-auto object-contain w-96 sm:w-[28rem] md:w-[32rem] lg:w-[36rem] xl:w-[44rem] 2xl:w-[48rem]"
-            style={{
-              filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
-            }}
-          />
-        </div>
-      </div>
+     <div className="flex flex-col items-center" style={{ gap: '3vh' }}>
+    <img 
+      src={letreiroCacaPalavras} 
+      alt="Letreiro Caça Palavras"
+      className="w-[25vw] sm:w-[28vw] md:w-[30vw] lg:w-[32vw] xl:w-[34vw]"
+      style={{
+        filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))'
+      }}
+    />
+
+    <img 
+      src={fraseCacaPalavra} 
+      alt="Fundo Caça Palavras"
+      className="w-[35vw] sm:w-[38vw] md:w-[42vw] lg:w-[46vw] xl:w-[48vw]"
+      style={{
+        filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
+      }}
+    />
+  </div>
 
       {/* Matriz de Caça Palavras 12x12 Centralizada */}
-      <div className="w-full h-screen pt-6 flex justify-center items-center translate-y-12">
+      <div className="w-full h-screen flex justify-center items-center transform scale-y-90" style={{height:"80vh"}}>
         
         {/* Matriz 12x12 de Botões - Centralizada e Aumentada */}
         <div className="grid grid-cols-12 gap-0 p-0 bg-black rounded-2xl shadow-xl border-4 border-black overflow-hidden">
@@ -313,15 +311,15 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
       </div>
 
       {/* Debug Visual - String de índices no canto esquerdo */}
-      <div className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-70 text-white p-4 rounded-lg max-w-xs">
-        <h3 className="text-sm font-bold mb-2">Debug - Índices:</h3>
-        <p className="text-xs break-words">
-          {stringIndices || 'Nenhum botão selecionado'}
-        </p>
-        <p className="text-xs mt-2 text-gray-300">
-          Total: {botoesClicados.size} botões
-        </p>
-      </div>
+      {/* <div className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-70 text-white p-4 rounded-lg max-w-xs"> */}
+      {/*   <h3 className="text-sm font-bold mb-2">Debug - Índices:</h3> */}
+      {/*   <p className="text-xs break-words"> */}
+      {/*     {stringIndices || 'Nenhum botão selecionado'} */}
+      {/*   </p> */}
+      {/*   <p className="text-xs mt-2 text-gray-300"> */}
+      {/*     Total: {botoesClicados.size} botões */}
+      {/*   </p> */}
+      {/* </div> */}
 
       {/* Painel de Pontuação - Lado direito da tela */}
       <div 
@@ -359,7 +357,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
           alt="Confirmar Resposta"
           className="w-auto h-auto object-contain"
           style={{
-            maxWidth: '80px',
+            maxWidth: '85%',
             height: 'auto',
             filter: stringIndices === '' ? 'grayscale(100%) brightness(0.5)' : 'none'
           }}
@@ -389,6 +387,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
           </div>
         </div>
       )}
+    </div>
     </main>
   );
 };

@@ -77,28 +77,32 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
   }, [alunoId, isLogado]);
   return (
     <main 
-      className="min-h-screen relative overflow-hidden w-full"
+      // className="min-h-screen relative overflow-hidden w-full"
+      className="min-h-screen w-full relative flex flex-col items-center justify-center overflow-hidden"
       style={{
         backgroundImage: `url(${fundoPontuacao})`,
-        backgroundSize: '100%',
-        backgroundPosition: 'center center',
+        backgroundSize:'cover',
+        // backgroundSize: '100%',
+        backgroundPosition:'center',
+        // backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat'
       }}
     >
+      <div className="relative flex flex-col items-center justify-between" style={{ height: '600px' }}>
       <img
         src={estrelas}
-        className="absolute center left-1/2 transform -translate-x-1/2 translate-y-4 w-96 scale-y-105"
+        // className="absolute left-1/2 top-[5vh] transform -translate-x-1/2 w-96 scale-y-105"
+        className="w-96 scale-y-105"
       />
 
       <img
         src={parabens}
-        className="absolute center left-1/2 transform -translate-x-1/2 translate-y-44 w-96 scale-y-105"
+        // className="absolute center left-1/2 transform -translate-x-1/2 translate-y-44 w-96 scale-y-105"
+        // className="absolute left-1/2 top-[32vh] transform -translate-x-1/2 w-96 scale-y-105"
+        className="w-96 scale-y-105"
       />
 
-      <img
-        src={dadinhoConfete}
-        className="absolute bottom transform translate-x-4 translate-y-56 w-96"
-      />
+
 
       {/* Menu de Navegação Reutilizável */}
       <MenuNavegacao 
@@ -120,7 +124,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
           <div className="text-center">
             <button
               onClick={handleVoltarTrilha}
-              className="text-white font-bold px-16 rounded-full text-3xl transition-all duration-300 transform hover:scale-105 shadow-2xl"
+              className="text-white font-bold px-16 pb-1 pt-0.5 rounded-full text-3xl transition-all duration-300 transform hover:scale-105 shadow-2xl"
               style={{ 
                 backgroundColor: '#f93d6e',
                 ':hover': { backgroundColor: '#e02a5b' }
@@ -133,7 +137,12 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
           </div>
         </div>
       </div>
-    </main>
+    </div>
+    <img
+        src={dadinhoConfete}
+        className="absolute bottom-0 left-6 w-96"
+    />
+  </main>
   );
 };
 
