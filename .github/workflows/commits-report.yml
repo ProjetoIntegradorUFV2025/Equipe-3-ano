@@ -19,7 +19,6 @@ jobs:
     # 🔐 DAR PERMISSÕES EXTRA PARA O GITHUB_TOKEN
     permissions:
       contents: write
-      members: read
 
     steps:
       - name: Checkout código com PAT
