@@ -54,6 +54,7 @@ jobs:
           
           python3 << 'PYTHON_SCRIPT'
           import os
+          import subprocess
           import requests
           from datetime import datetime
           from collections import defaultdict
@@ -70,108 +71,112 @@ jobs:
               'Accept': 'application/vnd.github.v3+json'
           }
           
-          # 1. Buscar commits no período especificado
-          print(f"🔍 Buscando commits de {since} a {until}...")
-          page = 1
-          total_commits = 0
-          contagem = defaultdict(int)
-          user_to_name = {}
-          
-          while True:
-              commits_url = f'https://api.github.com/repos/{repo}/commits'
-              params = {
-                  'since': f'{since}T00:00:00Z',
-                  'until': f'{until}T23:59:59Z',
-                  'per_page': 100,
-                  'page': page
-              }
-              
-              response = requests.get(commits_url, headers=headers, params=params)
-              
-              if response.status_code != 200:
-                  print(f"⚠️ Erro na API: {response.status_code}")
-                  break
-              
-              commits = response.json()
-              
-              if not commits or not isinstance(commits, list):
-                  break
-              
-              for commit in commits:
-                  author = commit.get('author')
-                  commit_author = commit.get('commit', {}).get('author', {})
-                  
-                  if author and author.get('login'):
-                      username = author['login']
-                      contagem[username] += 1
-                      total_commits += 1
-                      
-                      # Pegar o nome real do commit ou do perfil
-                      if commit_author.get('name'):
-                          user_to_name[username] = commit_author['name']
-                      elif not username in user_to_name:
-                          user_to_name[username] = username
-              
-              # Se retornou menos que 100, é a última página
-              if len(commits) < 100:
-                  break
-              
-              page += 1
-              
-              # Limitar a 20 páginas para evitar timeout
-              if page > 20:
-                  break
-          
-          print(f"✅ Total de commits processados: {total_commits}")
-          print(f"✅ Autores encontrados: {len(contagem)}")
-          
-          # 2. Buscar todos os colaboradores do repositório
+          # 1. Buscar colaboradores diretos do repositório (com permissão push)
           print("📋 Buscando colaboradores do repositório...")
-          page = 1
-          todos_colaboradores = []
+          colaboradores_url = f'https://api.github.com/repos/{repo}/collaborators'
+          params = {'affiliation': 'direct', 'per_page': 100}
           
-          while True:
-              colaboradores_url = f'https://api.github.com/repos/{repo}/collaborators'
-              params = {'per_page': 100, 'page': page}
-              
-              response = requests.get(colaboradores_url, headers=headers, params=params)
-              
-              if response.status_code != 200:
-                  print(f"⚠️ Erro ao buscar colaboradores: {response.status_code}")
-                  break
-              
-              colaboradores = response.json()
-              
-              if not colaboradores or not isinstance(colaboradores, list):
-                  break
-              
-              todos_colaboradores.extend(colaboradores)
-              
-              if len(colaboradores) < 100:
-                  break
-              
-              page += 1
+          response = requests.get(colaboradores_url, headers=headers, params=params)
           
-          print(f"✅ Encontrados {len(todos_colaboradores)} colaboradores")
+          if response.status_code != 200:
+              print(f"⚠️ Erro ao buscar colaboradores: {response.status_code}")
+              print(f"Response: {response.text}")
+              colaboradores_api = []
+          else:
+              colaboradores_api = response.json()
           
-          # Adicionar colaboradores que não fizeram commits
-          for colab in todos_colaboradores:
+          print(f"✅ Encontrados {len(colaboradores_api)} colaboradores diretos na API")
+          
+          # Criar set de usernames dos colaboradores
+          colaboradores_usernames = {colab['login'].lower() for colab in colaboradores_api}
+          
+          # 2. Buscar commits usando git log (mais confiável)
+          print(f"🔍 Buscando commits de {since} a {until}...")
+          
+          # Executar git log para pegar autor e email
+          cmd = [
+              'git', 'log',
+              f'--since={since}T00:00:00',
+              f'--until={until}T23:59:59',
+              '--all',
+              '--format=%ae|%an|%aE'
+          ]
+          
+          result = subprocess.run(cmd, capture_output=True, text=True)
+          commits_raw = result.stdout.strip().split('\n')
+          
+          # Contar commits por email
+          commits_por_email = defaultdict(int)
+          email_to_name = {}
+          
+          for line in commits_raw:
+              if not line:
+                  continue
+              parts = line.split('|')
+              if len(parts) >= 2:
+                  email = parts[0].lower()
+                  name = parts[1]
+                  commits_por_email[email] += 1
+                  email_to_name[email] = name
+          
+          print(f"✅ Total de commits encontrados: {sum(commits_por_email.values())}")
+          print(f"✅ Autores únicos: {len(commits_por_email)}")
+          
+          # 3. Mapear emails para usernames do GitHub
+          print("🔗 Mapeando emails para usernames...")
+          contagem_final = defaultdict(int)
+          user_to_display_name = {}
+          
+          # Para cada colaborador, buscar seus emails
+          for colab in colaboradores_api:
               username = colab['login']
-              if username not in contagem:
-                  contagem[username] = 0
-                  user_to_name[username] = username
+              
+              # Buscar emails do usuário via API
+              user_url = f'https://api.github.com/users/{username}'
+              user_response = requests.get(user_url, headers=headers)
+              
+              if user_response.status_code == 200:
+                  user_data = user_response.json()
+                  user_email = user_data.get('email', '').lower() if user_data.get('email') else None
+                  user_name = user_data.get('name', username)
+                  
+                  # Inicializar com 0
+                  contagem_final[username] = 0
+                  user_to_display_name[username] = user_name
+                  
+                  # Verificar se algum email nos commits bate
+                  for email, count in commits_por_email.items():
+                      # Verifica se o email contém o username ou vice-versa
+                      if user_email and email == user_email:
+                          contagem_final[username] += count
+                      elif username.lower() in email:
+                          contagem_final[username] += count
+                      elif email.split('@')[0].lower() == username.lower():
+                          contagem_final[username] += count
           
-          # 3. Gerar relatório em Markdown
+          # Adicionar commits de emails que não foram mapeados (se forem colaboradores)
+          for email, count in commits_por_email.items():
+              username_from_email = email.split('@')[0]
+              
+              # Verificar se é um colaborador conhecido
+              if username_from_email.lower() in colaboradores_usernames:
+                  if username_from_email not in contagem_final:
+                      contagem_final[username_from_email] = count
+                      user_to_display_name[username_from_email] = email_to_name.get(email, username_from_email)
+          
+          total_commits = sum(contagem_final.values())
+          
+          # 4. Gerar relatório em Markdown
           linhas = []
-          for username in sorted(contagem.keys(), key=lambda x: contagem[x], reverse=True):
-              nome_exibicao = user_to_name.get(username, username)
-              total = contagem[username]
+          for username in sorted(contagem_final.keys(), key=lambda x: contagem_final[x], reverse=True):
+              nome_exibicao = user_to_display_name.get(username, username)
+              total = contagem_final[username]
               linhas.append(f"| {nome_exibicao} (@{username}) | {total} |")
           
           markdown = f"""# 📊 Relatório de Commits
           **Período:** {since} → {until}  
           **Total de Commits:** {total_commits}  
-          **Colaboradores:** {len(todos_colaboradores)}
+          **Colaboradores:** {len(colaboradores_api)}
           
           | Autor | Commits |
           |--------|----------|
