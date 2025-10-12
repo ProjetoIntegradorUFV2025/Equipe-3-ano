@@ -7,6 +7,7 @@ import ilhaGeografia from '../assets/imgTelaTrilha/Ilha-geografia.png';
 import ilhaMatematica from '../assets/imgTelaTrilha/Ilha-Matematica.png';
 import popupJogarIlha from '../assets/imgTelaTrilha/popup-jogar-ilha.png';
 import TelaJogoCiencia from './TelaJogoCiencia';
+import JogoGeografia from './JogoGeografia';
 import TelaPontuacao from './TelaPontuacao';
 import useAlunoLogado from '../hooks/useAlunoLogado';
 
@@ -14,7 +15,7 @@ import useAlunoLogado from '../hooks/useAlunoLogado';
 // --- Componente: Tela Trilha ---
 const TelaTrilha = ({ onVoltar }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
-  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'ciencia', ou 'pontuacao'
+  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'ciencia', 'geografia', ou 'pontuacao'
   const [popupCienciaAberto, setPopupCienciaAberto] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -152,9 +153,14 @@ const TelaTrilha = ({ onVoltar }) => {
     return <TelaJogoCiencia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
   }
 
+  // Se estiver na tela de geografia, renderizar JogoGeografia
+  if (telaAtiva === 'geografia') {
+    return <JogoGeografia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+  }
+
   // Se estiver na tela de pontuação, renderizar TelaPontuacao
   if (telaAtiva === 'pontuacao') {
-    return <TelaPontuacao onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} ilhaCompletada={0} />;
+    return <TelaPontuacao onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} ilhaCompletada={3} />;
   }
 
   // Se o aluno não estiver logado, mostrar mensagem
@@ -331,7 +337,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(30%, -110%)' 
             }}>
             <button
-              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? () => console.log('Ilha Matemática clicada!') : undefined}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? () => setTelaAtiva('pontuacao') : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 2}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
                 (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2)
@@ -383,7 +389,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(-30%, -15%)' 
             }}>
             <button
-              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3) ? () => console.log('Ilha Geografia clicada!') : undefined}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3) ? () => setTelaAtiva('geografia') : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 3}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
                 (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3)
