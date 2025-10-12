@@ -19,6 +19,7 @@ jobs:
     # 🔐 DAR PERMISSÕES EXTRA PARA O GITHUB_TOKEN
     permissions:
       contents: write
+      members: read
 
     steps:
       - name: Checkout código com PAT
@@ -27,8 +28,19 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0
 
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Instalar dependências
+        run: |
+          pip install requests
+
       - name: Gerar relatório de commits
         env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
           SINCE: ${{ github.event.inputs.since }}
           UNTIL: ${{ github.event.inputs.until }}
         run: |
@@ -41,23 +53,110 @@ jobs:
           TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
           FILENAME="metricas/commits_${SINCE}_${UNTIL}_${TIMESTAMP}.md"
           
-          # Gera relatório usando git log
-          git log --since="$SINCE" --until="$UNTIL" --pretty=format:"%an" | \
-            sort | uniq -c | sort -rn | \
-            awk -v since="$SINCE" -v until="$UNTIL" '
-              BEGIN {
-                print "# 📊 Relatório de Commits"
-                print "**Período:** " since " → " until
-                print ""
-                print "| Autor | Commits |"
-                print "|--------|----------|"
-              }
-              {
-                printf "| %s | %d |\n", substr($0, index($0,$2)), $1
-              }
-            ' > "$FILENAME"
+          python3 << 'PYTHON_SCRIPT'
+          import os
+          import requests
+          from datetime import datetime
+          from collections import defaultdict
           
-          echo "✅ Relatório gerado: $FILENAME"
+          # Configurações
+          token = os.environ['GITHUB_TOKEN']
+          repo = os.environ['REPOSITORY']
+          since = os.environ['SINCE']
+          until = os.environ['UNTIL']
+          filename = os.environ['FILENAME']
+          
+          headers = {
+              'Authorization': f'token {token}',
+              'Accept': 'application/vnd.github.v3+json'
+          }
+          
+          # 1. Buscar todos os colaboradores do repositório
+          print("📋 Buscando colaboradores...")
+          colaboradores_url = f'https://api.github.com/repos/{repo}/collaborators'
+          response = requests.get(colaboradores_url, headers=headers)
+          colaboradores = response.json()
+          
+          # Criar dicionário com todos os colaboradores (inicializado com 0 commits)
+          contagem = {}
+          user_to_name = {}
+          
+          for colab in colaboradores:
+              username = colab['login']
+              contagem[username] = 0
+              user_to_name[username] = username  # Inicialmente usa o username
+          
+          print(f"✅ Encontrados {len(colaboradores)} colaboradores")
+          
+          # 2. Buscar commits no período especificado
+          print(f"🔍 Buscando commits de {since} a {until}...")
+          page = 1
+          total_commits = 0
+          
+          while True:
+              commits_url = f'https://api.github.com/repos/{repo}/commits'
+              params = {
+                  'since': f'{since}T00:00:00Z',
+                  'until': f'{until}T23:59:59Z',
+                  'per_page': 100,
+                  'page': page
+              }
+              
+              response = requests.get(commits_url, headers=headers, params=params)
+              commits = response.json()
+              
+              if not commits or not isinstance(commits, list):
+                  break
+              
+              for commit in commits:
+                  author = commit.get('author')
+                  if author and author.get('login'):
+                      username = author['login']
+                      # Se o autor está na lista de colaboradores, conta o commit
+                      if username in contagem:
+                          contagem[username] += 1
+                          total_commits += 1
+                          # Atualiza o nome real se disponível
+                          if 'name' in author and author['name']:
+                              user_to_name[username] = author['name']
+              
+              page += 1
+              
+              # Limitar a 10 páginas para evitar timeout
+              if page > 10:
+                  break
+          
+          print(f"✅ Total de commits processados: {total_commits}")
+          
+          # 3. Gerar relatório em Markdown
+          linhas = []
+          for username in sorted(contagem.keys(), key=lambda x: contagem[x], reverse=True):
+              nome_exibicao = user_to_name.get(username, username)
+              total = contagem[username]
+              linhas.append(f"| {nome_exibicao} (@{username}) | {total} |")
+          
+          markdown = f"""# 📊 Relatório de Commits
+          **Período:** {since} → {until}  
+          **Total de Commits:** {total_commits}  
+          **Colaboradores:** {len(colaboradores)}
+          
+          | Autor | Commits |
+          |--------|----------|
+          {chr(10).join(linhas)}
+          
+          ---
+          *Relatório gerado em {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
+          """
+          
+          # Salvar arquivo
+          with open(filename, 'w', encoding='utf-8') as f:
+              f.write(markdown)
+          
+          print(f"✅ Relatório gerado: {filename}")
+          PYTHON_SCRIPT
+          
+          echo ""
+          echo "📄 Conteúdo do relatório:"
           cat "$FILENAME"
 
       - name: Commit e push dos resultados
