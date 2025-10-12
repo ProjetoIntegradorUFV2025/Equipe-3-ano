@@ -19,72 +19,39 @@ jobs:
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v4
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          fetch-depth: 0
 
       - name: Gerar relatório de commits
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
           SINCE: ${{ github.event.inputs.since }}
           UNTIL: ${{ github.event.inputs.until }}
         run: |
-          echo "🔍 Gerando relatório de commits de $OWNER/$REPO entre $SINCE e $UNTIL..."
-
-          node - <<'EOF'
-          import { Octokit } from "https://esm.sh/@octokit/rest";
-          import fs from "fs";
-
-          const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-          const owner = process.env.OWNER;
-          const repo = process.env.REPO;
-          const since = process.env.SINCE;
-          const until = process.env.UNTIL;
-
-          const contagem = {};
-          const perPage = 100;
-          let page = 1;
-
-          const buscar = async () => {
-            while (true) {
-              const { data } = await octokit.repos.listCommits({
-                owner, repo, since, until, per_page: perPage, page
-              });
-              if (data.length === 0) break;
-              for (const commit of data) {
-                const autor = commit.commit.author?.name || commit.author?.login || "Desconhecido";
-                contagem[autor] = (contagem[autor] || 0) + 1;
+          echo "🔍 Gerando relatório de commits entre $SINCE e $UNTIL..."
+          
+          # Gera relatório usando git log
+          git log --since="$SINCE" --until="$UNTIL" --pretty=format:"%an" | \
+            sort | uniq -c | sort -rn | \
+            awk -v since="$SINCE" -v until="$UNTIL" '
+              BEGIN {
+                print "# 📊 Relatório de Commits"
+                print "**Período:** " since " → " until
+                print ""
+                print "| Autor | Commits |"
+                print "|--------|----------|"
               }
-              page++;
-            }
-          };
-
-          await buscar();
-
-          const linhas = Object.entries(contagem)
-            .sort((a, b) => b[1] - a[1])
-            .map(([autor, total]) => `| ${autor} | ${total} |`)
-            .join("\n");
-
-          const markdown = `# 📊 Relatório de Commits
-**Período:** ${since} → ${until}
-
-| Autor | Commits |
-|--------|----------|
-${linhas}`;
-
-          fs.writeFileSync("commits-report.md", markdown);
-          console.log("✅ Relatório gerado: commits-report.md");
-          EOF
+              {
+                printf "| %s | %d |\n", substr($0, index($0,$2)), $1
+              }
+            ' > commits-report.md
+          
+          echo "✅ Relatório gerado: commits-report.md"
+          cat commits-report.md
 
       - name: Commitar resultado
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add commits-report.md
-          git commit -m "📝 Atualiza relatório de commits"
+          git diff --staged --quiet || git commit -m "📝 Atualiza relatório de commits"
           git push
