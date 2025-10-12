@@ -70,27 +70,12 @@ jobs:
               'Accept': 'application/vnd.github.v3+json'
           }
           
-          # 1. Buscar todos os colaboradores do repositório
-          print("📋 Buscando colaboradores...")
-          colaboradores_url = f'https://api.github.com/repos/{repo}/collaborators'
-          response = requests.get(colaboradores_url, headers=headers)
-          colaboradores = response.json()
-          
-          # Criar dicionário com todos os colaboradores (inicializado com 0 commits)
-          contagem = {}
-          user_to_name = {}
-          
-          for colab in colaboradores:
-              username = colab['login']
-              contagem[username] = 0
-              user_to_name[username] = username  # Inicialmente usa o username
-          
-          print(f"✅ Encontrados {len(colaboradores)} colaboradores")
-          
-          # 2. Buscar commits no período especificado
+          # 1. Buscar commits no período especificado
           print(f"🔍 Buscando commits de {since} a {until}...")
           page = 1
           total_commits = 0
+          contagem = defaultdict(int)
+          user_to_name = {}
           
           while True:
               commits_url = f'https://api.github.com/repos/{repo}/commits'
@@ -102,6 +87,11 @@ jobs:
               }
               
               response = requests.get(commits_url, headers=headers, params=params)
+              
+              if response.status_code != 200:
+                  print(f"⚠️ Erro na API: {response.status_code}")
+                  break
+              
               commits = response.json()
               
               if not commits or not isinstance(commits, list):
@@ -109,23 +99,67 @@ jobs:
               
               for commit in commits:
                   author = commit.get('author')
+                  commit_author = commit.get('commit', {}).get('author', {})
+                  
                   if author and author.get('login'):
                       username = author['login']
-                      # Se o autor está na lista de colaboradores, conta o commit
-                      if username in contagem:
-                          contagem[username] += 1
-                          total_commits += 1
-                          # Atualiza o nome real se disponível
-                          if 'name' in author and author['name']:
-                              user_to_name[username] = author['name']
+                      contagem[username] += 1
+                      total_commits += 1
+                      
+                      # Pegar o nome real do commit ou do perfil
+                      if commit_author.get('name'):
+                          user_to_name[username] = commit_author['name']
+                      elif not username in user_to_name:
+                          user_to_name[username] = username
+              
+              # Se retornou menos que 100, é a última página
+              if len(commits) < 100:
+                  break
               
               page += 1
               
-              # Limitar a 10 páginas para evitar timeout
-              if page > 10:
+              # Limitar a 20 páginas para evitar timeout
+              if page > 20:
                   break
           
           print(f"✅ Total de commits processados: {total_commits}")
+          print(f"✅ Autores encontrados: {len(contagem)}")
+          
+          # 2. Buscar todos os colaboradores do repositório
+          print("📋 Buscando colaboradores do repositório...")
+          page = 1
+          todos_colaboradores = []
+          
+          while True:
+              colaboradores_url = f'https://api.github.com/repos/{repo}/collaborators'
+              params = {'per_page': 100, 'page': page}
+              
+              response = requests.get(colaboradores_url, headers=headers, params=params)
+              
+              if response.status_code != 200:
+                  print(f"⚠️ Erro ao buscar colaboradores: {response.status_code}")
+                  break
+              
+              colaboradores = response.json()
+              
+              if not colaboradores or not isinstance(colaboradores, list):
+                  break
+              
+              todos_colaboradores.extend(colaboradores)
+              
+              if len(colaboradores) < 100:
+                  break
+              
+              page += 1
+          
+          print(f"✅ Encontrados {len(todos_colaboradores)} colaboradores")
+          
+          # Adicionar colaboradores que não fizeram commits
+          for colab in todos_colaboradores:
+              username = colab['login']
+              if username not in contagem:
+                  contagem[username] = 0
+                  user_to_name[username] = username
           
           # 3. Gerar relatório em Markdown
           linhas = []
@@ -137,7 +171,7 @@ jobs:
           markdown = f"""# 📊 Relatório de Commits
           **Período:** {since} → {until}  
           **Total de Commits:** {total_commits}  
-          **Colaboradores:** {len(colaboradores)}
+          **Colaboradores:** {len(todos_colaboradores)}
           
           | Autor | Commits |
           |--------|----------|
