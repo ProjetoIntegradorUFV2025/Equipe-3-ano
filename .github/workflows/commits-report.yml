@@ -1,4 +1,4 @@
-name: Contar commits por integrante
+name: Contar commits por PR
 
 on:
   workflow_dispatch:
@@ -13,196 +13,115 @@ on:
         default: "2025-10-11"
 
 jobs:
-  contar-commits:
+  contar-commits-pr:
     runs-on: ubuntu-latest
-    
-    # 🔐 DAR PERMISSÕES EXTRA PARA O GITHUB_TOKEN
+
     permissions:
       contents: write
 
     steps:
-      - name: Checkout código com PAT
-        uses: actions/checkout@v3
+      - name: Checkout do código
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0
 
       - name: Configurar Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      
-      - name: Instalar dependências
-        run: |
-          pip install requests
 
-      - name: Gerar relatório de commits
+      - name: Instalar dependências
+        run: pip install requests
+
+      - name: Gerar relatório de commits por PR
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          REPOSITORY: ${{ github.repository }}
+          REPO: ${{ github.repository }}
           SINCE: ${{ github.event.inputs.since }}
           UNTIL: ${{ github.event.inputs.until }}
         run: |
-          echo "🔍 Gerando relatório de commits entre $SINCE e $UNTIL..."
-          
-          # Criar pasta metricas se não existir
-          mkdir -p metricas
-          
-          # Gerar nome do arquivo com timestamp
-          TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-          export FILENAME="metricas/commits_${SINCE}_${UNTIL}_${TIMESTAMP}.md"
-          
           python3 << 'PYTHON_SCRIPT'
           import os
-          import subprocess
           import requests
-          from datetime import datetime
+          from datetime import datetime, timezone
           from collections import defaultdict
-          
-          # Configurações
+
           token = os.environ['GITHUB_TOKEN']
-          repo = os.environ['REPOSITORY']
+          repo_full = os.environ['REPO']
           since = os.environ['SINCE']
           until = os.environ['UNTIL']
-          filename = os.environ['FILENAME']
-          
-          headers = {
-              'Authorization': f'token {token}',
-              'Accept': 'application/vnd.github.v3+json'
-          }
-          
-          # 1. Buscar colaboradores diretos do repositório (com permissão push)
-          print("📋 Buscando colaboradores do repositório...")
-          colaboradores_url = f'https://api.github.com/repos/{repo}/collaborators'
-          params = {'affiliation': 'direct', 'per_page': 100}
-          
-          response = requests.get(colaboradores_url, headers=headers, params=params)
-          
-          if response.status_code != 200:
-              print(f"⚠️ Erro ao buscar colaboradores: {response.status_code}")
-              print(f"Response: {response.text}")
-              colaboradores_api = []
-          else:
-              colaboradores_api = response.json()
-          
-          print(f"✅ Encontrados {len(colaboradores_api)} colaboradores diretos na API")
-          
-          # Criar set de usernames dos colaboradores
-          colaboradores_usernames = {colab['login'].lower() for colab in colaboradores_api}
-          
-          # 2. Buscar commits usando git log (mais confiável)
-          print(f"🔍 Buscando commits de {since} a {until}...")
-          
-          # Executar git log para pegar autor e email
-          cmd = [
-              'git', 'log',
-              f'--since={since}T00:00:00',
-              f'--until={until}T23:59:59',
-              '--all',
-              '--format=%ae|%an|%aE'
+
+          headers = {'Authorization': f'token {token}', 'Accept': 'application/vnd.github.v3+json'}
+          owner, repo = repo_full.split('/')
+
+          # Função para paginar resultados da API
+          def get_all(url, params=None):
+              results = []
+              page = 1
+              while True:
+                  params_page = params.copy() if params else {}
+                  params_page['per_page'] = 100
+                  params_page['page'] = page
+                  r = requests.get(url, headers=headers, params=params_page)
+                  r.raise_for_status()
+                  data = r.json()
+                  if not data:
+                      break
+                  results.extend(data)
+                  page += 1
+              return results
+
+          print(f"🔍 Buscando PRs criadas entre {since} e {until}...")
+          prs_url = f'https://api.github.com/repos/{owner}/{repo}/pulls'
+          all_prs = get_all(prs_url, params={'state': 'all', 'sort': 'created', 'direction': 'asc'})
+          # Filtrar PRs pelo período
+          filtered_prs = [
+              pr for pr in all_prs 
+              if since <= pr['created_at'][:10] <= until
           ]
-          
-          result = subprocess.run(cmd, capture_output=True, text=True)
-          commits_raw = result.stdout.strip().split('\n')
-          
-          # Contar commits por email
-          commits_por_email = defaultdict(int)
-          email_to_name = {}
-          
-          for line in commits_raw:
-              if not line:
-                  continue
-              parts = line.split('|')
-              if len(parts) >= 2:
-                  email = parts[0].lower()
-                  name = parts[1]
-                  commits_por_email[email] += 1
-                  email_to_name[email] = name
-          
-          print(f"✅ Total de commits encontrados: {sum(commits_por_email.values())}")
-          print(f"✅ Autores únicos: {len(commits_por_email)}")
-          
-          # 3. Mapear emails para usernames do GitHub
-          print("🔗 Mapeando emails para usernames...")
-          contagem_final = defaultdict(int)
-          user_to_display_name = {}
-          
-          # Para cada colaborador, buscar seus emails
-          for colab in colaboradores_api:
-              username = colab['login']
-              
-              # Buscar emails do usuário via API
-              user_url = f'https://api.github.com/users/{username}'
-              user_response = requests.get(user_url, headers=headers)
-              
-              if user_response.status_code == 200:
-                  user_data = user_response.json()
-                  user_email = user_data.get('email', '').lower() if user_data.get('email') else None
-                  user_name = user_data.get('name', username)
-                  
-                  # Inicializar com 0
-                  contagem_final[username] = 0
-                  user_to_display_name[username] = user_name
-                  
-                  # Verificar se algum email nos commits bate
-                  for email, count in commits_por_email.items():
-                      # Verifica se o email contém o username ou vice-versa
-                      if user_email and email == user_email:
-                          contagem_final[username] += count
-                      elif username.lower() in email:
-                          contagem_final[username] += count
-                      elif email.split('@')[0].lower() == username.lower():
-                          contagem_final[username] += count
-          
-          # Adicionar commits de emails que não foram mapeados (se forem colaboradores)
-          for email, count in commits_por_email.items():
-              username_from_email = email.split('@')[0]
-              
-              # Verificar se é um colaborador conhecido
-              if username_from_email.lower() in colaboradores_usernames:
-                  if username_from_email not in contagem_final:
-                      contagem_final[username_from_email] = count
-                      user_to_display_name[username_from_email] = email_to_name.get(email, username_from_email)
-          
-          total_commits = sum(contagem_final.values())
-          
-          # 4. Gerar relatório em Markdown
-          linhas = []
-          for username in sorted(contagem_final.keys(), key=lambda x: contagem_final[x], reverse=True):
-              nome_exibicao = user_to_display_name.get(username, username)
-              total = contagem_final[username]
-              linhas.append(f"| {nome_exibicao} (@{username}) | {total} |")
-          
-          markdown = f"""# 📊 Relatório de Commits
+          print(f"✅ PRs no período: {len(filtered_prs)}")
+
+          contagem = defaultdict(int)
+
+          # Para cada PR, pegar commits
+          for pr in filtered_prs:
+              pr_number = pr['number']
+              commits_url = pr['commits_url']
+              commits = get_all(commits_url)
+              for c in commits:
+                  author = c['author']['login'] if c['author'] else c['commit']['author']['name']
+                  commit_date = c['commit']['author']['date'][:10]
+                  if since <= commit_date <= until:
+                      contagem[author] += 1
+
+          # Gerar Markdown
+          total_commits = sum(contagem.values())
+          linhas = "\n".join(f"| {author} | {count} |" for author, count in sorted(contagem.items(), key=lambda x: x[1], reverse=True))
+          markdown = f"""# 📊 Relatório de Commits por PR
           **Período:** {since} → {until}  
           **Total de Commits:** {total_commits}  
-          **Colaboradores:** {len(colaboradores_api)}
-          
+          **Total de Autores:** {len(contagem)}
+
           | Autor | Commits |
-          |--------|----------|
-          {chr(10).join(linhas)}
-          
-          ---
-          *Relatório gerado em {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
+          |-------|---------|
+          {linhas}
+
+          *Relatório gerado em {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}*
           """
-          
-          # Salvar arquivo
+          # Salvar
+          os.makedirs('metricas', exist_ok=True)
+          filename = f"metricas/commits_pr_{since}_{until}.md"
           with open(filename, 'w', encoding='utf-8') as f:
               f.write(markdown)
-          
           print(f"✅ Relatório gerado: {filename}")
           PYTHON_SCRIPT
-          
-          echo ""
-          echo "📄 Conteúdo do relatório:"
-          cat "$FILENAME"
 
-      - name: Commit e push dos resultados
+      - name: Commit e push do relatório
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add metricas/
-          git commit -m "📝 Adiciona relatório de commits (${{ github.event.inputs.since }} → ${{ github.event.inputs.until }})" || echo "Sem alterações para commitar"
+          git commit -m "📝 Adiciona relatório de commits por PR (${{ github.event.inputs.since }} → ${{ github.event.inputs.until }})" || echo "Sem alterações para commitar"
           git push https://$PAT_TOKEN@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
