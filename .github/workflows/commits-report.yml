@@ -50,7 +50,7 @@ jobs:
           
           # Gerar nome do arquivo com timestamp
           TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-          FILENAME="metricas/commits_${SINCE}_${UNTIL}_${TIMESTAMP}.md"
+          export FILENAME="metricas/commits_${SINCE}_${UNTIL}_${TIMESTAMP}.md"
           
           python3 << 'PYTHON_SCRIPT'
           import os
