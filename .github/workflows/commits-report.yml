@@ -34,6 +34,13 @@ jobs:
         run: |
           echo "🔍 Gerando relatório de commits entre $SINCE e $UNTIL..."
           
+          # Criar pasta metricas se não existir
+          mkdir -p metricas
+          
+          # Gerar nome do arquivo com timestamp
+          TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+          FILENAME="metricas/commits_${SINCE}_${UNTIL}_${TIMESTAMP}.md"
+          
           # Gera relatório usando git log
           git log --since="$SINCE" --until="$UNTIL" --pretty=format:"%an" | \
             sort | uniq -c | sort -rn | \
@@ -48,10 +55,10 @@ jobs:
               {
                 printf "| %s | %d |\n", substr($0, index($0,$2)), $1
               }
-            ' > commits-report.md
+            ' > "$FILENAME"
           
-          echo "✅ Relatório gerado: commits-report.md"
-          cat commits-report.md
+          echo "✅ Relatório gerado: $FILENAME"
+          cat "$FILENAME"
 
       - name: Commit e push dos resultados
         env:
@@ -59,6 +66,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add commits-report.md
-          git commit -m "📝 Atualiza relatório de commits (${{ github.event.inputs.since }} → ${{ github.event.inputs.until }})" || echo "Sem alterações para commitar"
+          git add metricas/
+          git commit -m "📝 Adiciona relatório de commits (${{ github.event.inputs.since }} → ${{ github.event.inputs.until }})" || echo "Sem alterações para commitar"
           git push https://$PAT_TOKEN@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
