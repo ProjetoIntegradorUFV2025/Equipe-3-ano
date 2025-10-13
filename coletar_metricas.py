@@ -420,10 +420,6 @@ def gerar_relatorio_markdown(sprint_number, sprint_start, sprint_end, metricas_e
 | **PRs Aceitas** | {sum([u['PRs_Aceitas'] for u in metricas_individuais])} |
 | **1.3 - Taxa Produtividade PRs** | **{round(sum([u['PRs_Aceitas'] for u in metricas_individuais]) / sum([u['PRs_Criadas'] for u in metricas_individuais]) * 100, 2) if sum([u['PRs_Criadas'] for u in metricas_individuais]) > 0 else 0}%** |
 
-### 👀 1.4 - PRs Revisadas
-| Métrica | Valor |
-|---------|-------|
-| **1.4 - Total PRs Revisadas** | **{sum([u['PRs_Revisadas'] for u in metricas_individuais])}** |
 
 ### ✅ 1.5 - Taxa Aceitação Issues
 | Métrica | Valor |
@@ -457,18 +453,11 @@ def gerar_relatorio_markdown(sprint_number, sprint_start, sprint_end, metricas_e
 
 ## 🔄 MÉTRICAS DE QUALIDADE
 
-### 📊 Taxa de Retrabalho
-| Métrica | Valor |
-|---------|-------|
-| **Commits Submetidos** | {metricas_equipe['Commits_Submetidos']} |
-| **Commits Rejeitados** | {metricas_equipe['Commits_Rejeitados']} |
-| **Taxa de Retrabalho** | **{metricas_equipe['Taxa_Retrabalho_Percentual']}%** |
-
 ### 💬 Code Review
 | Métrica | Valor |
 |---------|-------|
 | **Total Comentários** | {metricas_equipe['Total_Comentarios_PRs']} |
-| **PRs Analisados** | {metricas_equipe['Total_PRs']} |
+| **PRs Analisados** | **{sum([u['PRs_Revisadas'] for u in metricas_individuais])}**|
 | **Nº Médio Comentários/Revisão** | **{metricas_equipe['Media_Comentarios_Por_Revisao']}** |
 
 ## 👥 MÉTRICAS INDIVIDUAIS DETALHADAS
