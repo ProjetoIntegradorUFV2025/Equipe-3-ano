@@ -62,7 +62,7 @@
 | RayannePapini | 2 | 1 | 50.0% | 0 | 0 | 0 | 0% |
 | ProjetoIntegradorUFV2025 | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | Tatiana0357 | 2 | 0 | 0.0% | 0 | 0 | 0 | 0% |
-| GuilhermePianetti | 4 | 4 | 100.0% | 0 | 0 | 0 | 0% |
+| GuilhermePianetti | 4 | 4 | 100.0% | 14 | 0 | 0 | 0% |
 | caioomenezes | 2 | 2 | 100.0% | 0 | 0 | 0 | 0% |
 | DaniiMelo | 2 | 0 | 0.0% | 0 | 0 | 0 | 0% |
 | Analucia26 | 2 | 2 | 100.0% | 3 | 0 | 0 | 0% |
