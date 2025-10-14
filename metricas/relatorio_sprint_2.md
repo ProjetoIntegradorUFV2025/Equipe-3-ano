@@ -62,7 +62,7 @@
 | Gabriwll | 2 | 1 | 50.0% | 0 | 0 | 0 | 0% |
 | ingridlrs | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
 | RayannePapini | 2 | 0 | 0.0% | 0 | 0 | 0 | 0% |
-| GuilhermePianetti | 5 | 4 | 80.0% | 6 | 0 | 0 | 0% |
+| GuilhermePianetti | 5 | 4 | 80.0% | 8 | 0 | 0 | 0% |
 | gabriel2036 | 0 | 0 | 0% | 6 | 0 | 0 | 0% |
 | cristinaleticia | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | DaniiMelo | 2 | 1 | 50.0% | 0 | 0 | 0 | 0% |
