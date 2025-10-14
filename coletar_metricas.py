@@ -457,12 +457,6 @@ def gerar_relatorio_markdown(sprint_number, sprint_start, sprint_end, metricas_e
 
 ## 🔄 MÉTRICAS DE QUALIDADE
 
-### 📊 Taxa de Retrabalho
-| Métrica | Valor |
-|---------|-------|
-| **Commits Submetidos** | {metricas_equipe['Commits_Submetidos']} |
-| **Commits Rejeitados** | {metricas_equipe['Commits_Rejeitados']} |
-| **Taxa de Retrabalho** | **{metricas_equipe['Taxa_Retrabalho_Percentual']}%** |
 
 ### 💬 Code Review
 | Métrica | Valor |
