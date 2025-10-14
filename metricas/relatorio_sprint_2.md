@@ -12,11 +12,6 @@
 | **PRs Aceitas** | 10 |
 | **1.3 - Taxa Produtividade PRs** | **43.48%** |
 
-### 👀 1.4 - PRs Revisadas
-| Métrica | Valor |
-|---------|-------|
-| **1.4 - Total PRs Revisadas** | **10** |
-
 ### ✅ 1.5 - Taxa Aceitação Issues
 | Métrica | Valor |
 |---------|-------|
@@ -67,7 +62,7 @@
 | Gabriwll | 2 | 1 | 50.0% | 0 | 0 | 0 | 0% |
 | ingridlrs | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
 | RayannePapini | 2 | 0 | 0.0% | 0 | 0 | 0 | 0% |
-| GuilhermePianetti | 5 | 4 | 80.0% | 0 | 0 | 0 | 0% |
+| GuilhermePianetti | 5 | 4 | 80.0% | 6 | 0 | 0 | 0% |
 | gabriel2036 | 0 | 0 | 0% | 6 | 0 | 0 | 0% |
 | cristinaleticia | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | DaniiMelo | 2 | 1 | 50.0% | 0 | 0 | 0 | 0% |
