@@ -1,0 +1,127 @@
+name: Contar commits por PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "Data inicial (YYYY-MM-DD)"
+        required: true
+        default: "2025-10-01"
+      until:
+        description: "Data final (YYYY-MM-DD)"
+        required: true
+        default: "2025-10-11"
+
+jobs:
+  contar-commits-pr:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Instalar dependências
+        run: pip install requests
+
+      - name: Gerar relatório de commits por PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          REPO: ${{ github.repository }}
+          SINCE: ${{ github.event.inputs.since }}
+          UNTIL: ${{ github.event.inputs.until }}
+        run: |
+          python3 << 'PYTHON_SCRIPT'
+          import os
+          import requests
+          from datetime import datetime, timezone
+          from collections import defaultdict
+
+          token = os.environ['GITHUB_TOKEN']
+          repo_full = os.environ['REPO']
+          since = os.environ['SINCE']
+          until = os.environ['UNTIL']
+
+          headers = {'Authorization': f'token {token}', 'Accept': 'application/vnd.github.v3+json'}
+          owner, repo = repo_full.split('/')
+
+          # Função para paginar resultados da API
+          def get_all(url, params=None):
+              results = []
+              page = 1
+              while True:
+                  params_page = params.copy() if params else {}
+                  params_page['per_page'] = 100
+                  params_page['page'] = page
+                  r = requests.get(url, headers=headers, params=params_page)
+                  r.raise_for_status()
+                  data = r.json()
+                  if not data:
+                      break
+                  results.extend(data)
+                  page += 1
+              return results
+
+          print(f"🔍 Buscando PRs criadas entre {since} e {until}...")
+          prs_url = f'https://api.github.com/repos/{owner}/{repo}/pulls'
+          all_prs = get_all(prs_url, params={'state': 'all', 'sort': 'created', 'direction': 'asc'})
+          # Filtrar PRs pelo período
+          filtered_prs = [
+              pr for pr in all_prs 
+              if since <= pr['created_at'][:10] <= until
+          ]
+          print(f"✅ PRs no período: {len(filtered_prs)}")
+
+          contagem = defaultdict(int)
+
+          # Para cada PR, pegar commits
+          for pr in filtered_prs:
+              pr_number = pr['number']
+              commits_url = pr['commits_url']
+              commits = get_all(commits_url)
+              for c in commits:
+                  author = c['author']['login'] if c['author'] else c['commit']['author']['name']
+                  commit_date = c['commit']['author']['date'][:10]
+                  if since <= commit_date <= until:
+                      contagem[author] += 1
+
+          # Gerar Markdown
+          total_commits = sum(contagem.values())
+          linhas = "\n".join(f"| {author} | {count} |" for author, count in sorted(contagem.items(), key=lambda x: x[1], reverse=True))
+          markdown = f"""# 📊 Relatório de Commits por PR
+          **Período:** {since} → {until}  
+          **Total de Commits:** {total_commits}  
+          **Total de Autores:** {len(contagem)}
+
+          | Autor | Commits |
+          |-------|---------|
+          {linhas}
+
+          *Relatório gerado em {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}*
+          """
+          # Salvar
+          os.makedirs('metricas', exist_ok=True)
+          filename = f"metricas/commits_pr_{since}_{until}.md"
+          with open(filename, 'w', encoding='utf-8') as f:
+              f.write(markdown)
+          print(f"✅ Relatório gerado: {filename}")
+          PYTHON_SCRIPT
+
+      - name: Commit e push do relatório
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add metricas/
+          git commit -m "📝 Adiciona relatório de commits por PR (${{ github.event.inputs.since }} → ${{ github.event.inputs.until }})" || echo "Sem alterações para commitar"
+          git push https://$PAT_TOKEN@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
