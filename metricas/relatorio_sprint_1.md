@@ -12,11 +12,6 @@
 | **PRs Aceitas** | 12 |
 | **1.3 - Taxa Produtividade PRs** | **50.0%** |
 
-### 👀 1.4 - PRs Revisadas
-| Métrica | Valor |
-|---------|-------|
-| **1.4 - Total PRs Revisadas** | **9** |
-
 ### ✅ 1.5 - Taxa Aceitação Issues
 | Métrica | Valor |
 |---------|-------|
@@ -60,7 +55,7 @@
 
 | Usuário | 1.3 PRs Criadas | 1.3 PRs Aceitas | 1.3 Produtividade | 1.4 PRs Revisadas | 1.5 Issues Identificadas | 1.5 Issues Aceitas | 1.5 Taxa Aceitação |
 |---------|----------------|----------------|------------------|------------------|-------------------------|-------------------|-------------------|
-| GuilhermePianetti | 4 | 3 | 75.0% | 0 | 0 | 0 | 0% |
+| GuilhermePianetti | 4 | 3 | 75.0% | 6 | 0 | 0 | 0% |
 | amandacmelo | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | melissaalanis | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | Tais0357 | 2 | 0 | 0.0% | 0 | 0 | 0 | 0% |
