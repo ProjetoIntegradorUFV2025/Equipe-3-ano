@@ -55,7 +55,7 @@
 >[!hint] JPA
 >- https://spring.io/guides/gs/accessing-data-mysql
 # Geral:
-Aplicação *web* que utiliza o padrão arquitetural MVC, cuja stack usada é:
+Aplicação *web* que utiliza essencialmente o modelo BCE, cuja stack usada é:
 - **Infra e padronização do ambiente de desenvolvimento**
 	- <span style="color:rgb(192, 33, 179)">Docker</span>
 		- <span style="color:rgb(0, 176, 240)">.env</span> para aprimorar segurança da aplicação
@@ -76,8 +76,10 @@ Aplicação *web* que utiliza o padrão arquitetural MVC, cuja stack usada é:
 			- Testes efetuados com <span style="color:rgb(0, 176, 80)">VITEST</span>
 	- <span style="color:rgb(192, 33, 179)">Tailwind + css</span>
 		- Estilização de páginas menos verbosa com curva de aprendizado aceitável
-- **Banco de dados**
+- **Banco de dados remoto**
 	- <span style="color:rgb(192, 33, 179)">MySQL</span>
+- **Deploy**
+	- <span style="color:rgb(192, 33, 179)">Tomcat externo</span>
 
 >[!info] A organização dos arquivos da prova de conceito e da aplicação no geral, vai ser:
 ```bash
@@ -95,7 +97,51 @@ prova_conceito/   (ou desconecta/)
 >[!info] Sobre as pastas:
 >- **backend** -> contempla todos os arquivos associados a testes java, código código, configuração do ambiente back-end, entre outros dessa natureza.
 >- **frontend** -> contemplam todos os arquivos associados ao desenvolvimento de telas, componentes, testes de componentes do front-end e, inicialmente, os assets utilizados pela aplicação, mas que podem ser movidos para a pasta database.
->- **database** -> inicialmente vazia, pensei em inserir as consultas SQL dos júniores aqui. Mas, pode ser que aqui também entrem os assets usados no desenvolvimento. É complicado popular essa pasta, tendo em vista que o banco usado é remoto.
+>- **database** -> inicialmente vazia, pode-se inserir as consultas SQL dos júniores aqui. Mas, pode ser que aqui também entrem os assets usados no desenvolvimento.
+## Orientações:
+
+>[!warning] Dúvidas ou sugestões? Chame o arquiteto!
+
+Será necessária a utilização de assets para o desenvolvimento das telas, para melhor organização desses elementos, estes devem ser colocados dentro da pasta ``assets``.
+
+Arquivos relacionados à Controle, Serviço, Repositório e Modelo devem ter uma pasta correspondente ao tipo de funcionalidade a ser implementada. 
+
+>[!example] Exemplo de organização de arquivos:
+```bash
+provaConceito
+└── src
+    └── main
+        └── java
+            └── com
+                └── provaConceito
+                    └── provaConceito
+                        ├── controle
+                        │   └── controleContador.java
+                        ├── modelo
+                        │   └── modeloContador.java
+                        ├── repositorio
+                        │   └── repositorioContador.java
+                        ├── servico
+                        │   └── servicoContador.java
+                        └── ProvaConceitoApplication.java
+```
+
+Arquivos de componentes React devem ser organizados como se segue: na pasta ``src/componentes`` (componentes mais gerais); ``src/componentes/modais`` (componentes modais).
+
+>[!example] Organização de componentes:
+```bash
+src/
+├── App.css
+├── App.jsx
+├── components
+│   ├── BotaoCliques.jsx
+│   ├── BotaoCliquesMock.jsx
+|	├── modais
+|	│   └── Modal.jsx
+│   ├── Parabens.jsx
+├── index.css
+├── main.jsx
+```
 # Front-end:
 O projeto foi construído usando o [vite](https://vite.dev/) , em suma, é um facilitador para desenvolvimento *web*.
 
@@ -106,7 +152,7 @@ O projeto foi construído usando o [vite](https://vite.dev/) , em suma, é um fa
 >[!hint] De forma simples, o React é um javascript com HTML misturado nele.
 
 >[!example] Na prova de conceito temos a seguinte organização dos arquivos para a pasta src:
->```tree
+```bash
 >.
 ├── App.css
 ├── App.jsx
@@ -122,7 +168,8 @@ O projeto foi construído usando o [vite](https://vite.dev/) , em suma, é um fa
 │   └── Parabens.jsx
 ├── index.css
 ├── main.jsx
-└── setupTests.js```
+└── setupTests.js
+```
 
 >[!info] A extensão usada pelo react é a **jsx**
 
@@ -311,7 +358,6 @@ Depois dessas explicações, basta chamar esses componentes no main.jsx que eles
 ```
 
 É importante citar alguns itens de css, como: *margin, padding, border*. São os controladores de espaço dos elementos da página. Margin controla o espaçamento externo dos elementos (border para elementos adjacentes); padding controla espaçamento interno dos elementos (border para elementos internos) e border é a fronteira entre o espaço interno e externo. E cada elemento tem seu tamanho próprio.
-
 # Back-end:
 O back-end é constituído puramente pelo spring boot, tendo as dependências e pacotes gerenciadas pelo maven.  O spring fornece uma gama de funcionalidades implementadas em *notations* . Essas notations podem fazer consultas ao banco de dados, realizar a integração web, simplificar métodos, entre muitas outras funcionalidades.
 
@@ -409,7 +455,7 @@ Temos dois tipos de teste: **cobertura** e **unitários**. Os testes e cobertura
 >[!important] Os logs de teste ficam na pasta target dentro do back-end (se teste de back-end) ou são exibidos no terminal (front-end e back-end)
 >Os formatos de arquivo de log podem ser .txt, .xml ou mesmo .html
 >As subpastas para conferir esses logs são ``site`` (cobertura)  ou ``surefire-reports`` (unitário)
-## Unitários:
+## Unidade:
 ### Back-end:
 Os testes unitários, no geral, são realizados conforme no exemplo:
 ```java
@@ -520,7 +566,7 @@ class CalculadoraTest {
 
 >[!hint] Os métodos assert validam a saída do teste com um resultado esperado
 
->[!info] Para rodar testes unitários, use **make maven-test**
+>[!info] Para rodar testes unidade, use **make maven-test**
 >Mas, caso queira rodar apenas alguns testes específicos, temos alguns comandos:
 >- <span style="color:rgb(175, 175, 14)">docker compose exec backend mvn -Dtest=MinhaClasseDeTeste test</span>
 >	- Roda testes dentro de uma classe específica 
@@ -653,4 +699,4 @@ Por fim, para explorar mais funcionalidades das tecnologias do back-end e do fro
 - Notações (java);
 - Hooks (react);
 - json;
-- objetos (javascript);\
+- objetos (javascript);
