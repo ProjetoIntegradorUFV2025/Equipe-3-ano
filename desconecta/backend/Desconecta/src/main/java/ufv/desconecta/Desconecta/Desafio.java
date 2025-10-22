@@ -44,7 +44,7 @@ public class Desafio {
 // Main para teste
     public static void main(String[] args) {
         Desafio desafio1 = new Desafio(1, EnumTiposDesafios.JogoConecta, 150);
-        Desafio desafio2 = new Desafio(2, EnumTiposDesafios.JogoPalavaras, 300);
+        Desafio desafio2 = new Desafio(2, EnumTiposDesafios.JogoPalavras, 300);
 
         System.out.println("Desafios Criados");
         exibirDesafio(desafio1);
