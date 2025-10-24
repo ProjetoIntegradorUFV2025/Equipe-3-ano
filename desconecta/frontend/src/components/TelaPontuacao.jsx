@@ -12,10 +12,14 @@ import dadinhoConfete from '../assets/dadinhoConfete.png'
 const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => {
   const { alunoId, isLogado } = useAlunoLogado();
   
-  // Valores temporários para exemplo - estes podem vir como props no futuro
-  const tempoSegundos = 120;
-  const tentativas = 3;
-  const pontos = 850;
+  // Buscar dados de pontuação do sessionStorage
+  const dadosPontuacaoString = sessionStorage.getItem('dadosPontuacao');
+  const dadosPontuacao = dadosPontuacaoString ? JSON.parse(dadosPontuacaoString) : null;
+  
+  // Valores da pontuação - usa dados do jogo se disponíveis, caso contrário usa valores padrão
+  const tempoSegundos = dadosPontuacao?.tempo ?? 120;
+  const tentativas = dadosPontuacao?.tentativas ?? 3;
+  const pontos = dadosPontuacao?.pontos ?? 850;
 
   // Função para avançar a ilha do aluno apenas se necessário
   const avancarIlhaAluno = async () => {
@@ -64,6 +68,9 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
 
   // Função para voltar à trilha e forçar recarregamento
   const handleVoltarTrilha = async () => {
+    // Limpar dados de pontuação do sessionStorage
+    sessionStorage.removeItem('dadosPontuacao');
+    
     // Sinaliza que o progresso foi atualizado para forçar recarregamento
     localStorage.setItem('progressoAtualizado', 'true');
     onVoltarTrilha();
