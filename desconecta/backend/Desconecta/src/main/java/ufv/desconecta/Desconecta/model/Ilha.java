@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import ufv.desconecta.Desconecta.EnumNomeIlha;
 
+import java.util.List;
+
 @Entity
 @Table(name = "TB_Ilha")
 @Data
@@ -21,9 +23,9 @@ public class Ilha {
     private boolean estado;    // true se desbloqueada
     private boolean foiJogada; // true se o aluno já jogou
 
-//    private List<Desafio> desafios;
-    //Lista de desafios
-
+    @OneToMany
+    @JoinColumn(name = "PK_Desafio")
+    private List<Desafio> desafios;
     public EnumNomeIlha buscaIlha(int idIlha) {
         if(idIlha < 0 ||idIlha > 4) {
             throw new IllegalArgumentException("Índice inválido para EnumNomeIlha: " + idIlha);
