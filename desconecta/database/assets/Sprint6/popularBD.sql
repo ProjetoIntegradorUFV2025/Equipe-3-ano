@@ -11,28 +11,29 @@ INSERT INTO tb_aluno (apelido, senha) VALUES
 -- =================================================================
 -- PASSO 2: CRIAR O REGISTRO DE PROGRESSO PARA CADA ALUNO
 -- =================================================================
--- Mantendo a chave primária (pk_progresso_aluno) igual à do aluno.
 INSERT INTO tb_progresso_aluno (pk_progresso_aluno, fk_aluno, pontuacao_total_aluno) VALUES
-(1, 1, 1500), -- Progresso para Soldadinho
-(2, 2, 500),  -- Progresso para Aninha
-(3, 3, 1000), -- Progresso para Pedrinho
-(4, 4, 200);  -- Progresso para Sofia
+(1, 1, 1500), -- Progresso para Soldadinho (PK e FK são 1)
+(2, 2, 500),  -- Progresso para Aninha (PK e FK são 2)
+(3, 3, 1000), -- Progresso para Pedrinho (PK e FK são 3)
+(4, 4, 200);  -- Progresso para Sofia (PK e FK são 4)
 
 -- =================================================================
--- PASSO 3: INSERIR APENAS A ILHA ATUAL DE CADA ALUNO
+-- PASSO 3: INSERIR AS ILHAS PARA CADA ALUNO, COM SEUS ESTADOS
 -- =================================================================
--- 'Soldadinho' (ID 1) está na ilha de Matemática (a 3ª).
+-- Inserindo ilhas para 'Soldadinho' (pk_progresso_aluno = 1)
 INSERT INTO tb_ilha (nome_ilha, estado, foi_jogada, pk_progresso_aluno) VALUES
-('MATEMATICA', 1, 0, 1);
+('DADOLANDIA', 1, 1, 1),
+('CIENCIAS',   1, 1, 1);
 
--- 'Aninha' (ID 2) está na ilha inicial, que ela já jogou.
+-- Inserindo ilhas para 'Aninha' (pk_progresso_aluno = 2)
 INSERT INTO tb_ilha (nome_ilha, estado, foi_jogada, pk_progresso_aluno) VALUES
 ('DADOLANDIA', 1, 1, 2);
 
--- 'Pedrinho' (ID 3) está na ilha de Ciências (a 2ª).
+-- Inserindo ilhas para 'Pedrinho' (pk_progresso_aluno = 3)
 INSERT INTO tb_ilha (nome_ilha, estado, foi_jogada, pk_progresso_aluno) VALUES
-('CIENCIAS', 1, 0, 3);
+('DADOLANDIA', 1, 1, 3),
+('CIENCIAS',   1, 0, 3);
 
--- 'Sofia' (ID 4) está na ilha inicial, que ela ainda não jogou.
+-- Inserindo ilhas para 'Sofia' (pk_progresso_aluno = 4)
 INSERT INTO tb_ilha (nome_ilha, estado, foi_jogada, pk_progresso_aluno) VALUES
 ('DADOLANDIA', 1, 0, 4);
