@@ -33,8 +33,8 @@ public class Ilha {
         return EnumNomeIlha.values()[idIlha];
     }
 
-    // relacionamento OneToOne com ProgressoAluno
-    @OneToOne
+    // relacionamento ManyToOne com ProgressoAluno
+    @ManyToOne
     @JoinColumn(name = "PK_ProgressoAluno")
     private ProgressoAluno progressoAluno;
 }
