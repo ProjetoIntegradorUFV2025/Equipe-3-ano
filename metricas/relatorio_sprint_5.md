@@ -21,15 +21,15 @@
 | Métrica | Valor |
 |---------|-------|
 | **Issues Identificadas** | 1 |
-| **Issues Aceitas** | 0 |
-| **1.5 - Taxa Aceitação Issues** | **0.0%** |
+| **Issues Aceitas** | 1 |
+| **1.5 - Taxa Aceitação Issues** | **100.0%** |
 
 ## 🏢 MÉTRICAS DE EQUIPE SOLICITADAS
 
 ### ✅ 2.5 - Taxa Resolução Issues
 | Métrica | Valor |
 |---------|-------|
-| **Issues Aceitos** | 0 |
+| **Issues Aceitos** | 1 |
 | **Issues Resolvidos** | 0 |
 | **2.5 - Taxa Resolução Issues** | **0%** |
 
@@ -73,7 +73,7 @@
 | caioomenezes | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | amandacmelo | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | francyelleserrano | 2 | 0 | 0.0% | 0 | 0 | 0 | 0% |
-| DalmoRainer | 2 | 0 | 0.0% | 0 | 0 | 0 | 0% |
+| DalmoRainer | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
 | RayannePapini | 2 | 0 | 0.0% | 0 | 0 | 0 | 0% |
 | DaniiMelo | 3 | 0 | 0.0% | 0 | 0 | 0 | 0% |
 | melissaalanis | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
