@@ -21,47 +21,55 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
   const tentativas = dadosPontuacao?.tentativas ?? 3;
   const pontos = dadosPontuacao?.pontos ?? 850;
 
-  // Função para avançar a ilha do aluno apenas se necessário
+  // Função para avançar a ilha do aluno
   const avancarIlhaAluno = async () => {
     if (!alunoId || !isLogado) {
       return false;
     }
 
     try {
-      // Primeiro, buscar o ID do progresso do aluno
+      console.log('Iniciando avanço de ilha...');
+      
+      // Buscar o ID do progresso do aluno
       const responseIdProgresso = await fetch(`http://localhost:8080/api/progresso-aluno/id/${alunoId}`);
       
       if (responseIdProgresso.ok) {
         const idProgressoAluno = await responseIdProgresso.json();
+        console.log('ID do progresso do aluno:', idProgressoAluno);
         
         if (idProgressoAluno) {
-          // Verificar a posição atual da ilha
-          const responsePosicaoAtual = await fetch(`http://localhost:8080/api/ilhas/posicao-ilha/${idProgressoAluno}`);
-          
-          if (responsePosicaoAtual.ok) {
-            const posicaoAtual = await responsePosicaoAtual.json();
-            
-            // Só avança se a posição atual for menor ou igual à ilha que foi completada
-            // Isso permite avanço na primeira vez e evita avanço em repetições
-            if (posicaoAtual <= ilhaCompletada) {
-              const responseAvancar = await fetch(`http://localhost:8080/api/ilhas/avancar-ilha/${idProgressoAluno}`, {
-                method: 'PUT'
-              });
-              
-              if (responseAvancar.ok) {
-                const novaPosicao = await responseAvancar.json();
-                console.log('Ilha avançada para posição:', novaPosicao);
-                return true;
-              }
-            } else {
-              console.log('Ilha já foi avançada anteriormente, não avançando novamente');
+          // Chamar diretamente avancarIlha - ele já faz todas as validações necessárias
+          console.log('Chamando avancar-ilha com PUT...');
+          const responseAvancar = await fetch(`http://localhost:8080/api/ilhas/avancar-ilha/${idProgressoAluno}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
             }
+          });
+          
+          console.log('Status da resposta:', responseAvancar.status);
+          
+          if (responseAvancar.ok) {
+            const novaPosicao = await responseAvancar.json();
+            
+            if (novaPosicao !== -1) {
+              console.log('✅ Ilha avançada para posição:', novaPosicao);
+              console.log('✅ Próxima ilha foi criada e desbloqueada automaticamente');
+              return true;
+            } else {
+              console.log('⚠️ Não foi possível avançar (última ilha ou ilha já avançada)');
+              return false;
+            }
+          } else {
+            const errorText = await responseAvancar.text();
+            console.error('❌ Erro ao avançar ilha:', errorText);
+            return false;
           }
         }
       }
       return false;
     } catch (error) {
-      console.error('Erro ao avançar ilha:', error);
+      console.error('❌ Erro ao avançar ilha:', error);
       return false;
     }
   };
@@ -76,11 +84,18 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1 }) => 
     onVoltarTrilha();
   };
 
-  // Avançar a ilha quando a tela de pontuação for carregada
+  // Avançar a ilha quando a tela de pontuação for carregada (apenas uma vez)
   useEffect(() => {
-    if (alunoId && isLogado) {
-      avancarIlhaAluno();
-    }
+    let executado = false;
+    
+    const executarAvanco = async () => {
+      if (!executado && alunoId && isLogado) {
+        executado = true;
+        await avancarIlhaAluno();
+      }
+    };
+    
+    executarAvanco();
   }, [alunoId, isLogado]);
   return (
     <main 
