@@ -62,7 +62,7 @@ const botoesData = [
 
 // --- Componente: Conecta Ciência ---
 const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
-  const { alunoApelido } = useAlunoLogado();
+  const { alunoId, isLogado } = useAlunoLogado();
   
   const [mostrarPontuacao, setMostrarPontuacao] = React.useState(false);
   const [botoesClicados, setBotoesClicados] = React.useState(new Set());
@@ -290,18 +290,15 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                   const tempoFinal = Math.floor((Date.now() - tempoInicio) / 1000);
                   
                   try {
-                    // Salvar pontuação via API usando o endpoint correto
+                    // Salvar pontuação via API usando o endpoint atualizado
+                    // Agora usa pkAluno e nomeIlha (enum) ao invés de buscar o ID da ilha
                     const responsePontuacao = await fetch(
-                      `http://localhost:8080/api/desafio/salvarPontuacao?apelidoAluno=${alunoApelido || ''}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
+                      `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
                       {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                          id: 2, // ID do desafio Conecta Ciência
-                          concluido: true
-                        })
+                        }
                       }
                     );
                     
@@ -315,6 +312,10 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                         tentativas: numeroErros,
                         pontos: pontuacaoCalculada
                       }));
+                    } else {
+                      console.error('Erro ao salvar pontuação. Status:', responsePontuacao.status);
+                      const errorText = await responsePontuacao.text();
+                      console.error('Resposta do servidor:', errorText);
                     }
                   } catch (error) {
                     console.error('Erro ao salvar pontuação:', error);

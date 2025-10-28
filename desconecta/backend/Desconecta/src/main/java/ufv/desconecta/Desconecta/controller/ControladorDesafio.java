@@ -2,8 +2,10 @@ package ufv.desconecta.Desconecta.controller;
 //comentario de teste
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ufv.desconecta.Desconecta.EnumNomeIlha;
 import ufv.desconecta.Desconecta.model.Desafio;
 import ufv.desconecta.Desconecta.model.Ilha;
+import ufv.desconecta.Desconecta.model.ProgressoAluno;
 import ufv.desconecta.Desconecta.repository.AcessoBDDesafio;
 import ufv.desconecta.Desconecta.repository.AcessoBDIlha;
 import ufv.desconecta.Desconecta.repository.AcessoBDProgressoAluno;
@@ -21,15 +23,18 @@ public class ControladorDesafio {
     private final AcessoBDDesafio acessoBDDesafio;
     private final PontuacaoService pontuacaoService;
     private final AcessoBDIlha acessoBDIlha;
+    private final AcessoBDProgressoAluno acessoBDProgressoAluno;
 
 
 
 
     @Autowired
-    public ControladorDesafio(AcessoBDDesafio acessoBDDesafio, PontuacaoService pontuacaoService, AcessoBDIlha acessoBDIlha) {
+    public ControladorDesafio(AcessoBDDesafio acessoBDDesafio, PontuacaoService pontuacaoService, 
+                              AcessoBDIlha acessoBDIlha, AcessoBDProgressoAluno acessoBDProgressoAluno) {
         this.acessoBDDesafio = acessoBDDesafio;
         this.pontuacaoService = pontuacaoService;
         this.acessoBDIlha = acessoBDIlha;
+        this.acessoBDProgressoAluno = acessoBDProgressoAluno;
     }
 
     @PostMapping("/concluir/{idDesafio}")
@@ -42,32 +47,91 @@ public class ControladorDesafio {
 
     @PostMapping("/salvarPontuacao")
     public int salvarPontuacaoDesafio(@RequestParam long pkAluno,
-                                      @RequestParam int idIlha,
+                                      @RequestParam String nomeIlha,
                                       @RequestParam int tempo,
                                       @RequestParam int numErros) {
 
-        if (pkAluno <= 0 || idIlha <= 0) {
+        System.out.println("=== ENDPOINT SALVAR PONTUAÇÃO ===");
+        System.out.println("PK Aluno: " + pkAluno);
+        System.out.println("Nome Ilha: " + nomeIlha);
+        System.out.println("Tempo: " + tempo + "s");
+        System.out.println("Erros: " + numErros);
+
+        if (pkAluno <= 0 || nomeIlha == null || nomeIlha.isEmpty()) {
+            System.out.println("❌ Dados de entrada inválidos!");
             return -1; // Dados de entrada inválidos
         }
 
+        try {
+            // Converter nome da ilha para enum
+            EnumNomeIlha enumIlha = EnumNomeIlha.valueOf(nomeIlha.toUpperCase());
+            System.out.println("Enum da ilha: " + enumIlha);
+            
+            // Buscar o progresso do aluno
+            ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno((int) pkAluno);
+            
+            if (progressoAluno == null) {
+                System.out.println("❌ Progresso do aluno não encontrado!");
+                return -3; // Progresso não encontrado
+            }
+            
+            System.out.println("ID Progresso: " + progressoAluno.getPK_ProgressoAluno());
+            
+            // Buscar todas as ilhas do progresso do aluno
+            List<Ilha> ilhas = acessoBDIlha.recuperarIlhasPorProgressoId(progressoAluno.getPK_ProgressoAluno().intValue());
+            System.out.println("Total de ilhas encontradas: " + ilhas.size());
+            
+            // Encontrar a ilha específica pelo enum
+            Ilha ilhaEncontrada = null;
+            for (Ilha ilha : ilhas) {
+                if (ilha.getNomeIlha() == enumIlha) {
+                    ilhaEncontrada = ilha;
+                    break;
+                }
+            }
+            
+            if (ilhaEncontrada == null) {
+                System.out.println("❌ Ilha não encontrada: " + nomeIlha);
+                return -4; // Ilha não encontrada
+            }
+            
+            int idIlha = ilhaEncontrada.getPK_Ilha();
+            System.out.println("ID da ilha encontrada: " + idIlha);
 
+            // Buscar desafio da ilha
+            Desafio desafioASerPontuado = acessoBDDesafio.getDesafioByIlhaId(idIlha);
 
-        Desafio desafioASerPontuado = acessoBDDesafio.getDesafioByIlhaId(idIlha);
+            if (desafioASerPontuado == null) {
+                System.out.println("❌ Desafio não encontrado para a ilha!");
+                return -5; // Desafio não encontrado
+            }
 
+            if (desafioASerPontuado.isConcluido()) {
+                System.out.println("⚠️ Desafio já foi concluído!");
+                return -2; // Desafio já concluído
+            }
 
-        if (desafioASerPontuado.isConcluido()) {
-            return -2;
+            // Calcular pontuação
+            int pontuacao = pontuacaoService.calcularPontuacao(tempo, numErros);
+            System.out.println("Pontuação calculada: " + pontuacao);
+            
+            // Salvar pontuação
+            pontuacaoService.salvarPontuacaoDesafio(pontuacao, desafioASerPontuado);
+
+            // Marcar desafio como concluído
+            concluirDesafio(desafioASerPontuado.getId());
+
+            System.out.println("✅ Pontuação salva com sucesso!");
+            return pontuacao;
+            
+        } catch (IllegalArgumentException e) {
+            System.out.println("❌ Nome de ilha inválido: " + nomeIlha);
+            return -6; // Nome de ilha inválido
+        } catch (Exception e) {
+            System.out.println("❌ Erro ao salvar pontuação: " + e.getMessage());
+            e.printStackTrace();
+            return -7; // Erro genérico
         }
-
-
-        int pontuacao = pontuacaoService.calcularPontuacao(tempo, numErros);
-        pontuacaoService.salvarPontuacaoDesafio(pontuacao, desafioASerPontuado);
-
-
-        concluirDesafio(desafioASerPontuado.getId());
-
-
-        return pontuacao;
     }
 
     @GetMapping("/testeBusca/{idAluno}")
