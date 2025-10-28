@@ -3,6 +3,8 @@ package ufv.desconecta.Desconecta.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ufv.desconecta.Desconecta.EnumNomeIlha;
+import ufv.desconecta.Desconecta.EnumTiposDesafios;
+import ufv.desconecta.Desconecta.model.Desafio;
 import ufv.desconecta.Desconecta.model.Ilha;
 import ufv.desconecta.Desconecta.model.ProgressoAluno;
 import ufv.desconecta.Desconecta.repository.AcessoBDIlha;
@@ -123,8 +125,22 @@ public class ControladorIlhas {
             novaIlha.setFoiJogada(false);
             novaIlha.setProgressoAluno(progresso);
 
+
+            // vincular ilha e desafio
+            switch (proximaIlhaEnum) {
+                case EnumNomeIlha.CIENCIAS, EnumNomeIlha.MATEMATICA -> {
+                    Desafio desafio1 = new Desafio(EnumTiposDesafios.JogoConecta, novaIlha);
+                    novaIlha.getDesafios().add(desafio1);
+                }
+                case EnumNomeIlha.GEOGRAFIA , EnumNomeIlha.HISTORIA -> {
+                    Desafio desafio2 = new Desafio(EnumTiposDesafios.JogoPalavras, novaIlha);
+                    novaIlha.getDesafios().add(desafio2);
+                }
+                default -> {
+                    return  -1;
+                }
+            }
             // 9. Adiciona a nova ilha à lista do progresso e salva TUDO no banco.
-            // O JPA irá fazer o UPDATE na 'ilhaAnterior' e o INSERT na 'novaIlha'.
             progresso.getIlhas().add(novaIlha);
             acessoBDProgressoAluno.salvarProgressoAluno(progresso);
 

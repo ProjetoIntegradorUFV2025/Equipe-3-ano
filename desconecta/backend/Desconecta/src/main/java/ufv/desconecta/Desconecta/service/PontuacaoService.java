@@ -17,14 +17,15 @@ public class PontuacaoService {
     @Autowired
     private RepositorioDesafio repositorioDesafio;
 
-    public int calcularPontuacao(String apelidoAluno, String nomeIlha, int tempo, int numErros) {
+
+    public int calcularPontuacao(int tempo, int numErros) {
         // Lógica de cálculo de pontuação
         // Exemplo: 1000 - (tempo * 2) - (numErros * 50)
+
         int pontuacaoBase = 1000;
         int penalidadeTempo = tempo * 2;
         int penalidadeErros = numErros * 50;
         int pontuacaoFinal = pontuacaoBase - penalidadeTempo - penalidadeErros;
-
         return Math.max(pontuacaoFinal, 0); // Garante que a pontuação não seja negativa
     }
 

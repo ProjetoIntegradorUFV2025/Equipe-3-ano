@@ -1,11 +1,14 @@
 package ufv.desconecta.Desconecta.model;
 
-
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import ufv.desconecta.Desconecta.EnumTiposDesafios;
 
 @Entity
 @Table(name = "TB_Desafio")
+@Getter
+@Setter
 public class Desafio {
 
     @Id
@@ -17,46 +20,17 @@ public class Desafio {
     private int pontuacaoDesafio;
     private boolean isConcluido;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_Ilha") // Esta será a coluna da chave estrangeira.
+    private Ilha ilha;
+
     public Desafio() {
     }
 
-    public Desafio(int id, EnumTiposDesafios tipoDesafio, int pontuacaoDesafio, boolean isConcluido) {
-        this.id = id;
+    public Desafio(EnumTiposDesafios tipoDesafio, Ilha ilha) {
         this.tipoDesafio = tipoDesafio;
-        this.pontuacaoDesafio = pontuacaoDesafio;
-        this.isConcluido = isConcluido;
+        this.ilha = ilha;
+        this.isConcluido = false;
+        this.pontuacaoDesafio = 0;
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public EnumTiposDesafios getTipoDesafio() {
-        return tipoDesafio;
-    }
-
-    public void setTipoDesafio(EnumTiposDesafios tipoDesafio) {
-        this.tipoDesafio = tipoDesafio;
-    }
-
-    public int getPontuacaoDesafio() {
-        return pontuacaoDesafio;
-    }
-
-    public void setPontuacaoDesafio(int pontuacaoDesafio) {
-        this.pontuacaoDesafio = pontuacaoDesafio;
-    }
-
-    public boolean isConcluido() {
-        return isConcluido;
-    }
-
-    public void setConcluido(boolean isConcluido) {
-        this.isConcluido = isConcluido;
-    }
-
 }
