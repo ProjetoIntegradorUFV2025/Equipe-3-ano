@@ -95,7 +95,9 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
   };
 
   const imagemAnterior = () => {
-    if (imagemAtual > 0) {
+    // Permite voltar em todas as imagens, EXCETO na imagem 25 (índice 24)
+    // que é a imagem imediatamente após o jogo ConectaCiencia
+    if (imagemAtual > 0 && imagemAtual !== 24) {
       setImagemAtual(prev => prev - 1);
       // Não inicia timer para voltar - deixa livre
     }
@@ -160,9 +162,10 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
       </div>
 
       {/* Botão Anterior - Extremo esquerdo */}
+      {/* Desabilitado apenas na imagem 25 (índice 24) - imediatamente após o jogo */}
       <button
         onClick={imagemAnterior}
-        disabled={imagens.length === 0 || imagemAtual === 0}
+        disabled={imagens.length === 0 || imagemAtual === 0 || imagemAtual === 24}
         className="fixed left-4 top-1/2 transform -translate-y-1/2 bg-transparent hover:scale-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20 flex items-center justify-center"
         style={{
           width: 'min(100px, 12vw)',
