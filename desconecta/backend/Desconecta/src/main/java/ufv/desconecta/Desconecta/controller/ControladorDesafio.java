@@ -156,4 +156,71 @@ public class ControladorDesafio {
 
         return "Busca concluída! Verifique o console.";
     }
+    
+    @GetMapping("/verificarConcluido")
+    public boolean verificarDesafioConcluido(@RequestParam long pkAluno,
+                                             @RequestParam String nomeIlha) {
+        
+        System.out.println("=== VERIFICAR SE DESAFIO ESTÁ CONCLUÍDO ===");
+        System.out.println("PK Aluno: " + pkAluno);
+        System.out.println("Nome Ilha: " + nomeIlha);
+        
+        if (pkAluno <= 0 || nomeIlha == null || nomeIlha.isEmpty()) {
+            System.out.println("❌ Dados de entrada inválidos!");
+            return false;
+        }
+        
+        try {
+            // Converter nome da ilha para enum
+            EnumNomeIlha enumIlha = EnumNomeIlha.valueOf(nomeIlha.toUpperCase());
+            
+            // Buscar o progresso do aluno
+            ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno((int) pkAluno);
+            
+            if (progressoAluno == null) {
+                System.out.println("❌ Progresso do aluno não encontrado!");
+                return false;
+            }
+            
+            // Buscar todas as ilhas do progresso do aluno
+            List<Ilha> ilhas = acessoBDIlha.recuperarIlhasPorProgressoId(progressoAluno.getPK_ProgressoAluno().intValue());
+            
+            // Encontrar a ilha específica pelo enum
+            Ilha ilhaEncontrada = null;
+            for (Ilha ilha : ilhas) {
+                if (ilha.getNomeIlha() == enumIlha) {
+                    ilhaEncontrada = ilha;
+                    break;
+                }
+            }
+            
+            if (ilhaEncontrada == null) {
+                System.out.println("❌ Ilha não encontrada: " + nomeIlha);
+                return false;
+            }
+            
+            int idIlha = ilhaEncontrada.getPK_Ilha();
+            
+            // Buscar desafio da ilha
+            Desafio desafio = acessoBDDesafio.getDesafioByIlhaId(idIlha);
+            
+            if (desafio == null) {
+                System.out.println("❌ Desafio não encontrado para a ilha!");
+                return false;
+            }
+            
+            boolean concluido = desafio.isConcluido();
+            System.out.println("Status do desafio: " + (concluido ? "✅ Concluído" : "⏳ Não concluído"));
+            
+            return concluido;
+            
+        } catch (IllegalArgumentException e) {
+            System.out.println("❌ Nome de ilha inválido: " + nomeIlha);
+            return false;
+        } catch (Exception e) {
+            System.out.println("❌ Erro ao verificar desafio: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

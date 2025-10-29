@@ -290,35 +290,67 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                   const tempoFinal = Math.floor((Date.now() - tempoInicio) / 1000);
                   
                   try {
-                    // Salvar pontuação via API usando o endpoint atualizado
-                    // Agora usa pkAluno e nomeIlha (enum) ao invés de buscar o ID da ilha
-                    const responsePontuacao = await fetch(
-                      `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
-                      {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json'
-                        }
-                      }
+                    // PRIMEIRO: Verificar se o desafio já foi concluído
+                    console.log('🔍 Verificando se desafio já foi concluído...');
+                    const responseVerificar = await fetch(
+                      `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=CIENCIAS`
                     );
                     
-                    if (responsePontuacao.ok) {
-                      const pontuacaoCalculada = await responsePontuacao.json();
-                      console.log('Pontuação calculada e salva:', pontuacaoCalculada);
-                      
-                      // Armazenar dados para a TelaPontuacao
-                      sessionStorage.setItem('dadosPontuacao', JSON.stringify({
-                        tempo: tempoFinal,
-                        tentativas: numeroErros,
-                        pontos: pontuacaoCalculada
-                      }));
-                    } else {
-                      console.error('Erro ao salvar pontuação. Status:', responsePontuacao.status);
-                      const errorText = await responsePontuacao.text();
-                      console.error('Resposta do servidor:', errorText);
+                    if (!responseVerificar.ok) {
+                      throw new Error('Erro ao verificar status do desafio');
                     }
+                    
+                    const desafioConcluido = await responseVerificar.json();
+                    console.log('Status do desafio:', desafioConcluido ? '✅ Já concluído' : '⏳ Não concluído');
+                    
+                    let pontuacaoCalculada = 0;
+                    
+                    // SEGUNDO: Salvar pontuação APENAS se o desafio NÃO foi concluído
+                    if (!desafioConcluido) {
+                      console.log('💾 Salvando pontuação (primeira vez)...');
+                      const responsePontuacao = await fetch(
+                        `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
+                        {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json'
+                          }
+                        }
+                      );
+                      
+                      if (responsePontuacao.ok) {
+                        pontuacaoCalculada = await responsePontuacao.json();
+                        console.log('✅ Pontuação calculada e salva:', pontuacaoCalculada);
+                      } else {
+                        console.error('❌ Erro ao salvar pontuação. Status:', responsePontuacao.status);
+                        const errorText = await responsePontuacao.text();
+                        console.error('Resposta do servidor:', errorText);
+                        
+                        // Se erro for -2 (já concluído), calcular pontuação localmente para exibir
+                        if (errorText === '-2') {
+                          console.log('⚠️ Desafio já estava concluído (código -2)');
+                          pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
+                          pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
+                        }
+                      }
+                    } else {
+                      console.log('⚠️ Desafio já foi concluído anteriormente. Pontuação NÃO será salva.');
+                      console.log('Calculando pontuação apenas para exibição...');
+                      // Calcular pontuação localmente apenas para exibir
+                      pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
+                      pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
+                    }
+                    
+                    // Armazenar dados para a TelaPontuacao
+                    sessionStorage.setItem('dadosPontuacao', JSON.stringify({
+                      tempo: tempoFinal,
+                      tentativas: numeroErros,
+                      pontos: pontuacaoCalculada,
+                      jaFoiConcluido: desafioConcluido // Flag para indicar se já estava concluído
+                    }));
+                    
                   } catch (error) {
-                    console.error('Erro ao salvar pontuação:', error);
+                    console.error('❌ Erro ao processar conclusão do jogo:', error);
                   }
                   
                   if (onConcluido) {
