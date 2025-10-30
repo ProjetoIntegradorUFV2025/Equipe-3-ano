@@ -42,12 +42,18 @@ const TelaTrilha = ({ onVoltar }) => {
         const idProgressoAluno = await responseIdProgresso.json();
         
         if (idProgressoAluno) {
-          // Agora buscar a posição da ilha usando o ID do progresso
-          const responsePosicao = await fetch(`http://localhost:8080/api/ilhas/posicao-ilha/${idProgressoAluno}`);
+          // Agora buscar a lista de posições das ilhas usando o ID do progresso
+          const responsePosicoes = await fetch(`http://localhost:8080/api/ilhas/posicoes-ilhas/${idProgressoAluno}`);
           
-          if (responsePosicao.ok) {
-            const posicaoIlha = await responsePosicao.json();
-            setPosicaoIlhaAtual(posicaoIlha);
+          if (responsePosicoes.ok) {
+            const posicoesIlhas = await responsePosicoes.json();
+            
+            // A posição mais avançada é o último elemento da lista ordenada
+            if (posicoesIlhas && posicoesIlhas.length > 0) {
+              const posicaoMaisAvancada = posicoesIlhas[posicoesIlhas.length - 1];
+              setPosicaoIlhaAtual(posicaoMaisAvancada);
+              console.log('Posição da ilha mais avançada:', posicaoMaisAvancada);
+            }
           }
         }
       }
@@ -75,7 +81,7 @@ const TelaTrilha = ({ onVoltar }) => {
         buscarPosicaoIlha();
       }
     }
-  }, [telaAtiva]); // Executa quando volta para a tela da trilha
+  }, [telaAtiva, alunoId, isLogado]); // Executa quando volta para a tela da trilha e quando o aluno muda
 
   const handleAbrirPopupCiencia = () => {
     setPopupCienciaAberto(true);
@@ -91,6 +97,10 @@ const TelaTrilha = ({ onVoltar }) => {
   };
 
   const handleVoltarTrilha = () => {
+    // Sempre recarrega o progresso ao voltar da tela de jogo
+    if (alunoId && isLogado) {
+      buscarPosicaoIlha();
+    }
     setTelaAtiva('trilha');
   };
 
@@ -166,7 +176,8 @@ const TelaTrilha = ({ onVoltar }) => {
 
   // Se estiver na tela de pontuação, renderizar TelaPontuacao
   if (telaAtiva === 'pontuacao') {
-    return <TelaPontuacao onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} ilhaCompletada={3} />;
+    // Dadolandia corresponde ao enum posição 0 (0=DADOLANDIA, 1=CIENCIAS, 2=GEOGRAFIA, 3=MATEMATICA, 4=HISTORIA)
+    return <TelaPontuacao onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} ilhaCompletada={0} />;
   }
 
   // Se o aluno não estiver logado, mostrar mensagem

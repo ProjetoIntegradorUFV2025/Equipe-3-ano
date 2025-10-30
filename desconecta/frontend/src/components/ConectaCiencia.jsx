@@ -1,6 +1,7 @@
 import React from 'react';
 import MenuNavegacao from './ui/MenuNavegacao';
 import TelaPontuacao from './TelaPontuacao';
+import useAlunoLogado from '../hooks/useAlunoLogado';
 
 // Importar imagem de fundo
 import fundoConecta from '../assets/HistoriaCiencia/JogoCiencia/Background.png';
@@ -60,7 +61,9 @@ const botoesData = [
 ];
 
 // --- Componente: Conecta Ciência ---
-const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
+const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
+  const { alunoId, isLogado } = useAlunoLogado();
+  
   const [mostrarPontuacao, setMostrarPontuacao] = React.useState(false);
   const [botoesClicados, setBotoesClicados] = React.useState(new Set());
   const [stringPosicoes, setStringPosicoes] = React.useState('');
@@ -69,6 +72,24 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
   const [botoesCorretos, setBotoesCorretos] = React.useState(new Set());
   const [respostasCorretas, setRespostasCorretas] = React.useState(0);
   const [mostrarPopupErro, setMostrarPopupErro] = React.useState(false);
+  
+  // Estados para pontuação
+  const [tempoInicio, setTempoInicio] = React.useState(null);
+  const [numeroErros, setNumeroErros] = React.useState(0);
+  const [tempoDecorrido, setTempoDecorrido] = React.useState(0);
+
+  // Iniciar o timer quando o componente for montado
+  React.useEffect(() => {
+    const inicio = Date.now();
+    setTempoInicio(inicio);
+    
+    // Timer para atualizar o tempo decorrido a cada segundo
+    const intervalo = setInterval(() => {
+      setTempoDecorrido(Math.floor((Date.now() - inicio) / 1000));
+    }, 1000);
+    
+    return () => clearInterval(intervalo);
+  }, []);
 
   // Função para ir para a tela de pontuação
   const irParaPontuacao = () => {
@@ -262,14 +283,88 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
               console.log('Resposta correta! Mostrando imagens de resolvidoção.');
               console.log(`Respostas corretas: ${novasRespostasCorretas}/4`);
               
-              // Se chegou a 4 respostas corretas, ir para a tela de pontuação
+              // Se chegou a 4 respostas corretas, chamar callback de conclusão
               if (novasRespostasCorretas >= 4) {
-                setTimeout(() => {
-                  setMostrarPontuacao(true);
-                }, 1500); // Aguarda 1.5 segundos para mostrar a imagem resolvida antes de ir para pontuação
+                setTimeout(async () => {
+                  // Calcular tempo final em segundos
+                  const tempoFinal = Math.floor((Date.now() - tempoInicio) / 1000);
+                  
+                  try {
+                    // PRIMEIRO: Verificar se o desafio já foi concluído
+                    console.log('🔍 Verificando se desafio já foi concluído...');
+                    const responseVerificar = await fetch(
+                      `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=CIENCIAS`
+                    );
+                    
+                    if (!responseVerificar.ok) {
+                      throw new Error('Erro ao verificar status do desafio');
+                    }
+                    
+                    const desafioConcluido = await responseVerificar.json();
+                    console.log('Status do desafio:', desafioConcluido ? '✅ Já concluído' : '⏳ Não concluído');
+                    
+                    let pontuacaoCalculada = 0;
+                    
+                    // SEGUNDO: Salvar pontuação APENAS se o desafio NÃO foi concluído
+                    if (!desafioConcluido) {
+                      console.log('💾 Salvando pontuação (primeira vez)...');
+                      const responsePontuacao = await fetch(
+                        `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
+                        {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json'
+                          }
+                        }
+                      );
+                      
+                      if (responsePontuacao.ok) {
+                        pontuacaoCalculada = await responsePontuacao.json();
+                        console.log('✅ Pontuação calculada e salva:', pontuacaoCalculada);
+                      } else {
+                        console.error('❌ Erro ao salvar pontuação. Status:', responsePontuacao.status);
+                        const errorText = await responsePontuacao.text();
+                        console.error('Resposta do servidor:', errorText);
+                        
+                        // Se erro for -2 (já concluído), calcular pontuação localmente para exibir
+                        if (errorText === '-2') {
+                          console.log('⚠️ Desafio já estava concluído (código -2)');
+                          pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
+                          pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
+                        }
+                      }
+                    } else {
+                      console.log('⚠️ Desafio já foi concluído anteriormente. Pontuação NÃO será salva.');
+                      console.log('Calculando pontuação apenas para exibição...');
+                      // Calcular pontuação localmente apenas para exibir
+                      pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
+                      pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
+                    }
+                    
+                    // Armazenar dados para a TelaPontuacao
+                    sessionStorage.setItem('dadosPontuacao', JSON.stringify({
+                      tempo: tempoFinal,
+                      tentativas: numeroErros,
+                      pontos: pontuacaoCalculada,
+                      jaFoiConcluido: desafioConcluido // Flag para indicar se já estava concluído
+                    }));
+                    
+                  } catch (error) {
+                    console.error('❌ Erro ao processar conclusão do jogo:', error);
+                  }
+                  
+                  if (onConcluido) {
+                    onConcluido();
+                  } else {
+                    setMostrarPontuacao(true);
+                  }
+                }, 1500); // Aguarda 1.5 segundos para mostrar a imagem resolvida antes de retornar
               }
             } else {
               console.log('Resposta incorreta.');
+              // Incrementar contador de erros
+              setNumeroErros(prev => prev + 1);
+              
               // Mostrar popup de erro
               setMostrarPopupErro(true);
               // Ocultar popup após 2 segundos

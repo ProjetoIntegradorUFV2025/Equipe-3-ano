@@ -8,7 +8,9 @@ import ufv.desconecta.Desconecta.model.Ilha;
 import java.util.List;
 
 public interface RepositorioIlha extends JpaRepository<Ilha, Integer> {
-    @Query("SELECT i FROM Ilha i WHERE i.progressoAluno.PK_ProgressoAluno = :id")
+
+    // AQUI ESTÁ A MUDANÇA: Adicionamos "ORDER BY i.nomeIlha"
+    @Query("SELECT i FROM Ilha i WHERE i.progressoAluno.PK_ProgressoAluno = :id ORDER BY i.nomeIlha")
     List<Ilha> buscarTodasAsIlhasDeUmProgresso(@Param("id") Long id);
 
 }
