@@ -155,22 +155,23 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
   };
 
   // Função para verificar resposta na API
+  // Alterei a função para usar o endpoint unificado (Gabriel)
   const verificarResposta = async () => {
     if (stringIndices === '') return;
 
     try {
-      console.log('Enviando requisição para API com:', stringIndices);
-      
-      const response = await fetch(
-        `http://localhost:8080/api/cacaPalavras/verificarAgrupamento/1?tentativa=${stringIndices}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      console.log('Enviando string de índices para a API:', stringIndices);
 
+      const params = new URLSearchParams();
+      params.append('tipoDesafio', 'JogoPalavras');
+      params.append('id', '1'); // ID do Caça-Palavras de Geografia
+      params.append('tentativa', stringIndices); // Enviando a string de índices
+
+      const response = await fetch('http://localhost:8080/api/desafio/verificar', {
+        method: 'POST',
+        body: params,
+      });
+      
       const resultado = await response.text();
       console.log('Resposta da API:', resultado);
 
@@ -234,7 +235,6 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                       const errorText = await responsePontuacao.text();
                       console.error('Resposta do servidor:', errorText);
                       
-                      // Se erro for -2 (já concluído), calcular pontuação localmente para exibir
                       if (errorText === '-2') {
                         console.log('⚠️ Desafio já estava concluído (código -2)');
                         pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
@@ -244,7 +244,6 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                   } else {
                     console.log('⚠️ Desafio já foi concluído anteriormente. Pontuação NÃO será salva.');
                     console.log('Calculando pontuação apenas para exibição...');
-                    // Calcular pontuação localmente apenas para exibir
                     pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
                     pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
                   }
@@ -252,23 +251,21 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                   // Armazenar dados para a TelaPontuacao
                   sessionStorage.setItem('dadosPontuacao', JSON.stringify({
                     tempo: tempoFinal,
-                    tentativas: numeroErros, // Agora usa o número real de erros
+                    tentativas: numeroErros,
                     pontos: pontuacaoCalculada,
-                    jaFoiConcluido: desafioConcluido // Flag para indicar se já estava concluído
+                    jaFoiConcluido: desafioConcluido
                   }));
                 }
               } catch (error) {
                 console.error('❌ Erro ao processar conclusão do jogo:', error);
               }
               
-              // Se existe callback onConcluido, usa ele (vindo da TelaJogoGeografia)
-              // Caso contrário, vai para tela de pontuação (modo standalone)
               if (onConcluido) {
                 onConcluido();
               } else {
                 setJogoCompleto(true);
               }
-            }, 1500); // Aguarda 1.5 segundos antes de processar
+            }, 1500);
           }
           
           return novaQuantidade;
@@ -278,12 +275,10 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
       } else {
         // Resposta incorreta - mostrar popup de erro
         console.log('Resposta incorreta! Mostrando popup de erro.');
-        // Incrementar contador de erros
         setNumeroErros(prev => prev + 1);
         
         setMostrarPopupErro(true);
         
-        // Auto-esconder popup após 2 segundos (mesmo tempo do ConectaCiencia)
         setTimeout(() => {
           setMostrarPopupErro(false);
         }, 2000);

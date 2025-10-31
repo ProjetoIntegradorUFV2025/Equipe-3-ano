@@ -1,19 +1,20 @@
 package ufv.desconecta.Desconecta.controller;
-//comentario de teste
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ufv.desconecta.Desconecta.EnumNomeIlha;
+import ufv.desconecta.Desconecta.EnumTiposDesafios;
 import ufv.desconecta.Desconecta.model.Desafio;
 import ufv.desconecta.Desconecta.model.Ilha;
 import ufv.desconecta.Desconecta.model.ProgressoAluno;
 import ufv.desconecta.Desconecta.repository.AcessoBDDesafio;
 import ufv.desconecta.Desconecta.repository.AcessoBDIlha;
 import ufv.desconecta.Desconecta.repository.AcessoBDProgressoAluno;
-import ufv.desconecta.Desconecta.repository.RepositorioDesafio;
 import ufv.desconecta.Desconecta.service.PontuacaoService;
+import ufv.desconecta.Desconecta.service.SolucionarDesafio; // Importe a nova interface
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map; // Importe a classe Map
 
 @RestController
 @RequestMapping("/api/desafio")
@@ -26,16 +27,42 @@ public class ControladorDesafio {
     private final AcessoBDProgressoAluno acessoBDProgressoAluno;
 
 
-
+    private final Map<String, SolucionarDesafio> solucionarDesafioMap;
 
     @Autowired
-    public ControladorDesafio(AcessoBDDesafio acessoBDDesafio, PontuacaoService pontuacaoService, 
-                              AcessoBDIlha acessoBDIlha, AcessoBDProgressoAluno acessoBDProgressoAluno) {
+    public ControladorDesafio(AcessoBDDesafio acessoBDDesafio, PontuacaoService pontuacaoService,
+                              AcessoBDIlha acessoBDIlha, AcessoBDProgressoAluno acessoBDProgressoAluno,
+                              Map<String, SolucionarDesafio> solucionarDesafioMap) {
         this.acessoBDDesafio = acessoBDDesafio;
         this.pontuacaoService = pontuacaoService;
         this.acessoBDIlha = acessoBDIlha;
         this.acessoBDProgressoAluno = acessoBDProgressoAluno;
+        this.solucionarDesafioMap = solucionarDesafioMap;
     }
+
+
+    @PostMapping("/verificar")
+    public String verificar(@RequestParam("tipoDesafio") EnumTiposDesafios tipoDesafio,
+                            @RequestParam("id") int id,
+                            @RequestParam("tentativa") String tentativa) {
+
+        // Converte o nome do Enum (ex: JogoConecta) para String para usar como chave do mapa
+        String chaveDoServico = tipoDesafio.name();
+
+        // Pega o serviço (ControladorConecta ou ControladorCacaPalavra) do mapa
+        SolucionarDesafio servico = solucionarDesafioMap.get(chaveDoServico);
+
+        if (servico != null) {
+            // Chama o método verificarAgrupamento do serviço encontrado
+            return servico.verificarAgrupamento(id, tentativa);
+        } else {
+            // Se nenhum serviço for encontrado para aquele tipo de desafio, retorna um erro.
+            return "Tipo de desafio inválido ou não implementado.";
+        }
+    }
+
+
+
 
     @PostMapping("/concluir/{idDesafio}")
     public boolean concluirDesafio(@PathVariable int idDesafio) {
@@ -66,21 +93,21 @@ public class ControladorDesafio {
             // Converter nome da ilha para enum
             EnumNomeIlha enumIlha = EnumNomeIlha.valueOf(nomeIlha.toUpperCase());
             System.out.println("Enum da ilha: " + enumIlha);
-            
+
             // Buscar o progresso do aluno
             ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno((int) pkAluno);
-            
+
             if (progressoAluno == null) {
                 System.out.println("❌ Progresso do aluno não encontrado!");
                 return -3; // Progresso não encontrado
             }
-            
+
             System.out.println("ID Progresso: " + progressoAluno.getPK_ProgressoAluno());
-            
+
             // Buscar todas as ilhas do progresso do aluno
             List<Ilha> ilhas = acessoBDIlha.recuperarIlhasPorProgressoId(progressoAluno.getPK_ProgressoAluno().intValue());
             System.out.println("Total de ilhas encontradas: " + ilhas.size());
-            
+
             // Encontrar a ilha específica pelo enum
             Ilha ilhaEncontrada = null;
             for (Ilha ilha : ilhas) {
@@ -89,12 +116,12 @@ public class ControladorDesafio {
                     break;
                 }
             }
-            
+
             if (ilhaEncontrada == null) {
                 System.out.println("❌ Ilha não encontrada: " + nomeIlha);
                 return -4; // Ilha não encontrada
             }
-            
+
             int idIlha = ilhaEncontrada.getPK_Ilha();
             System.out.println("ID da ilha encontrada: " + idIlha);
 
@@ -114,7 +141,7 @@ public class ControladorDesafio {
             // Calcular pontuação
             int pontuacao = pontuacaoService.calcularPontuacao(tempo, numErros);
             System.out.println("Pontuação calculada: " + pontuacao);
-            
+
             // Salvar pontuação
             pontuacaoService.salvarPontuacaoDesafio(pontuacao, desafioASerPontuado);
 
@@ -123,7 +150,7 @@ public class ControladorDesafio {
 
             System.out.println("✅ Pontuação salva com sucesso!");
             return pontuacao;
-            
+
         } catch (IllegalArgumentException e) {
             System.out.println("❌ Nome de ilha inválido: " + nomeIlha);
             return -6; // Nome de ilha inválido
@@ -134,57 +161,34 @@ public class ControladorDesafio {
         }
     }
 
-    @GetMapping("/testeBusca/{idAluno}")
-    public String testeBusca(@PathVariable long idAluno) { // Mudei para long
-
-        List<Desafio> desafios = acessoBDDesafio.getDesafiosDoAluno(idAluno);
-
-
-        if (desafios.isEmpty()) {
-            System.out.println("Nenhum desafio encontrado para o aluno com ID: " + idAluno);
-            return "Nenhum desafio encontrado.";
-        }
-
-  
-        Desafio primeiroDesafio = desafios.get(0);
-        System.out.println("Tipo do primeiro desafio: " + primeiroDesafio.getTipoDesafio());
-
-        // Você também pode iterar por todos os desafios encontrados
-        for (Desafio d : desafios) {
-            System.out.println("ID do Desafio: " + d.getId() + ", Tipo: " + d.getTipoDesafio());
-        }
-
-        return "Busca concluída! Verifique o console.";
-    }
-    
     @GetMapping("/verificarConcluido")
     public boolean verificarDesafioConcluido(@RequestParam long pkAluno,
                                              @RequestParam String nomeIlha) {
-        
+
         System.out.println("=== VERIFICAR SE DESAFIO ESTÁ CONCLUÍDO ===");
         System.out.println("PK Aluno: " + pkAluno);
         System.out.println("Nome Ilha: " + nomeIlha);
-        
+
         if (pkAluno <= 0 || nomeIlha == null || nomeIlha.isEmpty()) {
             System.out.println("❌ Dados de entrada inválidos!");
             return false;
         }
-        
+
         try {
             // Converter nome da ilha para enum
             EnumNomeIlha enumIlha = EnumNomeIlha.valueOf(nomeIlha.toUpperCase());
-            
+
             // Buscar o progresso do aluno
             ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno((int) pkAluno);
-            
+
             if (progressoAluno == null) {
                 System.out.println("❌ Progresso do aluno não encontrado!");
                 return false;
             }
-            
+
             // Buscar todas as ilhas do progresso do aluno
             List<Ilha> ilhas = acessoBDIlha.recuperarIlhasPorProgressoId(progressoAluno.getPK_ProgressoAluno().intValue());
-            
+
             // Encontrar a ilha específica pelo enum
             Ilha ilhaEncontrada = null;
             for (Ilha ilha : ilhas) {
@@ -193,27 +197,27 @@ public class ControladorDesafio {
                     break;
                 }
             }
-            
+
             if (ilhaEncontrada == null) {
                 System.out.println("❌ Ilha não encontrada: " + nomeIlha);
                 return false;
             }
-            
+
             int idIlha = ilhaEncontrada.getPK_Ilha();
-            
+
             // Buscar desafio da ilha
             Desafio desafio = acessoBDDesafio.getDesafioByIlhaId(idIlha);
-            
+
             if (desafio == null) {
                 System.out.println("❌ Desafio não encontrado para a ilha!");
                 return false;
             }
-            
+
             boolean concluido = desafio.isConcluido();
             System.out.println("Status do desafio: " + (concluido ? "✅ Concluído" : "⏳ Não concluído"));
-            
+
             return concluido;
-            
+
         } catch (IllegalArgumentException e) {
             System.out.println("❌ Nome de ilha inválido: " + nomeIlha);
             return false;
