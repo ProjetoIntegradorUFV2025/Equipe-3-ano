@@ -8,7 +8,8 @@ import ilhaMatematica from '../assets/imgTelaTrilha/Ilha-Matematica.png';
 import popupJogarIlha from '../assets/imgTelaTrilha/popup-jogar-ilha.png';
 import TelaJogoCiencia from './TelaJogoCiencia';
 import TelaDadolandia from './TelaDadolandia';
-import JogoGeografia from './JogoGeografia';
+import TelaJogoGeografia from './TelaJogoGeografia';
+import TelaJogoMatematica from './TelaJogoMatematica';
 import TelaPontuacao from './TelaPontuacao';
 import useAlunoLogado from '../hooks/useAlunoLogado';
 
@@ -16,7 +17,7 @@ import useAlunoLogado from '../hooks/useAlunoLogado';
 // --- Componente: Tela Trilha ---
 const TelaTrilha = ({ onVoltar }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
-  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', ou 'pontuacao'
+  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', ou 'pontuacao'
   const [popupCienciaAberto, setPopupCienciaAberto] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -169,9 +170,14 @@ const TelaTrilha = ({ onVoltar }) => {
     return <TelaDadolandia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
   }
 
-  // Se estiver na tela de geografia, renderizar JogoGeografia
+  // Se estiver na tela de geografia, renderizar TelaJogoGeografia
   if (telaAtiva === 'geografia') {
-    return <JogoGeografia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaJogoGeografia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+  }
+
+  // Se estiver na tela de matemática, renderizar TelaJogoMatematica
+  if (telaAtiva === 'matematica') {
+    return <TelaJogoMatematica onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
   }
 
   // Se estiver na tela de pontuação, renderizar TelaPontuacao
@@ -354,7 +360,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(30%, -110%)' 
             }}>
             <button
-              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? () => setTelaAtiva('pontuacao') : undefined}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? () => setTelaAtiva('matematica') : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 2}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
                 (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2)
