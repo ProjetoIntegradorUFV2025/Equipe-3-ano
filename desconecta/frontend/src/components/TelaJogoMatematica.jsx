@@ -104,8 +104,13 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu }) => {
 
   // TEMPORÁRIO: Enquanto o minijogo não existe, vai direto para pontuação
   if (mostrarMinijogo || mostrarPontuacao) {
-    // Matemática corresponde ao enum posição 3 (0=DADOLANDIA, 1=CIENCIAS, 2=GEOGRAFIA, 3=MATEMATICA, 4=HISTORIA)
-    return <TelaPontuacao onVoltarTrilha={onVoltarTrilha} onVoltarMenu={onVoltarMenu} ilhaCompletada={3} />;
+    // Matemática corresponde ao enum posição 2 (0=DADOLANDIA, 1=CIENCIAS, 2=MATEMATICA, 3=GEOGRAFIA, 4=HISTORIA)
+    return <TelaPontuacao 
+      onVoltarTrilha={onVoltarTrilha} 
+      onVoltarMenu={onVoltarMenu} 
+      ilhaCompletada={2} 
+      nomeIlhaJogada="MATEMATICA" 
+    />;
   }
 
   return (

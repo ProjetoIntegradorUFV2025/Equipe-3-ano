@@ -18,6 +18,7 @@ import useAlunoLogado from '../hooks/useAlunoLogado';
 const TelaTrilha = ({ onVoltar }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
   const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', ou 'pontuacao'
+  const [nomeIlhaJogada, setNomeIlhaJogada] = useState(null); // Rastreia qual ilha foi jogada
   const [popupDadolandiaAberto, setPopupDadolandiaAberto] = useState(false);
   const [popupCienciaAberto, setPopupCienciaAberto] = useState(false);
   const [popupMatematicaAberto, setPopupMatematicaAberto] = useState(false);
@@ -133,30 +134,37 @@ const TelaTrilha = ({ onVoltar }) => {
   // Funções para ir para cada ilha
   const handleIrParaDadolandia = () => {
     setPopupDadolandiaAberto(false);
+    setNomeIlhaJogada('DADOLANDIA');
     setTelaAtiva('dadolandia');
   };
 
   const handleIrParaCiencia = () => {
     setPopupCienciaAberto(false);
+    setNomeIlhaJogada('CIENCIAS');
     setTelaAtiva('ciencia');
   };
 
   const handleIrParaMatematica = () => {
     setPopupMatematicaAberto(false);
+    setNomeIlhaJogada('MATEMATICA');
     setTelaAtiva('matematica');
   };
 
   const handleIrParaGeografia = () => {
     setPopupGeografiaAberto(false);
+    setNomeIlhaJogada('GEOGRAFIA');
     setTelaAtiva('geografia');
   };
 
   const handleIrParaHistoria = () => {
     setPopupHistoriaAberto(false);
+    setNomeIlhaJogada('HISTORIA');
     setTelaAtiva('historia');
   };
 
   const handleVoltarTrilha = () => {
+    // Limpa o nome da ilha jogada ao voltar para a trilha
+    setNomeIlhaJogada(null);
     // Sempre recarrega o progresso ao voltar da tela de jogo
     if (alunoId && isLogado) {
       buscarPosicaoIlha();
@@ -242,7 +250,12 @@ const TelaTrilha = ({ onVoltar }) => {
   // Se estiver na tela de pontuação, renderizar TelaPontuacao
   if (telaAtiva === 'pontuacao') {
     // Dadolandia corresponde ao enum posição 0 (0=DADOLANDIA, 1=CIENCIAS, 2=GEOGRAFIA, 3=MATEMATICA, 4=HISTORIA)
-    return <TelaPontuacao onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} ilhaCompletada={0} />;
+    return <TelaPontuacao 
+      onVoltarTrilha={handleVoltarTrilha} 
+      onVoltarMenu={onVoltar} 
+      ilhaCompletada={0} 
+      nomeIlhaJogada={nomeIlhaJogada} 
+    />;
   }
 
   // Se o aluno não estiver logado, mostrar mensagem

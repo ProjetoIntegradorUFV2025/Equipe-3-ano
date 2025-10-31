@@ -308,8 +308,13 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
 
   // Se jogo completo, mostrar TelaPontuacao
   if (jogoCompleto) {
-    // Geografia corresponde ao enum posição 2 (0=DADOLANDIA, 1=CIENCIAS, 2=GEOGRAFIA, 3=MATEMATICA, 4=HISTORIA)
-    return <TelaPontuacao onVoltarTrilha={onVoltarTrilha} onVoltarMenu={onVoltarMenu} ilhaCompletada={2} />;
+    // Geografia corresponde ao enum posição 3 (0=DADOLANDIA, 1=CIENCIAS, 2=MATEMATICA, 3=GEOGRAFIA, 4=HISTORIA)
+    return <TelaPontuacao 
+      onVoltarTrilha={onVoltarTrilha} 
+      onVoltarMenu={onVoltarMenu} 
+      ilhaCompletada={3} 
+      nomeIlhaJogada="GEOGRAFIA" 
+    />;
   }
 
   return (

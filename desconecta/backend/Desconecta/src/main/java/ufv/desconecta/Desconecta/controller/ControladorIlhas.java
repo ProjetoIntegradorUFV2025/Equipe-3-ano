@@ -153,4 +153,34 @@ public class ControladorIlhas {
             return -1;
         }
     }
+
+    /**
+     * Verifica se uma ilha específica já foi jogada
+     * @param idProgressoAluno ID do progresso do aluno
+     * @param nomeIlha Nome da ilha (DADOLANDIA, CIENCIAS, MATEMATICA, GEOGRAFIA, HISTORIA)
+     * @return true se foi jogada, false caso contrário
+     */
+    @GetMapping("/verificar-foi-jogada")
+    public boolean verificarSeIlhaFoiJogada(
+            @RequestParam int idProgressoAluno,
+            @RequestParam String nomeIlha) {
+        try {
+            // Converte a string para o enum
+            EnumNomeIlha enumNomeIlha = EnumNomeIlha.valueOf(nomeIlha.toUpperCase());
+            
+            // Busca e retorna o status foiJogada
+            Optional<Boolean> foiJogada = acessoBDIlha.verificarSeIlhaFoiJogada(idProgressoAluno, enumNomeIlha);
+            
+            // Se a ilha não foi encontrada, retorna false
+            return foiJogada.orElse(false);
+            
+        } catch (IllegalArgumentException e) {
+            System.err.println("Nome de ilha inválido: " + nomeIlha);
+            return false;
+        } catch (Exception e) {
+            System.err.println("Erro ao verificar se ilha foi jogada: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

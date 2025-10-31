@@ -139,7 +139,12 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
   // Se deve mostrar a tela de pontuação, renderizar TelaPontuacao
   if (mostrarPontuacao) {
     // Ciências corresponde ao enum posição 1 (0=DADOLANDIA, 1=CIENCIAS, 2=GEOGRAFIA, 3=MATEMATICA, 4=HISTORIA)
-    return <TelaPontuacao onVoltarTrilha={onVoltarTrilha} onVoltarMenu={onVoltarMenu} ilhaCompletada={1} />;
+    return <TelaPontuacao 
+      onVoltarTrilha={onVoltarTrilha} 
+      onVoltarMenu={onVoltarMenu} 
+      ilhaCompletada={1} 
+      nomeIlhaJogada="CIENCIAS" 
+    />;
   }
 
   return (
