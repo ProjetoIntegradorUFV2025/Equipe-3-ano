@@ -157,6 +157,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
         posicao="top-right"
+        tipoTutorial="conecta"
       />
 
 {/* Letreiro e Texto Conecta */}

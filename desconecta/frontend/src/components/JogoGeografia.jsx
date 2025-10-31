@@ -331,6 +331,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
         posicao="top-right"
+        tipoTutorial="caca-palavras"
       />
 
 
