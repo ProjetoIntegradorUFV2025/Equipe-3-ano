@@ -18,7 +18,11 @@ import useAlunoLogado from '../hooks/useAlunoLogado';
 const TelaTrilha = ({ onVoltar }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
   const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', ou 'pontuacao'
+  const [popupDadolandiaAberto, setPopupDadolandiaAberto] = useState(false);
   const [popupCienciaAberto, setPopupCienciaAberto] = useState(false);
+  const [popupMatematicaAberto, setPopupMatematicaAberto] = useState(false);
+  const [popupGeografiaAberto, setPopupGeografiaAberto] = useState(false);
+  const [popupHistoriaAberto, setPopupHistoriaAberto] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -84,17 +88,72 @@ const TelaTrilha = ({ onVoltar }) => {
     }
   }, [telaAtiva, alunoId, isLogado]); // Executa quando volta para a tela da trilha e quando o aluno muda
 
+  // Funções para abrir popups
+  const handleAbrirPopupDadolandia = () => {
+    setPopupDadolandiaAberto(true);
+  };
+
   const handleAbrirPopupCiencia = () => {
     setPopupCienciaAberto(true);
+  };
+
+  const handleAbrirPopupMatematica = () => {
+    setPopupMatematicaAberto(true);
+  };
+
+  const handleAbrirPopupGeografia = () => {
+    setPopupGeografiaAberto(true);
+  };
+
+  const handleAbrirPopupHistoria = () => {
+    setPopupHistoriaAberto(true);
+  };
+
+  // Funções para fechar popups
+  const handleFecharPopupDadolandia = () => {
+    setPopupDadolandiaAberto(false);
   };
 
   const handleFecharPopupCiencia = () => {
     setPopupCienciaAberto(false);
   };
 
+  const handleFecharPopupMatematica = () => {
+    setPopupMatematicaAberto(false);
+  };
+
+  const handleFecharPopupGeografia = () => {
+    setPopupGeografiaAberto(false);
+  };
+
+  const handleFecharPopupHistoria = () => {
+    setPopupHistoriaAberto(false);
+  };
+
+  // Funções para ir para cada ilha
+  const handleIrParaDadolandia = () => {
+    setPopupDadolandiaAberto(false);
+    setTelaAtiva('dadolandia');
+  };
+
   const handleIrParaCiencia = () => {
     setPopupCienciaAberto(false);
     setTelaAtiva('ciencia');
+  };
+
+  const handleIrParaMatematica = () => {
+    setPopupMatematicaAberto(false);
+    setTelaAtiva('matematica');
+  };
+
+  const handleIrParaGeografia = () => {
+    setPopupGeografiaAberto(false);
+    setTelaAtiva('geografia');
+  };
+
+  const handleIrParaHistoria = () => {
+    setPopupHistoriaAberto(false);
+    setTelaAtiva('historia');
   };
 
   const handleVoltarTrilha = () => {
@@ -310,7 +369,7 @@ const TelaTrilha = ({ onVoltar }) => {
 >
   {/* Botão redondo */}
   <button
-    onClick={() => setTelaAtiva('dadolandia')}
+    onClick={handleAbrirPopupDadolandia}
     className="rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 border-8"
     style={{
       width: 'min(240px, 30vw)',
@@ -360,7 +419,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(30%, -110%)' 
             }}>
             <button
-              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? () => setTelaAtiva('matematica') : undefined}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? handleAbrirPopupMatematica : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 2}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
                 (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2)
@@ -412,7 +471,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(-30%, -15%)' 
             }}>
             <button
-              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3) ? () => setTelaAtiva('geografia') : undefined}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3) ? handleAbrirPopupGeografia : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 3}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
                 (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3)
@@ -461,7 +520,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(20%, 20%)' 
             }}>
             <button
-              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4) ? () => console.log('Ilha História clicada!') : undefined}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4) ? handleAbrirPopupHistoria : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 4}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
                 (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4)
@@ -504,6 +563,87 @@ const TelaTrilha = ({ onVoltar }) => {
         </div>
 
       </div>
+
+      {/* Popup de Confirmação para Ilha Dadolandia */}
+      {popupDadolandiaAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="relative"
+            style={{
+              backgroundImage: `url(${popupJogarIlha})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              width: 'min(600px, 90vw)',
+              height: 'min(500px, 90vh)',
+              aspectRatio: '6/5'
+            }}
+          >
+            {/* Botão X para fechar */}
+            <button
+              onClick={handleFecharPopupDadolandia}
+              className="absolute text-white rounded-full flex items-center justify-center font-bold transition-colors duration-200 shadow-lg"
+              style={{ 
+                backgroundColor: '#563066',
+                top: 'min(160px, 32%)',
+                left: 'min(24px, 4%)',
+                width: 'min(64px, 10.7vw)',
+                height: 'min(64px, 10.7vw)',
+                fontSize: 'min(24px, 4vw)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+            >
+              X
+            </button>
+
+            {/* Botões Sim e Não */}
+            <div 
+              className="absolute flex"
+              style={{
+                bottom: 'min(64px, 12.8%)',
+                left: 'min(180px, 40%)',
+                transform: 'translateX(-50%)',
+                gap: 'min(120px, 25%)'
+              }}
+            >
+              <button
+                onClick={handleIrParaDadolandia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Sim
+              </button>
+
+              <button
+                onClick={handleFecharPopupDadolandia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Popup de Confirmação para Ilha da Ciência */}
       {popupCienciaAberto && (
@@ -569,6 +709,243 @@ const TelaTrilha = ({ onVoltar }) => {
               {/* Botão Não */}
               <button
                 onClick={handleFecharPopupCiencia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup de Confirmação para Ilha da Matemática */}
+      {popupMatematicaAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="relative"
+            style={{
+              backgroundImage: `url(${popupJogarIlha})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              width: 'min(600px, 90vw)',
+              height: 'min(500px, 90vh)',
+              aspectRatio: '6/5'
+            }}
+          >
+            <button
+              onClick={handleFecharPopupMatematica}
+              className="absolute text-white rounded-full flex items-center justify-center font-bold transition-colors duration-200 shadow-lg"
+              style={{ 
+                backgroundColor: '#563066',
+                top: 'min(160px, 32%)',
+                left: 'min(24px, 4%)',
+                width: 'min(64px, 10.7vw)',
+                height: 'min(64px, 10.7vw)',
+                fontSize: 'min(24px, 4vw)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+            >
+              X
+            </button>
+
+            <div 
+              className="absolute flex"
+              style={{
+                bottom: 'min(64px, 12.8%)',
+                left: 'min(180px, 40%)',
+                transform: 'translateX(-50%)',
+                gap: 'min(120px, 25%)'
+              }}
+            >
+              <button
+                onClick={handleIrParaMatematica}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Sim
+              </button>
+
+              <button
+                onClick={handleFecharPopupMatematica}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup de Confirmação para Ilha da Geografia */}
+      {popupGeografiaAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="relative"
+            style={{
+              backgroundImage: `url(${popupJogarIlha})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              width: 'min(600px, 90vw)',
+              height: 'min(500px, 90vh)',
+              aspectRatio: '6/5'
+            }}
+          >
+            <button
+              onClick={handleFecharPopupGeografia}
+              className="absolute text-white rounded-full flex items-center justify-center font-bold transition-colors duration-200 shadow-lg"
+              style={{ 
+                backgroundColor: '#563066',
+                top: 'min(160px, 32%)',
+                left: 'min(24px, 4%)',
+                width: 'min(64px, 10.7vw)',
+                height: 'min(64px, 10.7vw)',
+                fontSize: 'min(24px, 4vw)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+            >
+              X
+            </button>
+
+            <div 
+              className="absolute flex"
+              style={{
+                bottom: 'min(64px, 12.8%)',
+                left: 'min(180px, 40%)',
+                transform: 'translateX(-50%)',
+                gap: 'min(120px, 25%)'
+              }}
+            >
+              <button
+                onClick={handleIrParaGeografia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Sim
+              </button>
+
+              <button
+                onClick={handleFecharPopupGeografia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup de Confirmação para Ilha da História */}
+      {popupHistoriaAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="relative"
+            style={{
+              backgroundImage: `url(${popupJogarIlha})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              width: 'min(600px, 90vw)',
+              height: 'min(500px, 90vh)',
+              aspectRatio: '6/5'
+            }}
+          >
+            <button
+              onClick={handleFecharPopupHistoria}
+              className="absolute text-white rounded-full flex items-center justify-center font-bold transition-colors duration-200 shadow-lg"
+              style={{ 
+                backgroundColor: '#563066',
+                top: 'min(160px, 32%)',
+                left: 'min(24px, 4%)',
+                width: 'min(64px, 10.7vw)',
+                height: 'min(64px, 10.7vw)',
+                fontSize: 'min(24px, 4vw)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+            >
+              X
+            </button>
+
+            <div 
+              className="absolute flex"
+              style={{
+                bottom: 'min(64px, 12.8%)',
+                left: 'min(180px, 40%)',
+                transform: 'translateX(-50%)',
+                gap: 'min(120px, 25%)'
+              }}
+            >
+              <button
+                onClick={handleIrParaHistoria}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Sim
+              </button>
+
+              <button
+                onClick={handleFecharPopupHistoria}
                 className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
                 style={{ 
                   backgroundColor: '#563066',
