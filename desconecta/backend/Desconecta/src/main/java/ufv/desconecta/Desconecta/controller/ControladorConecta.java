@@ -37,7 +37,7 @@ public class ControladorConecta implements SolucionarDesafio { // Implemente a i
         System.out.println(respostaCorretaConcatenada);
 
         // 4. Compara a resposta correta concatenada com a tentativa do aluno
-        if (respostaCorretaConcatenada.equals(respostaAluno)) {
+        if (respostaCorretaConcatenada.contains(respostaAluno)) {
             return "True";
         } else {
             return "False";
