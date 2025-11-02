@@ -3,6 +3,8 @@ package ufv.desconecta.Desconecta.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "TB_ProgressoAluno")
 @Getter
@@ -16,8 +18,8 @@ public class ProgressoAluno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long PK_ProgressoAluno;
 
-    @OneToOne(mappedBy = "progressoAluno", cascade = CascadeType.ALL)
-    private Ilha ilha;
+    @OneToMany(mappedBy = "progressoAluno", cascade = CascadeType.ALL)
+    private List<Ilha> ilhas;
 
     @Builder.Default
     @Column(name = "pontuacao_total_aluno")
@@ -35,10 +37,14 @@ public class ProgressoAluno {
         }
     }
 
-    public void setIlha(Ilha ilha) {
-        this.ilha = ilha;
-        if (ilha != null && ilha.getProgressoAluno() != this) {
-            ilha.setProgressoAluno(this);
+    public void setIlhas(List<Ilha> ilhas) {
+        this.ilhas = ilhas;
+        if (ilhas != null) {
+            for (Ilha ilha : ilhas) {
+                if (ilha.getProgressoAluno() != this) {
+                    ilha.setProgressoAluno(this);
+                }
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PopupTutorial from '../PopupTutorial';
 
 // Importar imagem de fundo do menu
 import menuBarraFundo from '../../assets/Menu-barra.png';
@@ -15,9 +16,11 @@ const MenuNavegacao = ({
   onVoltarMenu,
   onSairConta,
   posicao = "top-right", // "top-right", "top-left", "bottom-right", "bottom-left"
-  distanciaDoTopo = 180 // Distância regulável do topo do background do menu
+  distanciaDoTopo = 180, // Distância regulável do topo do background do menu
+  tipoTutorial = "todos" // "conecta", "caca-palavras", "todos"
 }) => {
   const [menuAberto, setMenuAberto] = useState(false);
+  const [tutorialPopupAberto, setTutorialPopupAberto] = useState(false);
 
   const toggleMenu = () => {
     setMenuAberto(!menuAberto);
@@ -206,8 +209,7 @@ const MenuNavegacao = ({
               {/* Botão 4: Ver Tutorial (não implementado) */}
               <button
                 onClick={() => {
-                  // Ainda não implementado
-                  console.log('Tutorial ainda não implementado');
+                  setTutorialPopupAberto(true);
                   setMenuAberto(false);
                 }}
                 className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
@@ -235,6 +237,13 @@ const MenuNavegacao = ({
           </div>
         )}
       </div>
+
+      {/* Popup de Tutorial */}
+      <PopupTutorial 
+        isOpen={tutorialPopupAberto}
+        onClose={() => setTutorialPopupAberto(false)}
+        tipoTutorial={tipoTutorial}
+      />
     </>
   );
 };

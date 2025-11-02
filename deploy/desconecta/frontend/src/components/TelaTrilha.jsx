@@ -7,7 +7,9 @@ import ilhaGeografia from '../assets/imgTelaTrilha/Ilha-geografia.png';
 import ilhaMatematica from '../assets/imgTelaTrilha/Ilha-Matematica.png';
 import popupJogarIlha from '../assets/imgTelaTrilha/popup-jogar-ilha.png';
 import TelaJogoCiencia from './TelaJogoCiencia';
-import JogoGeografia from './JogoGeografia';
+import TelaDadolandia from './TelaDadolandia';
+import TelaJogoGeografia from './TelaJogoGeografia';
+import TelaJogoMatematica from './TelaJogoMatematica';
 import TelaPontuacao from './TelaPontuacao';
 import useAlunoLogado from '../hooks/useAlunoLogado';
 
@@ -15,8 +17,13 @@ import useAlunoLogado from '../hooks/useAlunoLogado';
 // --- Componente: Tela Trilha ---
 const TelaTrilha = ({ onVoltar }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
-  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'ciencia', 'geografia', ou 'pontuacao'
+  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', ou 'pontuacao'
+  const [nomeIlhaJogada, setNomeIlhaJogada] = useState(null); // Rastreia qual ilha foi jogada
+  const [popupDadolandiaAberto, setPopupDadolandiaAberto] = useState(false);
   const [popupCienciaAberto, setPopupCienciaAberto] = useState(false);
+  const [popupMatematicaAberto, setPopupMatematicaAberto] = useState(false);
+  const [popupGeografiaAberto, setPopupGeografiaAberto] = useState(false);
+  const [popupHistoriaAberto, setPopupHistoriaAberto] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -42,13 +49,19 @@ const TelaTrilha = ({ onVoltar }) => {
         const idProgressoAluno = await responseIdProgresso.json();
         
         if (idProgressoAluno) {
-          // Agora buscar a posição da ilha usando o ID do progresso
-          // const responsePosicao = await fetch(`http://localhost:8080/api/ilhas/posicao-ilha/${idProgressoAluno}`);
-          const responsePosicao = await fetch(`${window.location.origin}/desconecta/api/ilhas/posicao-ilha/${idProgressoAluno}`);
+          // Agora buscar a lista de posições das ilhas usando o ID do progresso
+          // const responsePosicoes = await fetch(`http://localhost:8080/api/ilhas/posicoes-ilhas/${idProgressoAluno}`);
+          const responsePosicoes = await fetch(`${window.location.origin}/desconecta/api/ilhas/posicoes-ilhas/${idProgressoAluno}`);
           
-          if (responsePosicao.ok) {
-            const posicaoIlha = await responsePosicao.json();
-            setPosicaoIlhaAtual(posicaoIlha);
+          if (responsePosicoes.ok) {
+            const posicoesIlhas = await responsePosicoes.json();
+            
+            // A posição mais avançada é o último elemento da lista ordenada
+            if (posicoesIlhas && posicoesIlhas.length > 0) {
+              const posicaoMaisAvancada = posicoesIlhas[posicoesIlhas.length - 1];
+              setPosicaoIlhaAtual(posicaoMaisAvancada);
+              console.log('Posição da ilha mais avançada:', posicaoMaisAvancada);
+            }
           }
         }
       }
@@ -76,22 +89,88 @@ const TelaTrilha = ({ onVoltar }) => {
         buscarPosicaoIlha();
       }
     }
-  }, [telaAtiva]); // Executa quando volta para a tela da trilha
+  }, [telaAtiva, alunoId, isLogado]); // Executa quando volta para a tela da trilha e quando o aluno muda
+
+  // Funções para abrir popups
+  const handleAbrirPopupDadolandia = () => {
+    setPopupDadolandiaAberto(true);
+  };
 
   const handleAbrirPopupCiencia = () => {
     setPopupCienciaAberto(true);
+  };
+
+  const handleAbrirPopupMatematica = () => {
+    setPopupMatematicaAberto(true);
+  };
+
+  const handleAbrirPopupGeografia = () => {
+    setPopupGeografiaAberto(true);
+  };
+
+  const handleAbrirPopupHistoria = () => {
+    setPopupHistoriaAberto(true);
+  };
+
+  // Funções para fechar popups
+  const handleFecharPopupDadolandia = () => {
+    setPopupDadolandiaAberto(false);
   };
 
   const handleFecharPopupCiencia = () => {
     setPopupCienciaAberto(false);
   };
 
+  const handleFecharPopupMatematica = () => {
+    setPopupMatematicaAberto(false);
+  };
+
+  const handleFecharPopupGeografia = () => {
+    setPopupGeografiaAberto(false);
+  };
+
+  const handleFecharPopupHistoria = () => {
+    setPopupHistoriaAberto(false);
+  };
+
+  // Funções para ir para cada ilha
+  const handleIrParaDadolandia = () => {
+    setPopupDadolandiaAberto(false);
+    setNomeIlhaJogada('DADOLANDIA');
+    setTelaAtiva('dadolandia');
+  };
+
   const handleIrParaCiencia = () => {
     setPopupCienciaAberto(false);
+    setNomeIlhaJogada('CIENCIAS');
     setTelaAtiva('ciencia');
   };
 
+  const handleIrParaMatematica = () => {
+    setPopupMatematicaAberto(false);
+    setNomeIlhaJogada('MATEMATICA');
+    setTelaAtiva('matematica');
+  };
+
+  const handleIrParaGeografia = () => {
+    setPopupGeografiaAberto(false);
+    setNomeIlhaJogada('GEOGRAFIA');
+    setTelaAtiva('geografia');
+  };
+
+  const handleIrParaHistoria = () => {
+    setPopupHistoriaAberto(false);
+    setNomeIlhaJogada('HISTORIA');
+    setTelaAtiva('historia');
+  };
+
   const handleVoltarTrilha = () => {
+    // Limpa o nome da ilha jogada ao voltar para a trilha
+    setNomeIlhaJogada(null);
+    // Sempre recarrega o progresso ao voltar da tela de jogo
+    if (alunoId && isLogado) {
+      buscarPosicaoIlha();
+    }
     setTelaAtiva('trilha');
   };
 
@@ -155,14 +234,30 @@ const TelaTrilha = ({ onVoltar }) => {
     return <TelaJogoCiencia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
   }
 
-  // Se estiver na tela de geografia, renderizar JogoGeografia
+  // Se estiver na tela de Dadolandia, renderizar TelaDadolandia
+  if (telaAtiva === 'dadolandia') {
+    return <TelaDadolandia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+  }
+
+  // Se estiver na tela de geografia, renderizar TelaJogoGeografia
   if (telaAtiva === 'geografia') {
-    return <JogoGeografia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaJogoGeografia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+  }
+
+  // Se estiver na tela de matemática, renderizar TelaJogoMatematica
+  if (telaAtiva === 'matematica') {
+    return <TelaJogoMatematica onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
   }
 
   // Se estiver na tela de pontuação, renderizar TelaPontuacao
   if (telaAtiva === 'pontuacao') {
-    return <TelaPontuacao onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} ilhaCompletada={3} />;
+    // Dadolandia corresponde ao enum posição 0 (0=DADOLANDIA, 1=CIENCIAS, 2=GEOGRAFIA, 3=MATEMATICA, 4=HISTORIA)
+    return <TelaPontuacao 
+      onVoltarTrilha={handleVoltarTrilha} 
+      onVoltarMenu={onVoltar} 
+      ilhaCompletada={0} 
+      nomeIlhaJogada={nomeIlhaJogada} 
+    />;
   }
 
   // Se o aluno não estiver logado, mostrar mensagem
@@ -289,7 +384,7 @@ const TelaTrilha = ({ onVoltar }) => {
 >
   {/* Botão redondo */}
   <button
-    onClick={handleIrParaPontuacao}
+    onClick={handleAbrirPopupDadolandia}
     className="rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 border-8"
     style={{
       width: 'min(240px, 30vw)',
@@ -339,7 +434,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(30%, -110%)' 
             }}>
             <button
-              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? () => setTelaAtiva('pontuacao') : undefined}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? handleAbrirPopupMatematica : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 2}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
                 (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2)
@@ -391,7 +486,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(-30%, -15%)' 
             }}>
             <button
-              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3) ? () => setTelaAtiva('geografia') : undefined}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3) ? handleAbrirPopupGeografia : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 3}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
                 (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3)
@@ -440,7 +535,7 @@ const TelaTrilha = ({ onVoltar }) => {
               transform: 'translate(20%, 20%)' 
             }}>
             <button
-              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4) ? () => console.log('Ilha História clicada!') : undefined}
+              onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4) ? handleAbrirPopupHistoria : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 4}
               className={`rounded-full shadow-lg transform transition-all duration-300 border-8 ${
                 (posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4)
@@ -483,6 +578,87 @@ const TelaTrilha = ({ onVoltar }) => {
         </div>
 
       </div>
+
+      {/* Popup de Confirmação para Ilha Dadolandia */}
+      {popupDadolandiaAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="relative"
+            style={{
+              backgroundImage: `url(${popupJogarIlha})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              width: 'min(600px, 90vw)',
+              height: 'min(500px, 90vh)',
+              aspectRatio: '6/5'
+            }}
+          >
+            {/* Botão X para fechar */}
+            <button
+              onClick={handleFecharPopupDadolandia}
+              className="absolute text-white rounded-full flex items-center justify-center font-bold transition-colors duration-200 shadow-lg"
+              style={{ 
+                backgroundColor: '#563066',
+                top: 'min(160px, 32%)',
+                left: 'min(24px, 4%)',
+                width: 'min(64px, 10.7vw)',
+                height: 'min(64px, 10.7vw)',
+                fontSize: 'min(24px, 4vw)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+            >
+              X
+            </button>
+
+            {/* Botões Sim e Não */}
+            <div 
+              className="absolute flex"
+              style={{
+                bottom: 'min(64px, 12.8%)',
+                left: 'min(180px, 40%)',
+                transform: 'translateX(-50%)',
+                gap: 'min(120px, 25%)'
+              }}
+            >
+              <button
+                onClick={handleIrParaDadolandia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Sim
+              </button>
+
+              <button
+                onClick={handleFecharPopupDadolandia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Popup de Confirmação para Ilha da Ciência */}
       {popupCienciaAberto && (
@@ -548,6 +724,243 @@ const TelaTrilha = ({ onVoltar }) => {
               {/* Botão Não */}
               <button
                 onClick={handleFecharPopupCiencia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup de Confirmação para Ilha da Matemática */}
+      {popupMatematicaAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="relative"
+            style={{
+              backgroundImage: `url(${popupJogarIlha})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              width: 'min(600px, 90vw)',
+              height: 'min(500px, 90vh)',
+              aspectRatio: '6/5'
+            }}
+          >
+            <button
+              onClick={handleFecharPopupMatematica}
+              className="absolute text-white rounded-full flex items-center justify-center font-bold transition-colors duration-200 shadow-lg"
+              style={{ 
+                backgroundColor: '#563066',
+                top: 'min(160px, 32%)',
+                left: 'min(24px, 4%)',
+                width: 'min(64px, 10.7vw)',
+                height: 'min(64px, 10.7vw)',
+                fontSize: 'min(24px, 4vw)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+            >
+              X
+            </button>
+
+            <div 
+              className="absolute flex"
+              style={{
+                bottom: 'min(64px, 12.8%)',
+                left: 'min(180px, 40%)',
+                transform: 'translateX(-50%)',
+                gap: 'min(120px, 25%)'
+              }}
+            >
+              <button
+                onClick={handleIrParaMatematica}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Sim
+              </button>
+
+              <button
+                onClick={handleFecharPopupMatematica}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup de Confirmação para Ilha da Geografia */}
+      {popupGeografiaAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="relative"
+            style={{
+              backgroundImage: `url(${popupJogarIlha})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              width: 'min(600px, 90vw)',
+              height: 'min(500px, 90vh)',
+              aspectRatio: '6/5'
+            }}
+          >
+            <button
+              onClick={handleFecharPopupGeografia}
+              className="absolute text-white rounded-full flex items-center justify-center font-bold transition-colors duration-200 shadow-lg"
+              style={{ 
+                backgroundColor: '#563066',
+                top: 'min(160px, 32%)',
+                left: 'min(24px, 4%)',
+                width: 'min(64px, 10.7vw)',
+                height: 'min(64px, 10.7vw)',
+                fontSize: 'min(24px, 4vw)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+            >
+              X
+            </button>
+
+            <div 
+              className="absolute flex"
+              style={{
+                bottom: 'min(64px, 12.8%)',
+                left: 'min(180px, 40%)',
+                transform: 'translateX(-50%)',
+                gap: 'min(120px, 25%)'
+              }}
+            >
+              <button
+                onClick={handleIrParaGeografia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Sim
+              </button>
+
+              <button
+                onClick={handleFecharPopupGeografia}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup de Confirmação para Ilha da História */}
+      {popupHistoriaAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="relative"
+            style={{
+              backgroundImage: `url(${popupJogarIlha})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              width: 'min(600px, 90vw)',
+              height: 'min(500px, 90vh)',
+              aspectRatio: '6/5'
+            }}
+          >
+            <button
+              onClick={handleFecharPopupHistoria}
+              className="absolute text-white rounded-full flex items-center justify-center font-bold transition-colors duration-200 shadow-lg"
+              style={{ 
+                backgroundColor: '#563066',
+                top: 'min(160px, 32%)',
+                left: 'min(24px, 4%)',
+                width: 'min(64px, 10.7vw)',
+                height: 'min(64px, 10.7vw)',
+                fontSize: 'min(24px, 4vw)'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+            >
+              X
+            </button>
+
+            <div 
+              className="absolute flex"
+              style={{
+                bottom: 'min(64px, 12.8%)',
+                left: 'min(180px, 40%)',
+                transform: 'translateX(-50%)',
+                gap: 'min(120px, 25%)'
+              }}
+            >
+              <button
+                onClick={handleIrParaHistoria}
+                className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                style={{ 
+                  backgroundColor: '#563066',
+                  paddingTop: 'min(20px, 4%)',
+                  paddingBottom: 'min(20px, 4%)',
+                  paddingLeft: 'min(150px, 28%)',
+                  paddingRight: 'min(150px, 28%)',
+                  fontSize: 'min(30px, 5vw)'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#563066'}
+              >
+                Sim
+              </button>
+
+              <button
+                onClick={handleFecharPopupHistoria}
                 className="text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
                 style={{ 
                   backgroundColor: '#563066',
