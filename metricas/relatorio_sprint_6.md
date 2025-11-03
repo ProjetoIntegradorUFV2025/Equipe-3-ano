@@ -61,24 +61,24 @@
 
 | Usuário | 1.3 PRs Criadas | 1.3 PRs Aceitas | 1.3 Produtividade | 1.4 PRs Revisadas | 1.5 Issues Identificadas | 1.5 Issues Aceitas | 1.5 Taxa Aceitação |
 |---------|----------------|----------------|------------------|------------------|-------------------------|-------------------|-------------------|
-| Tais0357 | 3 | 1 | 33.33% | 0 | 0 | 0 | 0% |
-| Gabriwll | 3 | 0 | 0.0% | 0 | 0 | 0 | 0% |
+| Tais0357 | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
+| Gabriwll | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
 | Eufrausino | 1 | 1 | 100.0% | 3 | 2 | 1 | 50.0% |
-| RayannePapini | 3 | 0 | 0.0% | 0 | 0 | 0 | 0% |
-| Tatiana0357 | 3 | 1 | 33.33% | 0 | 0 | 0 | 0% |
-| GuilhermePianetti | 5 | 4 | 80.0% | 4 | 0 | 0 | 0% |
-| gabriel2036 | 5 | 5 | 100.0% | 20 | 0 | 0 | 0% |
-| ingridlrs | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
-| GuilhermeGC05 | 2 | 1 | 50.0% | 0 | 0 | 0 | 0% |
+| RayannePapini | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
+| Tatiana0357 | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
+| GuilhermePianetti | 3 | 3 | 100.0% | 4 | 0 | 0 | 0% |
+| gabriel2036 | 2 | 2 | 100.0% | 20 | 0 | 0 | 0% |
+| ingridlrs | 0 | 0 | 0.0% | 0 | 0 | 0 | 0% |
+| GuilhermeGC05 | 1 | 1 | 100.0% | 0 | 0 | 0 | 0% |
 | ProjetoIntegradorUFV2025 | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
-| francyelleserrano | 3 | 0 | 0.0% | 0 | 0 | 0 | 0% |
-| DalmoRainer | 2 | 1 | 50.0% | 0 | 0 | 0 | 0% |
+| francyelleserrano | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
+| DalmoRainer | 0 | 0 | 0.0% | 0 | 0 | 0 | 0% |
 | Analucia26 | 1 | 1 | 100.0% | 2 | 0 | 0 | 0% |
 | amandacmelo | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | melissaalanis | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | cristinaleticia | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | caioomenezes | 1 | 1 | 100.0% | 0 | 0 | 0 | 0% |
-| DaniiMelo | 3 | 0 | 0.0% | 0 | 0 | 0 | 0% |
+| DaniiMelo | 1 | 0 | 0.0% | 0 | 0 | 0 | 0% |
 
 
 ## 📋 Legenda das Métricas
