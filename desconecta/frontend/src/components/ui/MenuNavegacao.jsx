@@ -16,7 +16,8 @@ const MenuNavegacao = ({
   onVoltarMenu,
   onSairConta,
   posicao = "top-right", // "top-right", "top-left", "bottom-right", "bottom-left"
-  distanciaDoTopo = 180 // Distância regulável do topo do background do menu
+  distanciaDoTopo = 180, // Distância regulável do topo do background do menu
+  tipoTutorial = "todos" // "conecta", "caca-palavras", "todos"
 }) => {
   const [menuAberto, setMenuAberto] = useState(false);
   const [tutorialPopupAberto, setTutorialPopupAberto] = useState(false);
@@ -241,6 +242,7 @@ const MenuNavegacao = ({
       <PopupTutorial 
         isOpen={tutorialPopupAberto}
         onClose={() => setTutorialPopupAberto(false)}
+        tipoTutorial={tipoTutorial}
       />
     </>
   );

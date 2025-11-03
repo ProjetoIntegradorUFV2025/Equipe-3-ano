@@ -6,15 +6,25 @@ import tutorialConecta from '../assets/Dadolandia/Tutorial Conecta Dadolandia  .
 import tutorialCacaPalavras from '../assets/Dadolandia/Tutorial Caça-palavras.mp4';
 
 // --- Componente: Popup de Tutorial ---
-const PopupTutorial = ({ isOpen, onClose }) => {
+const PopupTutorial = ({ isOpen, onClose, tipoTutorial = "todos" }) => {
   const [tutorialAtual, setTutorialAtual] = useState(0);
   const videoRef = useRef(null);
 
-  // Array com todos os tutoriais
-  const tutoriais = [
-    { nome: 'Conecta', src: tutorialConecta },
-    { nome: 'Caça-palavras', src: tutorialCacaPalavras }
+  // Array com TODOS os tutoriais disponíveis
+  const todosTutoriais = [
+    { nome: 'Conecta', src: tutorialConecta, tipo: 'conecta' },
+    { nome: 'Caça-palavras', src: tutorialCacaPalavras, tipo: 'caca-palavras' }
   ];
+
+  // Filtrar tutoriais baseado no tipo
+  const tutoriais = tipoTutorial === "todos" 
+    ? todosTutoriais 
+    : todosTutoriais.filter(t => t.tipo === tipoTutorial);
+
+  // Resetar índice ao mudar o tipo de tutorial
+  useEffect(() => {
+    setTutorialAtual(0);
+  }, [tipoTutorial]);
 
   // Função para ir para o próximo tutorial
   const proximoTutorial = () => {
@@ -49,6 +59,27 @@ const PopupTutorial = ({ isOpen, onClose }) => {
 
   if (!isOpen) {
     return null;
+  }
+
+  // Se não houver tutoriais disponíveis para o tipo selecionado
+  if (tutoriais.length === 0) {
+    return (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+        onClick={handleOverlayClick}
+      >
+        <div className="bg-white p-8 rounded-xl shadow-2xl text-center">
+          <h2 className="text-2xl font-bold mb-4">Tutorial não disponível</h2>
+          <p className="mb-4">Este tutorial ainda não foi adicionado.</p>
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -88,39 +119,43 @@ const PopupTutorial = ({ isOpen, onClose }) => {
           ✕
         </button>
 
-        {/* Botão Anterior - Extremo esquerdo */}
-        <button
-          onClick={tutorialAnterior}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-transparent hover:scale-110 transition-all duration-300 z-20 flex items-center justify-center"
-          style={{
-            width: 'min(80px, 10vw)',
-            height: 'min(80px, 10vw)'
-          }}
-          title="Tutorial anterior"
-        >
-          <img
-            src={arrowLeftCircle}
-            alt="Seta anterior"
-            className="w-full h-full object-contain transform scale-x-[-1] drop-shadow-lg"
-          />
-        </button>
+        {/* Botão Anterior - Extremo esquerdo - Só mostra se houver mais de um tutorial */}
+        {tutoriais.length > 1 && (
+          <button
+            onClick={tutorialAnterior}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-transparent hover:scale-110 transition-all duration-300 z-20 flex items-center justify-center"
+            style={{
+              width: 'min(80px, 10vw)',
+              height: 'min(80px, 10vw)'
+            }}
+            title="Tutorial anterior"
+          >
+            <img
+              src={arrowLeftCircle}
+              alt="Seta anterior"
+              className="w-full h-full object-contain transform scale-x-[-1] drop-shadow-lg"
+            />
+          </button>
+        )}
 
-        {/* Botão Próximo - Extremo direito */}
-        <button
-          onClick={proximoTutorial}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-transparent hover:scale-110 transition-all duration-300 z-20 flex items-center justify-center"
-          style={{
-            width: 'min(80px, 10vw)',
-            height: 'min(80px, 10vw)'
-          }}
-          title="Próximo tutorial"
-        >
-          <img
-            src={arrowLeftCircle}
-            alt="Seta próxima"
-            className="w-full h-full object-contain drop-shadow-lg"
-          />
-        </button>
+        {/* Botão Próximo - Extremo direito - Só mostra se houver mais de um tutorial */}
+        {tutoriais.length > 1 && (
+          <button
+            onClick={proximoTutorial}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-transparent hover:scale-110 transition-all duration-300 z-20 flex items-center justify-center"
+            style={{
+              width: 'min(80px, 10vw)',
+              height: 'min(80px, 10vw)'
+            }}
+            title="Próximo tutorial"
+          >
+            <img
+              src={arrowLeftCircle}
+              alt="Seta próxima"
+              className="w-full h-full object-contain drop-shadow-lg"
+            />
+          </button>
+        )}
       </div>
     </div>
   );
