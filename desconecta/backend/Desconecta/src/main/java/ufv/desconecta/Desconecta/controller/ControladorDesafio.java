@@ -145,6 +145,12 @@ public class ControladorDesafio {
             // Salvar pontuação
             pontuacaoService.salvarPontuacaoDesafio(pontuacao, desafioASerPontuado);
 
+            // Somar com a pontuação total do aluno
+            int novaPontuacaoTotal = progressoAluno.getPontuacaoTotalAluno() + pontuacao;
+            progressoAluno.setPontuacaoTotalAluno(novaPontuacaoTotal);
+            acessoBDProgressoAluno.salvarProgressoAluno(progressoAluno);
+            System.out.println("Nova pontuação total do aluno: " + novaPontuacaoTotal);
+
             // Marcar desafio como concluído
             concluirDesafio(desafioASerPontuado.getId());
 
