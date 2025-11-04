@@ -2,8 +2,8 @@ package ufv.desconecta.Desconecta.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ufv.desconecta.Desconecta.EnumNomeIlha;
-import ufv.desconecta.Desconecta.EnumTiposDesafios;
+import ufv.desconecta.Desconecta.model.EnumNomeIlha;
+import ufv.desconecta.Desconecta.model.EnumTiposDesafios;
 import ufv.desconecta.Desconecta.model.Desafio;
 import ufv.desconecta.Desconecta.model.Ilha;
 import ufv.desconecta.Desconecta.model.ProgressoAluno;

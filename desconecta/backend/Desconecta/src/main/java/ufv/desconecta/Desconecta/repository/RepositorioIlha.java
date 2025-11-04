@@ -3,7 +3,7 @@ package ufv.desconecta.Desconecta.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ufv.desconecta.Desconecta.EnumNomeIlha;
+import ufv.desconecta.Desconecta.model.EnumNomeIlha;
 import ufv.desconecta.Desconecta.model.Ilha;
 
 import java.util.List;

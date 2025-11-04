@@ -15,6 +15,8 @@ public interface RepositorioAluno extends JpaRepository<Aluno, Long> {
     Optional<Aluno> findByApelido(@Param("apelido") String apelido);
     
     boolean existsByApelido(String apelido);
+
+
 }
 
 
