@@ -12,6 +12,7 @@ import TelaJogoGeografia from './TelaJogoGeografia';
 import TelaJogoMatematica from './TelaJogoMatematica';
 import TelaPontuacao from './TelaPontuacao';
 import useAlunoLogado from '../hooks/useAlunoLogado';
+import MenuNavegacao from './ui/MenuNavegacao';
 
 
 // --- Componente: Tela Trilha ---
@@ -286,6 +287,13 @@ const TelaTrilha = ({ onVoltar }) => {
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
     >
+      {/* Menu de Navegação */}
+      <MenuNavegacao 
+        onVoltarTrilha={() => {}} // Já está na trilha
+        onVoltarMenu={onVoltar}
+        posicao="top-right"
+      />
+
       {/* Container estendido horizontalmente */}
       <div 
         className="flex relative w-screen h-screen"
