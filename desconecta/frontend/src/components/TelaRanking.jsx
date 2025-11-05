@@ -14,41 +14,65 @@ const TelaRanking = ({ onVoltar }) => {
   const buscarRankings = async () => {
     try {
       setCarregando(true);
-      // Substitua pela URL correta da sua API
-      const response = await fetch('http://localhost:8080/api/ranking');
+      
+      // Buscar ranking geral
+      const response = await fetch('http://localhost:8080/api/classificacao/classificacaoGeral');
       
       if (!response.ok) {
         throw new Error('Erro ao carregar rankings');
       }
       
       const data = await response.json();
-      setRankings(data);
+      
+      // Transformar os dados da API para o formato esperado pelo componente
+      const rankingsFormatados = data.map((item, index) => ({
+        posicao: index + 1,
+        nome: item.nomeAluno,
+        pontos: item.pontuacaoTotalAluno
+      }));
+      
+      setRankings(rankingsFormatados);
       setErro(null);
     } catch (error) {
       console.error('Erro ao buscar rankings:', error);
       setErro('Não foi possível carregar os rankings.');
-      // Dados de exemplo para desenvolvimento
-      setRankings([
-        { posicao: 1, nome: 'João Silva', pontos: 1500 },
-        { posicao: 2, nome: 'Maria Santos', pontos: 1350 },
-        { posicao: 3, nome: 'Pedro Oliveira', pontos: 1200 },
-        { posicao: 4, nome: 'Ana Costa', pontos: 1100 },
-        { posicao: 5, nome: 'Carlos Souza', pontos: 1050 },
-        { posicao: 6, nome: 'Lucas Lima', pontos: 950 },
-        { posicao: 7, nome: 'Juliana Ferreira', pontos: 900 },
-        { posicao: 8, nome: 'Rafael Mendes', pontos: 850 },
-        { posicao: 9, nome: 'Beatriz Alves', pontos: 800 },
-        { posicao: 10, nome: 'Gabriel Rocha', pontos: 750 },
-      ]);
-      // Simulando classificação do aluno logado
-      setClassificacaoAluno({ posicao: 44, nome: 'Nome do aluno cadastrado', pontos: 556 });
     } finally {
       setCarregando(false);
     }
   };
 
+  // Função para buscar a classificação do aluno logado
+  const buscarClassificacaoAluno = async () => {
+    const apelidoAluno = localStorage.getItem('alunoApelido');
+    
+    if (!apelidoAluno) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/classificacao/classificacaoAluno?apelidoAluno=${encodeURIComponent(apelidoAluno)}`
+      );
+      
+      if (response.ok) {
+        const dadosAluno = await response.json();
+        
+        if (!dadosAluno.erro) {
+          setClassificacaoAluno({
+            posicao: dadosAluno.posicao,
+            nome: dadosAluno.nomeAluno,
+            pontos: dadosAluno.pontuacaoTotalAluno
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao buscar classificação do aluno:', error);
+    }
+  };
+
   useEffect(() => {
     buscarRankings();
+    buscarClassificacaoAluno();
   }, []);
 
   // Função para obter a cor do círculo da posição
@@ -72,7 +96,7 @@ const TelaRanking = ({ onVoltar }) => {
 
   return (
     <>
-      <style jsx>{`
+      <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 14px;
         }

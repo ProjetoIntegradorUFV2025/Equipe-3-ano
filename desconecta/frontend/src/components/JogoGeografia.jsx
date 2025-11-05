@@ -230,6 +230,17 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                     if (responsePontuacao.ok) {
                       pontuacaoCalculada = await responsePontuacao.json();
                       console.log('✅ Pontuação calculada e salva:', pontuacaoCalculada);
+
+                      // Calcular pontuação total do aluno
+                      const apelidoAluno = localStorage.getItem('apelidoAluno');
+                      if (apelidoAluno) {
+                        const paramsCalculo = new URLSearchParams();
+                        paramsCalculo.append('apelidoAluno', apelidoAluno);
+                        await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
+                          method: 'POST',
+                          body: paramsCalculo
+                        });
+                      }
                     } else {
                       console.error('❌ Erro ao salvar pontuação. Status:', responsePontuacao.status);
                       const errorText = await responsePontuacao.text();
