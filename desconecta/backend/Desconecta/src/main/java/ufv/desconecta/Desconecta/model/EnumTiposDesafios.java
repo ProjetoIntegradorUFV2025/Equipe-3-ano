@@ -1,4 +1,4 @@
-package ufv.desconecta.Desconecta;
+package ufv.desconecta.Desconecta.model;
 
 public enum EnumTiposDesafios {
     JogoConecta,

@@ -1,5 +1,6 @@
 package ufv.desconecta.Desconecta.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class ProgressoAluno {
     private Long PK_ProgressoAluno;
 
     @OneToMany(mappedBy = "progressoAluno", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Ilha> ilhas;
 
     @Builder.Default

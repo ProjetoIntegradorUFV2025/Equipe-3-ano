@@ -3,7 +3,6 @@ package ufv.desconecta.Desconecta.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import ufv.desconecta.Desconecta.EnumTiposDesafios;
 
 @Entity
 @Table(name = "TB_Desafio")
