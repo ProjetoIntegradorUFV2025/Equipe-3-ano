@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PopupTutorial from '../PopupTutorial';
+import TelaRanking from '../TelaRanking';
 
 // Importar imagem de fundo do menu
 import menuBarraFundo from '../../assets/Menu-barra.png';
@@ -18,12 +19,14 @@ const MenuNavegacao = ({
   onVoltarTrilha, 
   onVoltarMenu,
   onSairConta,
+  onAbrirRanking,
   posicao = "top-right", // "top-right", "top-left", "bottom-right", "bottom-left"
   distanciaDoTopo = 180, // Distância regulável do topo do background do menu
   tipoTutorial = "todos" // "conecta", "caca-palavras", "todos"
 }) => {
   const [menuAberto, setMenuAberto] = useState(false);
   const [tutorialPopupAberto, setTutorialPopupAberto] = useState(false);
+  const [rankingAberto, setRankingAberto] = useState(false);
 
   const toggleMenu = () => {
     setMenuAberto(!menuAberto);
@@ -134,11 +137,14 @@ const MenuNavegacao = ({
                 Voltar à Trilha
               </button>
 
-              {/* Botão 2: Tela de Pontuação (não implementado) */}
+              {/* Botão 2: Tela de Pontuação (Ranking) */}
               <button
                 onClick={() => {
-                  // Ainda não implementado
-                  console.log('Tela de pontuação ainda não implementada');
+                  if (onAbrirRanking) {
+                    onAbrirRanking();
+                  } else {
+                    setRankingAberto(true);
+                  }
                   setMenuAberto(false);
                 }}
                 className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
@@ -242,6 +248,11 @@ const MenuNavegacao = ({
         onClose={() => setTutorialPopupAberto(false)}
         tipoTutorial={tipoTutorial}
       />
+
+      {/* Tela de Ranking */}
+      {rankingAberto && (
+        <TelaRanking onVoltar={() => setRankingAberto(false)} />
+      )}
     </>
   );
 };

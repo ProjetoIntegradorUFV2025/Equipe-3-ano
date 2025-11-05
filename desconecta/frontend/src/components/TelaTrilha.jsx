@@ -16,7 +16,7 @@ import MenuNavegacao from './ui/MenuNavegacao';
 
 
 // --- Componente: Tela Trilha ---
-const TelaTrilha = ({ onVoltar }) => {
+const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
   const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', ou 'pontuacao'
   const [nomeIlhaJogada, setNomeIlhaJogada] = useState(null); // Rastreia qual ilha foi jogada
@@ -291,6 +291,7 @@ const TelaTrilha = ({ onVoltar }) => {
       <MenuNavegacao 
         onVoltarTrilha={() => {}} // Já está na trilha
         onVoltarMenu={onVoltar}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
       />
 

@@ -141,6 +141,7 @@ const TelaRanking = ({ onVoltar }) => {
       <MenuNavegacao 
         onVoltarTrilha={onVoltar}
         onVoltarMenu={onVoltar}
+        onAbrirRanking={() => {}} // Já está no ranking
         posicao="top-right"
       />
 

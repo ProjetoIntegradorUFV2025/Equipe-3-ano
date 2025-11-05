@@ -30,6 +30,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
   const [tempoInicio, setTempoInicio] = useState(null);
   const [tempoDecorrido, setTempoDecorrido] = useState(0);
   const [numeroErros, setNumeroErros] = useState(0); // Contador de erros
+  const [mostrarPopupInicial, setMostrarPopupInicial] = useState(true);
   const [letrasMatriz, setLetrasMatriz] = useState(() => {
     // Inicializa a matriz com letras aleatórias
     return Array(144).fill().map(() => {
@@ -65,6 +66,15 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
     }, 1000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  // Fechar popup inicial automaticamente após 8 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMostrarPopupInicial(false);
+    }, 8000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   
@@ -491,6 +501,28 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                 filter: 'drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3))'
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Popup Inicial - Frase Caça Palavra */}
+      {mostrarPopupInicial && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]"
+          onClick={() => setMostrarPopupInicial(false)}
+        >
+          <div className="text-center">
+            <img 
+              src={fraseCacaPalavra}
+              alt="Caça Palavras"
+              className="w-[90vw] max-w-5xl"
+              style={{
+                filter: "drop-shadow(0 0 30px rgba(96, 160, 181, 0.8)) drop-shadow(0 0 60px rgba(96, 160, 181, 0.6))"
+              }}
+            />
+            <p className="text-white text-3xl mt-8 opacity-75">
+              Clique para começar
+            </p>
           </div>
         </div>
       )}

@@ -30,7 +30,7 @@ const TelaJogo = () => {
 
   // Se estiver na tela de jogo, renderizar TelaTrilha
   if (telaAtiva === 'jogo') {
-    return <TelaTrilha onVoltar={handleVoltarMenu} />;
+    return <TelaTrilha onVoltar={handleVoltarMenu} onAbrirRanking={handleVerPontuacao} />;
   }
 
   // Se estiver na tela de ranking, renderizar TelaRanking
