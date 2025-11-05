@@ -82,4 +82,8 @@ public class AcessoBDProgressoAluno  {
     public List<ClassificacaoDTO> obterClassificacaoGeralOrdenada(){
         return repositorioProgressoAluno.findClassificacaoOrdenada();
     }
+
+    public ProgressoAluno getProgressoPeloAlunoId(long alunoId) {
+        return repositorioProgressoAluno.findByAlunoId(alunoId).orElse(null);
+    }
 }
