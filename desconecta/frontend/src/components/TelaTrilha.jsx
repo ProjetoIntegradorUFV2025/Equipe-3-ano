@@ -230,22 +230,22 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
 
   // Se estiver na tela de ciência, renderizar TelaJogoCiencia
   if (telaAtiva === 'ciencia') {
-    return <TelaJogoCiencia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaJogoCiencia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
   }
 
   // Se estiver na tela de Dadolandia, renderizar TelaDadolandia
   if (telaAtiva === 'dadolandia') {
-    return <TelaDadolandia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaDadolandia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
   }
 
   // Se estiver na tela de geografia, renderizar TelaJogoGeografia
   if (telaAtiva === 'geografia') {
-    return <TelaJogoGeografia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaJogoGeografia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
   }
 
   // Se estiver na tela de matemática, renderizar TelaJogoMatematica
   if (telaAtiva === 'matematica') {
-    return <TelaJogoMatematica onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaJogoMatematica onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
   }
 
   // Se estiver na tela de pontuação, renderizar TelaPontuacao
@@ -254,6 +254,7 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
     return <TelaPontuacao 
       onVoltarTrilha={handleVoltarTrilha} 
       onVoltarMenu={onVoltar} 
+      onAbrirRanking={onAbrirRanking}
       ilhaCompletada={0} 
       nomeIlhaJogada={nomeIlhaJogada} 
     />;

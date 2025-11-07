@@ -19,7 +19,7 @@ import popupErro from '../assets/HistoriaGeografia/JogoGeografia/PopUpErro.png';
 import TelaPontuacao from './TelaPontuacao';
 
 // --- Componente: Jogo Geografia ---
-const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
+const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanking }) => {
   const [palavrasEncontradas, setPalavrasEncontradas] = useState(0);
   const totalPalavras = 5;
   const [botoesClicados, setBotoesClicados] = useState(new Set());
@@ -322,12 +322,17 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
     setMostrarPopupErro(false);
   };
 
-  // Se jogo completo, mostrar TelaPontuacao
+  // Se jogo completo, redirecionar usando onConcluido
   if (jogoCompleto) {
-    // Geografia corresponde ao enum posição 3 (0=DADOLANDIA, 1=CIENCIAS, 2=MATEMATICA, 3=GEOGRAFIA, 4=HISTORIA)
+    if (onConcluido) {
+      onConcluido();
+      return null;
+    }
+    // Fallback: se não houver onConcluido, mostrar TelaPontuacao diretamente
     return <TelaPontuacao 
       onVoltarTrilha={onVoltarTrilha} 
-      onVoltarMenu={onVoltarMenu} 
+      onVoltarMenu={onVoltarMenu}
+      onAbrirRanking={onAbrirRanking}
       ilhaCompletada={3} 
       nomeIlhaJogada="GEOGRAFIA" 
     />;
@@ -351,6 +356,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
         tipoTutorial="caca-palavras"
       />

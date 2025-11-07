@@ -45,7 +45,7 @@ const imagens = [
 ].filter(img => img !== undefined);
 
 // --- Componente: Tela Jogo Geografia ---
-const TelaJogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
+const TelaJogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const [imagemAtual, setImagemAtual] = useState(0);
   const [podeNavegar, setPodeNavegar] = useState(true);
   const [tempoRestante, setTempoRestante] = useState(0);
@@ -112,6 +112,7 @@ const TelaJogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
       <JogoGeografia 
         onVoltarTrilha={onVoltarTrilha} 
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         onConcluido={() => {
           // Após concluir o jogo, voltar para img23 (índice 22)
           setImagemAtual(22);
@@ -127,7 +128,8 @@ const TelaJogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
     // Geografia corresponde ao enum posição 3 (0=DADOLANDIA, 1=CIENCIAS, 2=MATEMATICA, 3=GEOGRAFIA, 4=HISTORIA)
     return <TelaPontuacao 
       onVoltarTrilha={onVoltarTrilha} 
-      onVoltarMenu={onVoltarMenu} 
+      onVoltarMenu={onVoltarMenu}
+      onAbrirRanking={onAbrirRanking} 
       ilhaCompletada={3} 
       nomeIlhaJogada="GEOGRAFIA" 
     />;
@@ -139,6 +141,7 @@ const TelaJogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
       />
 

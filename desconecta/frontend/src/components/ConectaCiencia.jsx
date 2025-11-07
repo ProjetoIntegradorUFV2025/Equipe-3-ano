@@ -81,7 +81,7 @@ const botoesData = [
 ];
 
 // --- Componente: Conecta Ciência ---
-const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
+const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanking }) => {
   const { alunoId, isLogado } = useAlunoLogado();
 
   const [mostrarPontuacao, setMostrarPontuacao] = React.useState(false);
@@ -186,6 +186,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
       <TelaPontuacao
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         ilhaCompletada={1}
         nomeIlhaJogada="CIENCIAS"
       />
@@ -206,6 +207,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
       <MenuNavegacao
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
         tipoTutorial="conecta"
       />

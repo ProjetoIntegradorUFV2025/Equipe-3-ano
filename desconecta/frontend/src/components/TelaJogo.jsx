@@ -24,6 +24,10 @@ const TelaJogo = () => {
     setTelaAtiva('menu');
   };
 
+  const handleVoltarParaTrilha = () => {
+    setTelaAtiva('jogo'); // 'jogo' é a TelaTrilha
+  };
+
   const handleVerPontuacao = () => {
     setTelaAtiva('ranking');
   };
@@ -35,7 +39,7 @@ const TelaJogo = () => {
 
   // Se estiver na tela de ranking, renderizar TelaRanking
   if (telaAtiva === 'ranking') {
-    return <TelaRanking onVoltar={handleVoltarMenu} />;
+    return <TelaRanking onVoltar={handleVoltarParaTrilha} />;
   }
 
   // Renderizar tela de menu (original)

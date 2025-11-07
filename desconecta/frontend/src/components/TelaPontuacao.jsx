@@ -9,7 +9,7 @@ import parabens from '../assets/parabens.png'
 import dadinhoConfete from '../assets/dadinhoConfete.png'
 
 // --- Componente: Tela Pontuação ---
-const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1, nomeIlhaJogada = null }) => {
+const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompletada = 1, nomeIlhaJogada = null }) => {
   const { alunoId, isLogado } = useAlunoLogado();
   
   // Buscar dados de pontuação do sessionStorage
@@ -170,6 +170,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1, nomeI
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
       />
 
