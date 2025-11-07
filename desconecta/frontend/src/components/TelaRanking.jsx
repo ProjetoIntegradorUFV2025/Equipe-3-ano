@@ -10,6 +10,19 @@ const TelaRanking = ({ onVoltar }) => {
   const [erro, setErro] = useState(null);
   const [classificacaoAluno, setClassificacaoAluno] = useState(null);
 
+  // Função para limpar métricas e voltar para a trilha
+  const handleVoltar = () => {
+    // Limpar APENAS dados de pontuação do sessionStorage
+    // NÃO remove dados do localStorage (alunoId, apelidoAluno, etc.)
+    sessionStorage.removeItem('dadosPontuacao');
+    console.log('🧹 Métricas do jogo limpas do sessionStorage (dados de login preservados)');
+    
+    // Chamar a função de voltar
+    if (onVoltar) {
+      onVoltar();
+    }
+  };
+
   // Função para buscar os rankings do backend
   const buscarRankings = async () => {
     try {
@@ -139,8 +152,8 @@ const TelaRanking = ({ onVoltar }) => {
       >
       {/* Menu de Navegação */}
       <MenuNavegacao 
-        onVoltarTrilha={onVoltar}
-        onVoltarMenu={onVoltar}
+        onVoltarTrilha={handleVoltar}
+        onVoltarMenu={handleVoltar}
         onAbrirRanking={() => {}} // Já está no ranking
         posicao="top-right"
       />
@@ -148,7 +161,7 @@ const TelaRanking = ({ onVoltar }) => {
       {/* Botão de Voltar */}
       <div className="absolute top-8 left-8 z-10">
         <button
-          onClick={onVoltar}
+          onClick={handleVoltar}
           className="flex items-center gap-2 px-6 py-3 text-white font-bold text-xl rounded-full shadow-lg transition-all duration-300"
           style={{ backgroundColor: '#563066' }}
           onMouseEnter={(e) => e.target.style.backgroundColor = '#4a2857'}

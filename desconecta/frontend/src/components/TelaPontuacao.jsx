@@ -116,7 +116,8 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
 
   // Função para voltar à trilha e forçar recarregamento
   const handleVoltarTrilha = async () => {
-    // Limpar dados de pontuação do sessionStorage
+    // Limpar APENAS dados de pontuação do sessionStorage
+    // NÃO remove dados do localStorage (alunoId, apelidoAluno, etc.)
     sessionStorage.removeItem('dadosPontuacao');
     
     // Sinaliza que o progresso foi atualizado para forçar recarregamento
@@ -168,8 +169,8 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
 
       {/* Menu de Navegação Reutilizável */}
       <MenuNavegacao 
-        onVoltarTrilha={onVoltarTrilha}
-        onVoltarMenu={onVoltarMenu}
+        onVoltarTrilha={handleVoltarTrilha}
+        onVoltarMenu={handleVoltarTrilha}
         onAbrirRanking={onAbrirRanking}
         posicao="top-right"
       />
