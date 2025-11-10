@@ -19,7 +19,7 @@ import popupErro from '../assets/HistoriaGeografia/JogoGeografia/PopUpErro.png';
 import TelaPontuacao from './TelaPontuacao';
 
 // --- Componente: Jogo Geografia ---
-const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
+const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanking }) => {
   const [palavrasEncontradas, setPalavrasEncontradas] = useState(0);
   const totalPalavras = 5;
   const [botoesClicados, setBotoesClicados] = useState(new Set());
@@ -27,6 +27,10 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
   const [stringIndices, setStringIndices] = useState('');
   const [mostrarPopupErro, setMostrarPopupErro] = useState(false);
   const [jogoCompleto, setJogoCompleto] = useState(false);
+  const [tempoInicio, setTempoInicio] = useState(null);
+  const [tempoDecorrido, setTempoDecorrido] = useState(0);
+  const [numeroErros, setNumeroErros] = useState(0); // Contador de erros
+  const [mostrarPopupInicial, setMostrarPopupInicial] = useState(true);
   const [letrasMatriz, setLetrasMatriz] = useState(() => {
     // Inicializa a matriz com letras aleatórias
     return Array(144).fill().map(() => {
@@ -52,6 +56,26 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
       definirLetra(indice, letra);
     }
   };
+
+  // useEffect para iniciar o temporizador quando o componente for montado
+  useEffect(() => {
+    setTempoInicio(Date.now());
+    
+    const timer = setInterval(() => {
+      setTempoDecorrido(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Fechar popup inicial automaticamente após 8 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMostrarPopupInicial(false);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   
   useEffect(() => {
@@ -141,32 +165,24 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
   };
 
   // Função para verificar resposta na API
+  // Alterei a função para usar o endpoint unificado (Gabriel)
   const verificarResposta = async () => {
     if (stringIndices === '') return;
 
     try {
-      console.log('Enviando requisição para API com:', stringIndices);
+      console.log('Enviando string de índices para a API:', stringIndices);
+
+      const params = new URLSearchParams();
+      params.append('tipoDesafio', 'JogoPalavras');
+      params.append('id', '1'); // ID do Caça-Palavras de Geografia
+      params.append('tentativa', stringIndices); // Enviando a string de índices
+
+      // const response = await fetch('http://localhost:8080/api/desafio/verificar', {
+      const response = await fetch(`${window.location.origin}/desconecta/api/desafio/verificar` , {
+        method: 'POST',
+        body: params,
+      });
       
-      // const response = await fetch(
-      //   `http://localhost:8080/api/cacaPalavras/verificarAgrupamento/1?tentativa=${stringIndices}`,
-      //   {
-      //     method: 'GET',
-      //     headers: {
-      //       'Content-Type': 'application/json'
-      //     }
-      //   }
-      // );
-
-      const response = await fetch(
-        `${window.location.origin}/desconecta/api/cacaPalavras/verificarAgrupamento/1?tentativa=${stringIndices}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      )
-
       const resultado = await response.text();
       console.log('Resposta da API:', resultado);
 
@@ -184,10 +200,97 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
           
           // Verificar se completou todas as palavras
           if (novaQuantidade >= totalPalavras) {
-            console.log('Jogo completo! Redirecionando para pontuação em 3 segundos...');
-            setTimeout(() => {
-              setJogoCompleto(true);
-            }, 3000);
+            console.log('Jogo completo! Salvando pontuação e redirecionando...');
+            
+            setTimeout(async () => {
+              // Calcular tempo final em segundos
+              const tempoFinal = tempoDecorrido;
+              
+              try {
+                const alunoId = localStorage.getItem('alunoId');
+                
+                if (alunoId) {
+                  // PRIMEIRO: Verificar se o desafio já foi concluído
+                  console.log('🔍 Verificando se desafio já foi concluído...');
+                  const responseVerificar = await fetch(
+                    // `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA`
+                    `${window.location.origin}/desconecta/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA`
+                  );
+                  
+                  if (!responseVerificar.ok) {
+                    throw new Error('Erro ao verificar status do desafio');
+                  }
+                  
+                  const desafioConcluido = await responseVerificar.json();
+                  console.log('Status do desafio:', desafioConcluido ? '✅ Já concluído' : '⏳ Não concluído');
+                  
+                  let pontuacaoCalculada = 0;
+                  
+                  // SEGUNDO: Salvar pontuação APENAS se o desafio NÃO foi concluído
+                  if (!desafioConcluido) {
+                    console.log('💾 Salvando pontuação (primeira vez)...');
+                    const responsePontuacao = await fetch(
+                      // `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
+                      `${window.location.origin}/desconecta/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
+                      {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        }
+                      }
+                    );
+                    
+                    if (responsePontuacao.ok) {
+                      pontuacaoCalculada = await responsePontuacao.json();
+                      console.log('✅ Pontuação calculada e salva:', pontuacaoCalculada);
+
+                      // Calcular pontuação total do aluno
+                      const apelidoAluno = localStorage.getItem('apelidoAluno');
+                      if (apelidoAluno) {
+                        const paramsCalculo = new URLSearchParams();
+                        paramsCalculo.append('apelidoAluno', apelidoAluno);
+                        // await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
+                        await fetch(`${window.location.origin}/desconecta/api/progresso-aluno/calcularPontuacaoTotal`, {
+                          method: 'POST',
+                          body: paramsCalculo
+                        });
+                      }
+                    } else {
+                      console.error('❌ Erro ao salvar pontuação. Status:', responsePontuacao.status);
+                      const errorText = await responsePontuacao.text();
+                      console.error('Resposta do servidor:', errorText);
+                      
+                      if (errorText === '-2') {
+                        console.log('⚠️ Desafio já estava concluído (código -2)');
+                        pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
+                        pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
+                      }
+                    }
+                  } else {
+                    console.log('⚠️ Desafio já foi concluído anteriormente. Pontuação NÃO será salva.');
+                    console.log('Calculando pontuação apenas para exibição...');
+                    pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
+                    pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
+                  }
+                  
+                  // Armazenar dados para a TelaPontuacao
+                  sessionStorage.setItem('dadosPontuacao', JSON.stringify({
+                    tempo: tempoFinal,
+                    tentativas: numeroErros,
+                    pontos: pontuacaoCalculada,
+                    jaFoiConcluido: desafioConcluido
+                  }));
+                }
+              } catch (error) {
+                console.error('❌ Erro ao processar conclusão do jogo:', error);
+              }
+              
+              if (onConcluido) {
+                onConcluido();
+              } else {
+                setJogoCompleto(true);
+              }
+            }, 1500);
           }
           
           return novaQuantidade;
@@ -197,12 +300,13 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
       } else {
         // Resposta incorreta - mostrar popup de erro
         console.log('Resposta incorreta! Mostrando popup de erro.');
+        setNumeroErros(prev => prev + 1);
+        
         setMostrarPopupErro(true);
         
-        // Auto-esconder popup após 3 segundos
         setTimeout(() => {
           setMostrarPopupErro(false);
-        }, 3000);
+        }, 2000);
       }
 
       // Em ambos os casos, limpar seleção atual e string
@@ -222,9 +326,20 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
     setMostrarPopupErro(false);
   };
 
-  // Se jogo completo, mostrar TelaPontuacao
+  // Se jogo completo, redirecionar usando onConcluido
   if (jogoCompleto) {
-    return <TelaPontuacao onVoltarTrilha={onVoltarTrilha} onVoltarMenu={onVoltarMenu} />;
+    if (onConcluido) {
+      onConcluido();
+      return null;
+    }
+    // Fallback: se não houver onConcluido, mostrar TelaPontuacao diretamente
+    return <TelaPontuacao 
+      onVoltarTrilha={onVoltarTrilha} 
+      onVoltarMenu={onVoltarMenu}
+      onAbrirRanking={onAbrirRanking}
+      ilhaCompletada={3} 
+      nomeIlhaJogada="GEOGRAFIA" 
+    />;
   }
 
   return (
@@ -245,7 +360,9 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
+        tipoTutorial="caca-palavras"
       />
 
 
@@ -394,6 +511,28 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu }) => {
                 filter: 'drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3))'
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Popup Inicial - Frase Caça Palavra */}
+      {mostrarPopupInicial && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]"
+          onClick={() => setMostrarPopupInicial(false)}
+        >
+          <div className="text-center">
+            <img 
+              src={fraseCacaPalavra}
+              alt="Caça Palavras"
+              className="w-[90vw] max-w-5xl"
+              style={{
+                filter: "drop-shadow(0 0 30px rgba(96, 160, 181, 0.8)) drop-shadow(0 0 60px rgba(96, 160, 181, 0.6))"
+              }}
+            />
+            <p className="text-white text-3xl mt-8 opacity-75">
+              Clique para começar
+            </p>
           </div>
         </div>
       )}

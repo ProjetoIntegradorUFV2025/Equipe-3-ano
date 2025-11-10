@@ -2,19 +2,21 @@ package ufv.desconecta.Desconecta.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ufv.desconecta.Desconecta.EnumNomeIlha;
+import ufv.desconecta.Desconecta.model.EnumNomeIlha;
 import ufv.desconecta.Desconecta.model.Aluno;
 import ufv.desconecta.Desconecta.model.Ilha;
 import ufv.desconecta.Desconecta.model.ProgressoAluno;
 import ufv.desconecta.Desconecta.repository.AcessoBDAluno;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/api/aluno")
 @CrossOrigin(origins = "*") // permitir requisições do React
 public class ControladorAluno {
-    
+
     private final AcessoBDAluno acessoBDAluno;
-    
+
     @Autowired
     public ControladorAluno(AcessoBDAluno acessoBDAluno) {
         this.acessoBDAluno = acessoBDAluno;
@@ -43,7 +45,10 @@ public class ControladorAluno {
             ilhaInicial.setFoiJogada(false);
 
             novoProgresso.setAluno(aluno);
-            novoProgresso.setIlha(ilhaInicial);
+
+            novoProgresso.setIlhas(new ArrayList<>());
+            novoProgresso.getIlhas().add(ilhaInicial);
+            ilhaInicial.setProgressoAluno(novoProgresso);
 
 
             return acessoBDAluno.inserirAluno(aluno);
