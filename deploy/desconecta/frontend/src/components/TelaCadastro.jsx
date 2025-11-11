@@ -24,7 +24,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
 
     try {
       // const response = await fetch('http://localhost:8080/api/aluno/cadastro', {
-      const response = await fetch(`${window.location.origin}/desconecta/api/aluno/cadastro`,{
+      const response = await fetch(`${window.location.origin}/desconecta/api/aluno/cadastro`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -41,7 +41,7 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
 
       // Requisição para o endpoint de login
       // const response = await fetch('http://localhost:8080/api/aluno/login', {
-      const response = await fetch(`${window.location.origin}/desconecta/api/aluno/login`,{
+      const response = await fetch(`${window.location.origin}/desconecta/api/aluno/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
