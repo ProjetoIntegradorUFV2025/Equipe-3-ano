@@ -88,15 +88,12 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
     definirLetraPorCoordenada(6, 5, 'L');
     
     // Exemplo: inserir "MUNDO" verticalmente
-    definirLetraPorCoordenada(0, 2, 'F');
-    definirLetraPorCoordenada(0, 3, 'L');
-    definirLetraPorCoordenada(0, 4, 'O');
-    definirLetraPorCoordenada(0, 5, 'R');
-    definirLetraPorCoordenada(0, 6, 'E');
-    definirLetraPorCoordenada(0, 7, 'S');
-    definirLetraPorCoordenada(0, 8, 'T');
-    definirLetraPorCoordenada(0, 9, 'A');
-    definirLetraPorCoordenada(0, 10, 'L');
+    definirLetraPorCoordenada(0, 2, 'J');
+    definirLetraPorCoordenada(0, 3, 'A');
+    definirLetraPorCoordenada(0, 4, 'T');
+    definirLetraPorCoordenada(0, 5, 'O');
+    definirLetraPorCoordenada(0, 6, 'B');
+    definirLetraPorCoordenada(0, 7, 'A');
 
     definirLetraPorCoordenada(4, 0, 'G');
     definirLetraPorCoordenada(4, 1, 'O');
