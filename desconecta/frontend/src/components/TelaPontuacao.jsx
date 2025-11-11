@@ -9,7 +9,7 @@ import parabens from '../assets/parabens.png'
 import dadinhoConfete from '../assets/dadinhoConfete.png'
 
 // --- Componente: Tela Pontuação ---
-const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1, nomeIlhaJogada = null }) => {
+const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompletada = 1, nomeIlhaJogada = null }) => {
   const { alunoId, isLogado } = useAlunoLogado();
   
   // Buscar dados de pontuação do sessionStorage
@@ -116,7 +116,8 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1, nomeI
 
   // Função para voltar à trilha e forçar recarregamento
   const handleVoltarTrilha = async () => {
-    // Limpar dados de pontuação do sessionStorage
+    // Limpar APENAS dados de pontuação do sessionStorage
+    // NÃO remove dados do localStorage (alunoId, apelidoAluno, etc.)
     sessionStorage.removeItem('dadosPontuacao');
     
     // Sinaliza que o progresso foi atualizado para forçar recarregamento
@@ -168,8 +169,9 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, ilhaCompletada = 1, nomeI
 
       {/* Menu de Navegação Reutilizável */}
       <MenuNavegacao 
-        onVoltarTrilha={onVoltarTrilha}
-        onVoltarMenu={onVoltarMenu}
+        onVoltarTrilha={handleVoltarTrilha}
+        onVoltarMenu={handleVoltarTrilha}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
       />
 

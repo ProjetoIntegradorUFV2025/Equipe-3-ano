@@ -5,7 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import ufv.desconecta.Desconecta.EnumNomeIlha;
+import ufv.desconecta.Desconecta.model.EnumNomeIlha;
 import ufv.desconecta.Desconecta.model.Ilha;
 
 import java.util.List;

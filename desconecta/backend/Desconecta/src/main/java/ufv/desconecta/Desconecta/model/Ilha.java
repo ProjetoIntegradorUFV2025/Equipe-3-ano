@@ -1,8 +1,8 @@
 package ufv.desconecta.Desconecta.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-import ufv.desconecta.Desconecta.EnumNomeIlha;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,5 +36,6 @@ public class Ilha {
     // relacionamento ManyToOne com ProgressoAluno
     @ManyToOne
     @JoinColumn(name = "PK_ProgressoAluno")
+    @JsonBackReference
     private ProgressoAluno progressoAluno;
 }

@@ -42,7 +42,7 @@ const imagens = [
 ].filter(img => img !== undefined);
 
 // --- Componente: Tela Jogo Ciência ---
-const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
+const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const [imagemAtual, setImagemAtual] = useState(0);
   const [podeNavegar, setPodeNavegar] = useState(true);
   const [tempoRestante, setTempoRestante] = useState(0);
@@ -109,6 +109,7 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
       <ConectaCiencia 
         onVoltarTrilha={onVoltarTrilha} 
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         onConcluido={() => {
           // Após concluir o jogo, voltar para img25 (índice 24)
           setImagemAtual(24);
@@ -124,7 +125,8 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
     // Ciências corresponde ao enum posição 1 (0=DADOLANDIA, 1=CIENCIAS, 2=MATEMATICA, 3=GEOGRAFIA, 4=HISTORIA)
     return <TelaPontuacao 
       onVoltarTrilha={onVoltarTrilha} 
-      onVoltarMenu={onVoltarMenu} 
+      onVoltarMenu={onVoltarMenu}
+      onAbrirRanking={onAbrirRanking}
       ilhaCompletada={1} 
       nomeIlhaJogada="CIENCIAS" 
     />;
@@ -136,6 +138,7 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu }) => {
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
       />
 

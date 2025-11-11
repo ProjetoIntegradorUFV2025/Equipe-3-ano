@@ -4,9 +4,7 @@ import React from 'react';
 
 
 export const GamepadIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 256 256">
-    <path fill="currentColor" d="M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h84v-52H80v-32h44V84H80V52h44V40Zm-44 168h44v-52h-44v-32h44V84h-44V52h44V40h-32v44h-32v32h32v44h-32v32h32Zm60-124a12 12 0 1 1-12-12a12 12 0 0 1 12 12Zm-24 24a12 12 0 1 1-12-12a12 12 0 0 1 12 12Zm24 24a12 12 0 1 1-12-12a12 12 0 0 1 12 12Zm-24 24a12 12 0 1 1-12-12a12 12 0 0 1 12 12Z" />
-  </svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad2-icon lucide-gamepad-2"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
 );
 
 export const StarIcon = () => (

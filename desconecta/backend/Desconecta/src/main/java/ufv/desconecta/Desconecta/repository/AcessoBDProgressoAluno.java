@@ -4,7 +4,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import ufv.desconecta.Desconecta.dto.ClassificacaoDTO;
 import ufv.desconecta.Desconecta.model.Aluno;
 import ufv.desconecta.Desconecta.model.Ilha;
 import ufv.desconecta.Desconecta.model.ProgressoAluno;
@@ -14,9 +16,14 @@ import java.util.Collections;
 import java.util.List;
 
 @Repository
-public class AcessoBDProgressoAluno {
+public class AcessoBDProgressoAluno  {
+
+    private final RepositorioProgressoAluno repositorioProgressoAluno;
 
 
+    public AcessoBDProgressoAluno(RepositorioProgressoAluno repo) {
+        this.repositorioProgressoAluno = repo;
+    }
     // Método para armazenar a pontuação
     @Transactional
     public boolean armazenarPontuacaoAluno(int idProgressoAluno, int pontuacao) {
@@ -72,4 +79,11 @@ public class AcessoBDProgressoAluno {
         return entityManager.merge(progresso);
     }
 
+    public List<ClassificacaoDTO> obterClassificacaoGeralOrdenada(){
+        return repositorioProgressoAluno.findClassificacaoOrdenada();
+    }
+
+    public ProgressoAluno getProgressoPeloAlunoId(long alunoId) {
+        return repositorioProgressoAluno.findByAlunoId(alunoId).orElse(null);
+    }
 }

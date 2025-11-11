@@ -12,10 +12,11 @@ import TelaJogoGeografia from './TelaJogoGeografia';
 import TelaJogoMatematica from './TelaJogoMatematica';
 import TelaPontuacao from './TelaPontuacao';
 import useAlunoLogado from '../hooks/useAlunoLogado';
+import MenuNavegacao from './ui/MenuNavegacao';
 
 
 // --- Componente: Tela Trilha ---
-const TelaTrilha = ({ onVoltar }) => {
+const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
   const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', ou 'pontuacao'
   const [nomeIlhaJogada, setNomeIlhaJogada] = useState(null); // Rastreia qual ilha foi jogada
@@ -229,22 +230,22 @@ const TelaTrilha = ({ onVoltar }) => {
 
   // Se estiver na tela de ciência, renderizar TelaJogoCiencia
   if (telaAtiva === 'ciencia') {
-    return <TelaJogoCiencia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaJogoCiencia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
   }
 
   // Se estiver na tela de Dadolandia, renderizar TelaDadolandia
   if (telaAtiva === 'dadolandia') {
-    return <TelaDadolandia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaDadolandia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
   }
 
   // Se estiver na tela de geografia, renderizar TelaJogoGeografia
   if (telaAtiva === 'geografia') {
-    return <TelaJogoGeografia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaJogoGeografia onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
   }
 
   // Se estiver na tela de matemática, renderizar TelaJogoMatematica
   if (telaAtiva === 'matematica') {
-    return <TelaJogoMatematica onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} />;
+    return <TelaJogoMatematica onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
   }
 
   // Se estiver na tela de pontuação, renderizar TelaPontuacao
@@ -253,6 +254,7 @@ const TelaTrilha = ({ onVoltar }) => {
     return <TelaPontuacao 
       onVoltarTrilha={handleVoltarTrilha} 
       onVoltarMenu={onVoltar} 
+      onAbrirRanking={onAbrirRanking}
       ilhaCompletada={0} 
       nomeIlhaJogada={nomeIlhaJogada} 
     />;
@@ -286,6 +288,14 @@ const TelaTrilha = ({ onVoltar }) => {
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
     >
+      {/* Menu de Navegação */}
+      <MenuNavegacao 
+        onVoltarTrilha={() => {}} // Já está na trilha
+        onVoltarMenu={onVoltar}
+        onAbrirRanking={onAbrirRanking}
+        posicao="top-right"
+      />
+
       {/* Container estendido horizontalmente */}
       <div 
         className="flex relative w-screen h-screen"

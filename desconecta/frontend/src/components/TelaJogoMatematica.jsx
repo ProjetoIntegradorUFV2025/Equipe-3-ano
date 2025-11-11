@@ -43,12 +43,13 @@ const imagens = [
 ].filter(img => img !== undefined);
 
 // --- Componente: Tela Jogo Matemática ---
-const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu }) => {
+const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const [imagemAtual, setImagemAtual] = useState(0);
   const [podeNavegar, setPodeNavegar] = useState(true);
   const [tempoRestante, setTempoRestante] = useState(0);
   const [mostrarPontuacao, setMostrarPontuacao] = useState(false);
   const [mostrarMinijogo, setMostrarMinijogo] = useState(false);
+  const [jogoMatematicaConcluido, setJogoMatematicaConcluido] = useState(false);
 
   // Debug: verificar se as imagens foram carregadas
   console.log('Total de imagens carregadas:', imagens.length);
@@ -81,6 +82,8 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu }) => {
 
   const proximaImagem = () => {
     if (podeNavegar && imagemAtual < imagens.length - 1) {
+      // TODO: Ajustar o índice quando souber em qual imagem o jogo deve aparecer
+      // Por enquanto, não há redirecionamento para o jogo no meio das imagens
       setImagemAtual(prev => prev + 1);
       iniciarTimer();
     } else if (podeNavegar && imagemAtual === imagens.length - 1) {
@@ -90,6 +93,9 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu }) => {
   };
 
   const imagemAnterior = () => {
+    // TODO: Quando o jogo for implementado, adicionar lógica para bloquear
+    // o botão voltar na imagem imediatamente após o jogo
+    // Exemplo: if (imagemAtual > 0 && imagemAtual !== imagemAposJogo)
     if (imagemAtual > 0) {
       setImagemAtual(prev => prev - 1);
       // Não inicia timer para voltar - deixa livre
@@ -99,7 +105,19 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu }) => {
   // TODO: Quando o minijogo for criado, descomentar este bloco
   // Se deve mostrar o minijogo, renderizar MinijogoMatematica
   // if (mostrarMinijogo) {
-  //   return <MinijogoMatematica onVoltarTrilha={onVoltarTrilha} onVoltarMenu={onVoltarMenu} />;
+  //   return (
+  //     <MinijogoMatematica 
+  //       onVoltarTrilha={onVoltarTrilha} 
+  //       onVoltarMenu={onVoltarMenu}
+  //       onAbrirRanking={onAbrirRanking}
+  //       onConcluido={() => {
+  //         // Após concluir o jogo, voltar para a próxima imagem após o jogo
+  //         setImagemAtual(imagemAposJogo); // TODO: definir índice correto
+  //         setMostrarMinijogo(false);
+  //         setJogoMatematicaConcluido(true);
+  //       }}
+  //     />
+  //   );
   // }
 
   // TEMPORÁRIO: Enquanto o minijogo não existe, vai direto para pontuação
@@ -107,7 +125,8 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu }) => {
     // Matemática corresponde ao enum posição 2 (0=DADOLANDIA, 1=CIENCIAS, 2=MATEMATICA, 3=GEOGRAFIA, 4=HISTORIA)
     return <TelaPontuacao 
       onVoltarTrilha={onVoltarTrilha} 
-      onVoltarMenu={onVoltarMenu} 
+      onVoltarMenu={onVoltarMenu}
+      onAbrirRanking={onAbrirRanking}
       ilhaCompletada={2} 
       nomeIlhaJogada="MATEMATICA" 
     />;
@@ -119,6 +138,7 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu }) => {
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
       />
 
