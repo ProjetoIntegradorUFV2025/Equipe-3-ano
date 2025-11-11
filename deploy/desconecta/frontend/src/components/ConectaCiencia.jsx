@@ -326,7 +326,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
             // 2. Fazer a requisição para o novo endpoint unificado
             const response = await fetch(
               // "http://localhost:8080/api/desafio/verificar",
-              `${window.location.origin}/desconecta/api/desafio/verificar`, 
+              `${window.location.origin}/desconecta/api/desafio/verificar`,
               {
                 method: "POST",
                 body: params,

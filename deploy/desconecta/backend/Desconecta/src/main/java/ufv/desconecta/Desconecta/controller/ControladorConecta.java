@@ -34,7 +34,7 @@ public class ControladorConecta implements SolucionarDesafio { // Implemente a i
 
         // 3. Junta a lista ordenada em uma única string (ex: "CachorroGatoPássaroPeixe")
         String respostaCorretaConcatenada = String.join("", respostasCertas);
-        //System.out.println(respostaCorretaConcatenada);
+        System.out.println(respostaCorretaConcatenada);
 
         // 4. Compara a resposta correta concatenada com a tentativa do aluno
         if (respostaCorretaConcatenada.contains(respostaAluno)) {
@@ -50,9 +50,9 @@ public class ControladorConecta implements SolucionarDesafio { // Implemente a i
             @PathVariable("id") int PK_Conecta,
             @RequestParam("novaResposta") String novaResposta,
             @RequestParam("idResposta") int idResposta) {
-        //System.out.println("ID Resposta: " + idResposta);
-        //System.out.println("Nova Resposta: " + novaResposta);
-        //System.out.println("PK_Conecta: " + PK_Conecta);
+        System.out.println("ID Resposta: " + idResposta);
+        System.out.println("Nova Resposta: " + novaResposta);
+        System.out.println("PK_Conecta: " + PK_Conecta);
         return acessoBDConecta.atualizarRespostaCerta(PK_Conecta, novaResposta, idResposta);
     }
 }

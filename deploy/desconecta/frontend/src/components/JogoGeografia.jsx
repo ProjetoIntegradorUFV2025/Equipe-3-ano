@@ -178,7 +178,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
       params.append('tentativa', stringIndices); // Enviando a string de índices
 
       // const response = await fetch('http://localhost:8080/api/desafio/verificar', {
-      const response = await fetch(`${window.location.origin}/desconecta/api/desafio/verificar` , {
+      const response = await fetch(`${window.location.origin}/desconecta/api/desafio/verificar`, {
         method: 'POST',
         body: params,
       });
