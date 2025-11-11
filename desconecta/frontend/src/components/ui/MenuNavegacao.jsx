@@ -4,6 +4,9 @@ import PopupTutorial from '../PopupTutorial';
 // Importar imagem de fundo do menu
 import menuBarraFundo from '../../assets/Menu-barra.png';
 
+// Importar ícone do menu
+import navBarIcon from '../../assets/MenuLateral/NavBar.png';
+
 // Importar imagens dos botões do menu lateral
 import menuVoltarTrilha from '../../assets/MenuLateral/MenuVoltarTrilha.png';
 import menuPontuacao from '../../assets/MenuLateral/MenuPontuacao.png';
@@ -15,6 +18,7 @@ const MenuNavegacao = ({
   onVoltarTrilha, 
   onVoltarMenu,
   onSairConta,
+  onAbrirRanking,
   posicao = "top-right", // "top-right", "top-left", "bottom-right", "bottom-left"
   distanciaDoTopo = 180, // Distância regulável do topo do background do menu
   tipoTutorial = "todos" // "conecta", "caca-palavras", "todos"
@@ -70,25 +74,20 @@ const MenuNavegacao = ({
             e.stopPropagation();
             toggleMenu();
           }}
-          className="p-3 rounded-lg shadow-lg transition-all duration-300 relative z-50"
+          className="rounded-lg transition-all duration-300 relative z-50 hover:scale-110"
           style={{ 
-            backgroundColor: '#563066',
-            opacity: 0.9
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#4a2857';
-            e.target.style.opacity = '1';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = '#563066';
-            e.target.style.opacity = '0.9';
+            backgroundColor: 'transparent',
+            padding: 0,
+            border: 'none',
+            outline: 'none'
           }}
         >
-          <div className="flex flex-col space-y-1">
-            <div className="w-6 h-0.5 bg-white"></div>
-            <div className="w-6 h-0.5 bg-white"></div>
-            <div className="w-6 h-0.5 bg-white"></div>
-          </div>
+          <img 
+            src={navBarIcon} 
+            alt="Menu" 
+            className="w-16 h-16"
+            style={{ display: 'block' }}
+          />
         </button>
 
         {/* Menu com Imagem de Fundo */}
@@ -136,12 +135,14 @@ const MenuNavegacao = ({
                 Voltar à Trilha
               </button>
 
-              {/* Botão 2: Tela de Pontuação (não implementado) */}
+              {/* Botão 2: Tela de Pontuação (Ranking) */}
               <button
                 onClick={() => {
-                  // Ainda não implementado
-                  console.log('Tela de pontuação ainda não implementada');
                   setMenuAberto(false);
+                  // Abre o ranking diretamente
+                  if (onAbrirRanking) {
+                    onAbrirRanking();
+                  }
                 }}
                 className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
                 style={{ 

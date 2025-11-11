@@ -2,8 +2,8 @@ package ufv.desconecta.Desconecta.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ufv.desconecta.Desconecta.EnumNomeIlha;
-import ufv.desconecta.Desconecta.EnumTiposDesafios;
+import ufv.desconecta.Desconecta.model.EnumNomeIlha;
+import ufv.desconecta.Desconecta.model.EnumTiposDesafios;
 import ufv.desconecta.Desconecta.model.Desafio;
 import ufv.desconecta.Desconecta.model.Ilha;
 import ufv.desconecta.Desconecta.model.ProgressoAluno;
@@ -145,6 +145,12 @@ public class ControladorDesafio {
             // Salvar pontuação
             pontuacaoService.salvarPontuacaoDesafio(pontuacao, desafioASerPontuado);
 
+            // Somar com a pontuação total do aluno
+            int novaPontuacaoTotal = progressoAluno.getPontuacaoTotalAluno() + pontuacao;
+            progressoAluno.setPontuacaoTotalAluno(novaPontuacaoTotal);
+            acessoBDProgressoAluno.salvarProgressoAluno(progressoAluno);
+            System.out.println("Nova pontuação total do aluno: " + novaPontuacaoTotal);
+
             // Marcar desafio como concluído
             concluirDesafio(desafioASerPontuado.getId());
 
@@ -227,4 +233,6 @@ public class ControladorDesafio {
             return false;
         }
     }
+
+
 }

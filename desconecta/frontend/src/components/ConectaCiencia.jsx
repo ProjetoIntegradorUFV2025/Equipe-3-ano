@@ -81,7 +81,7 @@ const botoesData = [
 ];
 
 // --- Componente: Conecta Ciência ---
-const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
+const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanking }) => {
   const { alunoId, isLogado } = useAlunoLogado();
 
   const [mostrarPontuacao, setMostrarPontuacao] = React.useState(false);
@@ -97,6 +97,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
   const [tempoInicio, setTempoInicio] = React.useState(null);
   const [numeroErros, setNumeroErros] = React.useState(0);
   const [tempoDecorrido, setTempoDecorrido] = React.useState(0);
+  const [mostrarPopupInicial, setMostrarPopupInicial] = React.useState(true);
 
   // Iniciar o timer quando o componente for montado
   React.useEffect(() => {
@@ -109,6 +110,15 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
     }, 1000);
 
     return () => clearInterval(intervalo);
+  }, []);
+
+  // Fechar popup inicial automaticamente após 8 segundos
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setMostrarPopupInicial(false);
+    }, 8000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Função para ir para a tela de pontuação
@@ -176,6 +186,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
       <TelaPontuacao
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         ilhaCompletada={1}
         nomeIlhaJogada="CIENCIAS"
       />
@@ -196,6 +207,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
       <MenuNavegacao
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
         tipoTutorial="conecta"
       />
@@ -392,6 +404,17 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                           "✅ Pontuação calculada e salva:",
                           pontuacaoCalculada
                         );
+
+                        // Calcular pontuação total do aluno
+                        const apelidoAluno = localStorage.getItem('apelidoAluno');
+                        if (apelidoAluno) {
+                          const paramsCalculo = new URLSearchParams();
+                          paramsCalculo.append('apelidoAluno', apelidoAluno);
+                          await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
+                            method: 'POST',
+                            body: paramsCalculo
+                          });
+                        }
                       } else {
                         console.error(
                           "❌ Erro ao salvar pontuação. Status:",
@@ -512,6 +535,28 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                 setMostrarPopupErro(false);
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Popup Inicial - CONECTA */}
+      {mostrarPopupInicial && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]"
+          onClick={() => setMostrarPopupInicial(false)}
+        >
+          <div className="text-center">
+            <img
+              src={textoConecta}
+              alt="Conecta"
+              className="w-[90vw] max-w-5xl"
+              style={{
+                filter: "drop-shadow(0 0 30px rgba(138, 112, 163, 0.8)) drop-shadow(0 0 60px rgba(138, 112, 163, 0.6))"
+              }}
+            />
+            <p className="text-white text-3xl mt-8 opacity-75">
+              Clique para começar
+            </p>
           </div>
         </div>
       )}

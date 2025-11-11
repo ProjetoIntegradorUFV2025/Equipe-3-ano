@@ -49,7 +49,7 @@ const FASES = {
 };
 
 // --- Componente: Tela Dadolandia ---
-const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu }) => {
+const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const [imagemAtual, setImagemAtual] = useState(0);
   const [podeNavegar, setPodeNavegar] = useState(true);
   const [tempoRestante, setTempoRestante] = useState(0);
@@ -157,7 +157,8 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu }) => {
     // Dadolandia corresponde ao enum posição 0 (0=DADOLANDIA, 1=CIENCIAS, 2=MATEMATICA, 3=GEOGRAFIA, 4=HISTORIA)
     return <TelaPontuacao 
       onVoltarTrilha={onVoltarTrilha} 
-      onVoltarMenu={onVoltarMenu} 
+      onVoltarMenu={onVoltarMenu}
+      onAbrirRanking={onAbrirRanking}
       ilhaCompletada={0} 
       nomeIlhaJogada="DADOLANDIA" 
     />;
@@ -169,6 +170,7 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu }) => {
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
       />
 

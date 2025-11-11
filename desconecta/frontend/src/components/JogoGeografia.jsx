@@ -19,7 +19,7 @@ import popupErro from '../assets/HistoriaGeografia/JogoGeografia/PopUpErro.png';
 import TelaPontuacao from './TelaPontuacao';
 
 // --- Componente: Jogo Geografia ---
-const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
+const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanking }) => {
   const [palavrasEncontradas, setPalavrasEncontradas] = useState(0);
   const totalPalavras = 5;
   const [botoesClicados, setBotoesClicados] = useState(new Set());
@@ -30,6 +30,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
   const [tempoInicio, setTempoInicio] = useState(null);
   const [tempoDecorrido, setTempoDecorrido] = useState(0);
   const [numeroErros, setNumeroErros] = useState(0); // Contador de erros
+  const [mostrarPopupInicial, setMostrarPopupInicial] = useState(true);
   const [letrasMatriz, setLetrasMatriz] = useState(() => {
     // Inicializa a matriz com letras aleatórias
     return Array(144).fill().map(() => {
@@ -67,6 +68,15 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
     return () => clearInterval(timer);
   }, []);
 
+  // Fechar popup inicial automaticamente após 8 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMostrarPopupInicial(false);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   
   useEffect(() => {
     // Suas instruções aqui - executam quando a tela carrega
@@ -78,15 +88,12 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
     definirLetraPorCoordenada(6, 5, 'L');
     
     // Exemplo: inserir "MUNDO" verticalmente
-    definirLetraPorCoordenada(0, 2, 'F');
-    definirLetraPorCoordenada(0, 3, 'L');
-    definirLetraPorCoordenada(0, 4, 'O');
-    definirLetraPorCoordenada(0, 5, 'R');
-    definirLetraPorCoordenada(0, 6, 'E');
-    definirLetraPorCoordenada(0, 7, 'S');
-    definirLetraPorCoordenada(0, 8, 'T');
-    definirLetraPorCoordenada(0, 9, 'A');
-    definirLetraPorCoordenada(0, 10, 'L');
+    definirLetraPorCoordenada(0, 2, 'J');
+    definirLetraPorCoordenada(0, 3, 'A');
+    definirLetraPorCoordenada(0, 4, 'T');
+    definirLetraPorCoordenada(0, 5, 'O');
+    definirLetraPorCoordenada(0, 6, 'B');
+    definirLetraPorCoordenada(0, 7, 'A');
 
     definirLetraPorCoordenada(4, 0, 'G');
     definirLetraPorCoordenada(4, 1, 'O');
@@ -230,6 +237,17 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                     if (responsePontuacao.ok) {
                       pontuacaoCalculada = await responsePontuacao.json();
                       console.log('✅ Pontuação calculada e salva:', pontuacaoCalculada);
+
+                      // Calcular pontuação total do aluno
+                      const apelidoAluno = localStorage.getItem('apelidoAluno');
+                      if (apelidoAluno) {
+                        const paramsCalculo = new URLSearchParams();
+                        paramsCalculo.append('apelidoAluno', apelidoAluno);
+                        await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
+                          method: 'POST',
+                          body: paramsCalculo
+                        });
+                      }
                     } else {
                       console.error('❌ Erro ao salvar pontuação. Status:', responsePontuacao.status);
                       const errorText = await responsePontuacao.text();
@@ -301,12 +319,17 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
     setMostrarPopupErro(false);
   };
 
-  // Se jogo completo, mostrar TelaPontuacao
+  // Se jogo completo, redirecionar usando onConcluido
   if (jogoCompleto) {
-    // Geografia corresponde ao enum posição 3 (0=DADOLANDIA, 1=CIENCIAS, 2=MATEMATICA, 3=GEOGRAFIA, 4=HISTORIA)
+    if (onConcluido) {
+      onConcluido();
+      return null;
+    }
+    // Fallback: se não houver onConcluido, mostrar TelaPontuacao diretamente
     return <TelaPontuacao 
       onVoltarTrilha={onVoltarTrilha} 
-      onVoltarMenu={onVoltarMenu} 
+      onVoltarMenu={onVoltarMenu}
+      onAbrirRanking={onAbrirRanking}
       ilhaCompletada={3} 
       nomeIlhaJogada="GEOGRAFIA" 
     />;
@@ -330,6 +353,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
       <MenuNavegacao 
         onVoltarTrilha={onVoltarTrilha}
         onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
         posicao="top-right"
         tipoTutorial="caca-palavras"
       />
@@ -480,6 +504,28 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido }) => {
                 filter: 'drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3))'
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Popup Inicial - Frase Caça Palavra */}
+      {mostrarPopupInicial && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]"
+          onClick={() => setMostrarPopupInicial(false)}
+        >
+          <div className="text-center">
+            <img 
+              src={fraseCacaPalavra}
+              alt="Caça Palavras"
+              className="w-[90vw] max-w-5xl"
+              style={{
+                filter: "drop-shadow(0 0 30px rgba(96, 160, 181, 0.8)) drop-shadow(0 0 60px rgba(96, 160, 181, 0.6))"
+              }}
+            />
+            <p className="text-white text-3xl mt-8 opacity-75">
+              Clique para começar
+            </p>
           </div>
         </div>
       )}
