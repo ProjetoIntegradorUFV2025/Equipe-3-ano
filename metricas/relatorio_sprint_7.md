@@ -21,17 +21,17 @@
 | Métrica | Valor |
 |---------|-------|
 | **Issues Identificadas** | 6 |
-| **Issues Aceitas** | 0 |
-| **1.5 - Taxa Aceitação Issues** | **0.0%** |
+| **Issues Aceitas** | 6 |
+| **1.5 - Taxa Aceitação Issues** | **100.0%** |
 
 ## 🏢 MÉTRICAS DE EQUIPE SOLICITADAS
 
 ### ✅ 2.5 - Taxa Resolução Issues
 | Métrica | Valor |
 |---------|-------|
-| **Issues Aceitos** | 0 |
-| **Issues Resolvidos** | 0 |
-| **2.5 - Taxa Resolução Issues** | **0%** |
+| **Issues Aceitos** | 6 |
+| **Issues Resolvidos** | 6 |
+| **2.5 - Taxa Resolução Issues** | **100.0%** |
 
 ### ⏱️ 2.7 - Tempo Médio Resolução Issues
 | Métrica | Valor |
