@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PopupTutorial from '../PopupTutorial';
+import { useAudio } from '../../contexts/AudioContext';
 
 // Importar imagem de fundo do menu
 import menuBarraFundo from '../../assets/Menu-barra.png';
@@ -7,11 +8,11 @@ import menuBarraFundo from '../../assets/Menu-barra.png';
 // Importar ícone do menu
 import navBarIcon from '../../assets/MenuLateral/NavBar.png';
 
-// Importar imagens dos botões do menu lateral
-import menuVoltarTrilha from '../../assets/MenuLateral/MenuVoltarTrilha.png';
-import menuPontuacao from '../../assets/MenuLateral/MenuPontuacao.png';
-import menuSair from '../../assets/MenuLateral/MenuSair.png';
-import menuTutorial from '../../assets/MenuLateral/MenuTutorial.png';
+// Importar SVGs dos botões do menu lateral
+import iconVoltarTrilha from '../../assets/MenuLateral/Setinha de voltar.svg';
+import iconPontuacao from '../../assets/MenuLateral/Estrela Pontuacao.svg';
+import iconSair from '../../assets/MenuLateral/Sair.svg';
+import iconTutorial from '../../assets/MenuLateral/Play tutorial.svg';
 
 // --- Componente: Menu de Navegação Reutilizável ---
 const MenuNavegacao = ({ 
@@ -25,6 +26,7 @@ const MenuNavegacao = ({
 }) => {
   const [menuAberto, setMenuAberto] = useState(false);
   const [tutorialPopupAberto, setTutorialPopupAberto] = useState(false);
+  const { volume, changeVolume, isPlaying, togglePlay } = useAudio();
 
   const toggleMenu = () => {
     setMenuAberto(!menuAberto);
@@ -116,22 +118,32 @@ const MenuNavegacao = ({
                 className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
                 style={{ 
                   backgroundColor: 'transparent',
-                  border: '2px solid transparent'
+                  border: '2px solid transparent',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.borderColor = 'transparent';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'transparent';
                 }}
               >
-                <img 
-                  src={menuVoltarTrilha} 
-                  alt="Voltar à Trilha" 
-                  className="w-16 h-17 mr-4"
-                />
+                <div className="w-16 h-16 mr-4 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#563060', userSelect: 'none', flexShrink: 0 }}
+                >
+                  <img 
+                    src={iconVoltarTrilha} 
+                    alt="Voltar à Trilha" 
+                    className="w-8 h-8"
+                    style={{ userSelect: 'none' }}
+                    draggable="false"
+                  />
+                </div>
                 Voltar à Trilha
               </button>
 
@@ -147,22 +159,32 @@ const MenuNavegacao = ({
                 className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
                 style={{ 
                   backgroundColor: 'transparent',
-                  border: '2px solid transparent'
+                  border: '2px solid transparent',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.borderColor = 'transparent';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'transparent';
                 }}
               >
-                <img 
-                  src={menuPontuacao} 
-                  alt="Pontuação" 
-                  className="w-16 h-16 mr-4"
-                />
+                <div className="w-16 h-16 mr-4 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#563060', userSelect: 'none', flexShrink: 0 }}
+                >
+                  <img 
+                    src={iconPontuacao} 
+                    alt="Pontuação" 
+                    className="w-8 h-8"
+                    style={{ userSelect: 'none' }}
+                    draggable="false"
+                  />
+                </div>
                 Pontuação
               </button>
 
@@ -188,22 +210,32 @@ const MenuNavegacao = ({
                 className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
                 style={{ 
                   backgroundColor: 'transparent',
-                  border: '2px solid transparent'
+                  border: '2px solid transparent',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.borderColor = 'transparent';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'transparent';
                 }}
               >
-                <img 
-                  src={menuSair} 
-                  alt="Sair da Conta" 
-                  className="w-16 h-16 mr-4"
-                />
+                <div className="w-16 h-16 mr-4 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#563060', userSelect: 'none', flexShrink: 0 }}
+                >
+                  <img 
+                    src={iconSair} 
+                    alt="Sair da Conta" 
+                    className="w-8 h-8"
+                    style={{ userSelect: 'none' }}
+                    draggable="false"
+                  />
+                </div>
                 Sair da Conta
               </button>
 
@@ -216,24 +248,109 @@ const MenuNavegacao = ({
                 className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
                 style={{ 
                   backgroundColor: 'transparent',
+                  border: '2px solid transparent',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }}
+              >
+                <div className="w-16 h-16 mr-4 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#563060', userSelect: 'none', flexShrink: 0 }}
+                >
+                  <img 
+                    src={iconTutorial} 
+                    alt="Ver Tutorial" 
+                    className="w-8 h-8"
+                    style={{ userSelect: 'none' }}
+                    draggable="false"
+                  />
+                </div>
+                Ver Tutorial
+              </button>
+
+              {/* Botão 5: Controle de Áudio */}
+              <div className="w-full py-4 px-6 rounded-lg flex items-center justify-start transition-all duration-200"
+                style={{ 
+                  backgroundColor: 'transparent',
                   border: '2px solid transparent'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.borderColor = 'transparent';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'transparent';
                 }}
               >
-                <img 
-                  src={menuTutorial} 
-                  alt="Ver Tutorial" 
-                  className="w-16 h-16 mr-4"
+                {/* Ícone de Áudio */}
+                <div className="w-16 h-16 mr-4 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#563060', color: '#ffffff' }}
+                >
+                  <svg 
+                    width="32" 
+                    height="32" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                  </svg>
+                </div>
+                
+                {/* Controle de Volume */}
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={volume * 100}
+                  onChange={(e) => changeVolume(e.target.value / 100)}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #563060 0%, #563060 ${volume * 100}%, rgba(255,255,255,0.3) ${volume * 100}%, rgba(255,255,255,0.3) 100%)`,
+                    outline: 'none'
+                  }}
                 />
-                Ver Tutorial
-              </button>
+                
+                <style>{`
+                  input[type="range"]::-webkit-slider-thumb {
+                    appearance: none;
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 50%;
+                    background: #ffffff;
+                    cursor: pointer;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                  }
+                  input[type="range"]::-moz-range-thumb {
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 50%;
+                    background: #ffffff;
+                    cursor: pointer;
+                    border: none;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                  }
+                `}</style>
+              </div>
             </div>
           </div>
         )}
