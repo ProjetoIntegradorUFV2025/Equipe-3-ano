@@ -30,15 +30,16 @@ import img20 from '../assets/HistoriaCiencia/Quadro 20.gif';
 import img21 from '../assets/HistoriaCiencia/Quadro 21.gif';
 import img22 from '../assets/HistoriaCiencia/Quadro 22.gif';
 import img23 from '../assets/HistoriaCiencia/Quadro 23.gif';
-import img24 from '../assets/HistoriaCiencia/Quadro 28.gif';
-import img25 from '../assets/HistoriaCiencia/Quadro 23.gif';
-import img26 from '../assets/HistoriaCiencia/Quadro 28.gif';
+import img24 from '../assets/HistoriaCiencia/Quadro 24.gif';
+import img25 from '../assets/HistoriaCiencia/Quadro25.gif';
+import img26 from '../assets/HistoriaCiencia/Quadro26.gif';
+import img27 from '../assets/HistoriaCiencia/Quadro27.gif';
 
 // Array com todas as imagens em ordem (filtra apenas as que foram importadas com sucesso)
 const imagens = [
   img1, img2, img3, img4, img5, img6, img7, img8, img9, img10,
   img11, img12, img13, img14, img15, img16, img17, img18, img19, img20,
-  img21, img22, img23, img24, img25, img26
+  img21, img22, img23, img24, img25, img26, img27
 ].filter(img => img !== undefined);
 
 // --- Componente: Tela Jogo Ciência ---
