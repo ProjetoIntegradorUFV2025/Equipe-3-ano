@@ -28,6 +28,8 @@ import img19 from '../assets/Dadolandia/Dadolandia Quadro 19.gif';
 import img20 from '../assets/Dadolandia/Dadolandia Quadro 20.gif';
 import img21 from '../assets/Dadolandia/Dadolandia Quadro 21.gif';
 import img22 from '../assets/Dadolandia/Dadolandia Quadro 22.gif';
+import img23 from '../assets/Dadolandia/Dadolandia Quadro 23.gif';
+import img24 from '../assets/Dadolandia/Dadolandia Quadro 24.gif';
 
 // Importar vídeos dos tutoriais
 import tutorialConecta from '../assets/Dadolandia/Tutorial Conecta Dadolandia  .mp4';
@@ -37,7 +39,7 @@ import tutorialCacaPalavras from '../assets/Dadolandia/Tutorial Caça-palavras.m
 const imagens = [
   img1, img2, img3, img4, img5, img6, img7, img8, img9, img10,
   img11, img12, img13, img14, img15, img16, img17, img18, img19, img20,
-  img21, img22
+  img21, img22, img23, img24
 ].filter(img => img !== undefined);
 
 // Estados para as fases
