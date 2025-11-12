@@ -60,6 +60,8 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const [mostrarPontuacao, setMostrarPontuacao] = useState(false);
   const [tutorialConectaConcluido, setTutorialConectaConcluido] = useState(false);
   const [tutorialCacaPalavrasConcluido, setTutorialCacaPalavrasConcluido] = useState(false);
+  const [videoConectaJaTocou, setVideoConectaJaTocou] = useState(false);
+  const [videoCacaPalavrasJaTocou, setVideoCacaPalavrasJaTocou] = useState(false);
 
   // Refs para os vídeos
   const videoConectaRef = useRef(null);
@@ -85,21 +87,32 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   // Controlar música baseado na fase atual
   useEffect(() => {
     console.log('TelaDadolandia: Fase mudou para', faseAtual);
-    if (faseAtual === FASES.TUTORIAL_CONECTA || faseAtual === FASES.TUTORIAL_CACAPALAVRAS) {
+    if (faseAtual === FASES.TUTORIAL_CONECTA) {
       // Pausar música ao entrar em fase de tutorial
       console.log('TelaDadolandia: Chamando pauseMusic()');
       pauseMusic();
       
-      // Forçar play do vídeo após pequeno delay
-      setTimeout(() => {
-        if (faseAtual === FASES.TUTORIAL_CONECTA && videoConectaRef.current) {
-          videoConectaRef.current.play().catch(err => console.error('Erro ao tocar vídeo:', err));
-        } else if (faseAtual === FASES.TUTORIAL_CACAPALAVRAS && videoCacaPalavrasRef.current) {
-          videoCacaPalavrasRef.current.play().catch(err => console.error('Erro ao tocar vídeo:', err));
-        }
-      }, 100);
+      // Tocar vídeo automaticamente apenas na primeira vez
+      if (!videoConectaJaTocou && videoConectaRef.current) {
+        setTimeout(() => {
+          videoConectaRef.current?.play().catch(err => console.error('Erro ao tocar vídeo:', err));
+          setVideoConectaJaTocou(true);
+        }, 100);
+      }
+    } else if (faseAtual === FASES.TUTORIAL_CACAPALAVRAS) {
+      // Pausar música ao entrar em fase de tutorial
+      console.log('TelaDadolandia: Chamando pauseMusic()');
+      pauseMusic();
+      
+      // Tocar vídeo automaticamente apenas na primeira vez
+      if (!videoCacaPalavrasJaTocou && videoCacaPalavrasRef.current) {
+        setTimeout(() => {
+          videoCacaPalavrasRef.current?.play().catch(err => console.error('Erro ao tocar vídeo:', err));
+          setVideoCacaPalavrasJaTocou(true);
+        }, 100);
+      }
     }
-  }, [faseAtual, pauseMusic]);
+  }, [faseAtual, pauseMusic, videoConectaJaTocou, videoCacaPalavrasJaTocou]);
 
   const iniciarTimer = () => {
     setPodeNavegar(false);
@@ -275,7 +288,6 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
               ref={videoConectaRef}
               src={tutorialConecta}
               controls
-              autoPlay
               className="max-w-full max-h-full object-contain"
               style={{
                 width: '100vw',
@@ -344,7 +356,6 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
               ref={videoCacaPalavrasRef}
               src={tutorialCacaPalavras}
               controls
-              autoPlay
               className="max-w-full max-h-full object-contain"
               style={{
                 width: '100vw',
