@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MenuNavegacao from './ui/MenuNavegacao';
 import TelaPontuacao from './TelaPontuacao';
+import { useAudio } from '../contexts/AudioContext';
 
 // Importar imagem da seta
 import arrowLeftCircle from '../assets/Arrow - Left Circle.png';
@@ -64,6 +65,9 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const videoConectaRef = useRef(null);
   const videoCacaPalavrasRef = useRef(null);
 
+  // Hook para controlar áudio de fundo
+  const { pauseMusic, resumeMusic } = useAudio();
+
   // Debug: verificar se as imagens foram carregadas
   console.log('Total de imagens carregadas:', imagens.length);
   console.log('Imagem atual:', imagens[imagemAtual]);
@@ -77,6 +81,25 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       setTempoRestante(0);
     };
   }, []);
+
+  // Controlar música baseado na fase atual
+  useEffect(() => {
+    console.log('TelaDadolandia: Fase mudou para', faseAtual);
+    if (faseAtual === FASES.TUTORIAL_CONECTA || faseAtual === FASES.TUTORIAL_CACAPALAVRAS) {
+      // Pausar música ao entrar em fase de tutorial
+      console.log('TelaDadolandia: Chamando pauseMusic()');
+      pauseMusic();
+      
+      // Forçar play do vídeo após pequeno delay
+      setTimeout(() => {
+        if (faseAtual === FASES.TUTORIAL_CONECTA && videoConectaRef.current) {
+          videoConectaRef.current.play().catch(err => console.error('Erro ao tocar vídeo:', err));
+        } else if (faseAtual === FASES.TUTORIAL_CACAPALAVRAS && videoCacaPalavrasRef.current) {
+          videoCacaPalavrasRef.current.play().catch(err => console.error('Erro ao tocar vídeo:', err));
+        }
+      }, 100);
+    }
+  }, [faseAtual, pauseMusic]);
 
   const iniciarTimer = () => {
     setPodeNavegar(false);
@@ -131,6 +154,7 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
         setFaseAtual(FASES.IMAGENS);
         setImagemAtual(20);
         setPodeNavegar(true);
+        resumeMusic(); // Retomar música ao voltar para imagens
       }
     }
   };
@@ -151,6 +175,7 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       // Voltar do Tutorial Conecta para a imagem 20 (índice 19)
       setFaseAtual(FASES.IMAGENS);
       setImagemAtual(19);
+      resumeMusic(); // Retomar música ao voltar para imagens
     }
   };
 
@@ -257,7 +282,19 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
                 height: '100vh',
                 objectFit: 'contain'
               }}
-              onEnded={() => handleVideoConcluido('conecta')}
+              onLoadedData={() => {
+                console.log('Vídeo Conecta carregado - pausando música');
+                pauseMusic();
+              }}
+              onPlay={() => {
+                console.log('Vídeo Conecta iniciou - pausando música');
+                pauseMusic();
+              }}
+              onEnded={() => {
+                console.log('Vídeo Conecta terminou - retomando música');
+                handleVideoConcluido('conecta');
+                resumeMusic();
+              }}
               onError={(e) => {
                 console.error('Erro ao carregar vídeo:', e.target.src);
               }}
@@ -314,7 +351,19 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
                 height: '100vh',
                 objectFit: 'contain'
               }}
-              onEnded={() => handleVideoConcluido('cacaPalavras')}
+              onLoadedData={() => {
+                console.log('Vídeo Caça-palavras carregado - pausando música');
+                pauseMusic();
+              }}
+              onPlay={() => {
+                console.log('Vídeo Caça-palavras iniciou - pausando música');
+                pauseMusic();
+              }}
+              onEnded={() => {
+                console.log('Vídeo Caça-palavras terminou - retomando música');
+                handleVideoConcluido('cacaPalavras');
+                resumeMusic();
+              }}
               onError={(e) => {
                 console.error('Erro ao carregar vídeo:', e.target.src);
               }}

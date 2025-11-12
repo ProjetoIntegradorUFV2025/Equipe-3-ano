@@ -21,19 +21,23 @@ export const AudioProvider = ({ children }) => {
     audioRef.current = new Audio(musicaFundo);
     audioRef.current.loop = true;
     audioRef.current.volume = volume;
+    
+    console.log('AudioContext: Áudio criado e configurado');
 
     // Tentar reproduzir automaticamente
     const playAudio = async () => {
       try {
         await audioRef.current.play();
         setIsPlaying(true);
+        console.log('AudioContext: Música iniciada com sucesso');
       } catch (error) {
-        console.log('Autoplay bloqueado. Aguardando interação do usuário.');
+        console.log('AudioContext: Autoplay bloqueado. Aguardando interação do usuário.');
         // Adicionar listener para primeira interação
         const startAudio = async () => {
           try {
             await audioRef.current.play();
             setIsPlaying(true);
+            console.log('AudioContext: Música iniciada após interação');
             document.removeEventListener('click', startAudio);
           } catch (err) {
             console.error('Erro ao iniciar áudio:', err);
@@ -49,6 +53,7 @@ export const AudioProvider = ({ children }) => {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
+        console.log('AudioContext: Áudio destruído');
       }
     };
   }, []);
@@ -71,13 +76,33 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
+  const pauseMusic = () => {
+    if (audioRef.current) {
+      console.log('AudioContext: Pausando música - isPlaying:', isPlaying);
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      console.log('AudioContext: audioRef.current não existe');
+    }
+  };
+
+  const resumeMusic = () => {
+    if (audioRef.current) {
+      console.log('AudioContext: Retomando música - isPlaying:', isPlaying);
+      audioRef.current.play().catch(err => console.error('Erro ao retomar música:', err));
+      setIsPlaying(true);
+    } else {
+      console.log('AudioContext: audioRef.current não existe para retomar');
+    }
+  };
+
   const changeVolume = (newVolume) => {
     const vol = Math.max(0, Math.min(1, newVolume));
     setVolume(vol);
   };
 
   return (
-    <AudioContext.Provider value={{ volume, changeVolume, isPlaying, togglePlay }}>
+    <AudioContext.Provider value={{ volume, changeVolume, isPlaying, togglePlay, pauseMusic, resumeMusic }}>
       {children}
     </AudioContext.Provider>
   );
