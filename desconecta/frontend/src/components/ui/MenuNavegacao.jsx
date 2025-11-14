@@ -106,7 +106,7 @@ const MenuNavegacao = ({
           >
             {/* Container dos botões com distância regulável do topo */}
             <div 
-              className="flex flex-col space-y-4 px-6"
+              className="flex flex-col space-y-1 px-6"
               style={{ marginTop: `${distanciaDoTopo}px` }}
             >
               {/* Botão 1: Voltar à Trilha */}
@@ -115,7 +115,7 @@ const MenuNavegacao = ({
                   if (onVoltarTrilha) onVoltarTrilha();
                   setMenuAberto(false);
                 }}
-                className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
+                className="w-full py-2 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
                 style={{ 
                   backgroundColor: 'transparent',
                   border: '2px solid transparent',
@@ -156,7 +156,7 @@ const MenuNavegacao = ({
                     onAbrirRanking();
                   }
                 }}
-                className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
+                className="w-full py-2 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
                 style={{ 
                   backgroundColor: 'transparent',
                   border: '2px solid transparent',
@@ -207,7 +207,7 @@ const MenuNavegacao = ({
                   // Redirecionar para tela inicial (recarregar página para resetar estado)
                   window.location.href = '/';
                 }}
-                className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
+                className="w-full py-2 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
                 style={{ 
                   backgroundColor: 'transparent',
                   border: '2px solid transparent',
@@ -245,7 +245,7 @@ const MenuNavegacao = ({
                   setTutorialPopupAberto(true);
                   setMenuAberto(false);
                 }}
-                className="w-full py-4 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
+                className="w-full py-2 px-6 text-white text-3xl font-semibold transition-all duration-200 rounded-lg flex items-center justify-start"
                 style={{ 
                   backgroundColor: 'transparent',
                   border: '2px solid transparent',
@@ -278,7 +278,7 @@ const MenuNavegacao = ({
               </button>
 
               {/* Botão 5: Controle de Áudio */}
-              <div className="w-full py-4 px-6 rounded-lg flex items-center justify-start transition-all duration-200"
+              <div className="w-full py-2 px-6 rounded-lg flex items-center justify-start transition-all duration-200"
                 style={{ 
                   backgroundColor: 'transparent',
                   border: '2px solid transparent'
