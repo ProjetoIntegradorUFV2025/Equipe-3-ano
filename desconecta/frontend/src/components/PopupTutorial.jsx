@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useAudio } from '../contexts/AudioContext';
 import arrowLeftCircle from '../assets/Arrow - Left Circle.png';
 
 // Importar vídeos dos tutoriais
@@ -9,6 +10,7 @@ import tutorialCacaPalavras from '../assets/Dadolandia/Tutorial Caça-palavras.m
 const PopupTutorial = ({ isOpen, onClose, tipoTutorial = "todos" }) => {
   const [tutorialAtual, setTutorialAtual] = useState(0);
   const videoRef = useRef(null);
+  const { pauseMusic, resumeMusic } = useAudio();
 
   // Array com TODOS os tutoriais disponíveis
   const todosTutoriais = [
@@ -45,6 +47,7 @@ const PopupTutorial = ({ isOpen, onClose, tipoTutorial = "todos" }) => {
   // Fechar popup ao clicar no overlay
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
+      resumeMusic(); // Retomar música ao fechar
       onClose();
     }
   };
@@ -56,6 +59,22 @@ const PopupTutorial = ({ isOpen, onClose, tipoTutorial = "todos" }) => {
       videoRef.current.play();
     }
   }, [tutorialAtual]);
+
+  // Pausar música quando o popup abre, retomar quando fecha
+  useEffect(() => {
+    if (isOpen) {
+      pauseMusic();
+    } else {
+      resumeMusic();
+    }
+    
+    // Cleanup: retomar música quando componente desmonta
+    return () => {
+      if (isOpen) {
+        resumeMusic();
+      }
+    };
+  }, [isOpen, pauseMusic, resumeMusic]);
 
   if (!isOpen) {
     return null;
@@ -99,6 +118,8 @@ const PopupTutorial = ({ isOpen, onClose, tipoTutorial = "todos" }) => {
             autoPlay
             loop
             className="max-w-full max-h-full object-contain"
+            onPlay={() => pauseMusic()}
+            onEnded={() => resumeMusic()}
             onError={(e) => {
               console.error('Erro ao carregar vídeo:', e.target.src);
             }}
@@ -107,7 +128,10 @@ const PopupTutorial = ({ isOpen, onClose, tipoTutorial = "todos" }) => {
 
         {/* Botão Fechar (X) */}
         <button
-          onClick={onClose}
+          onClick={() => {
+            resumeMusic();
+            onClose();
+          }}
           className="absolute top-4 right-4 text-white font-bold w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-200"
           style={{ 
             fontSize: 'min(20px, 2vw)',

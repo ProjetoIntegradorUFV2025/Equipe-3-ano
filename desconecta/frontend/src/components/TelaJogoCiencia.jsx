@@ -7,38 +7,39 @@ import ConectaCiencia from './ConectaCiencia';
 import arrowLeftCircle from '../assets/Arrow - Left Circle.png';
 
 // Importar todas as imagens estaticamente da pasta HistoriaCiencia
-import img1 from '../assets/HistoriaCiencia/Quadro 1.gif';
-import img2 from '../assets/HistoriaCiencia/Quadro 2.gif';
-import img3 from '../assets/HistoriaCiencia/Quadro 3.gif';
-import img4 from '../assets/HistoriaCiencia/Quadro 4.gif';
-import img5 from '../assets/HistoriaCiencia/Quadro 5.gif';
-import img6 from '../assets/HistoriaCiencia/Quadro 6.gif';
-import img7 from '../assets/HistoriaCiencia/Quadro 7.gif';
-import img8 from '../assets/HistoriaCiencia/Quadro 8.gif';
-import img9 from '../assets/HistoriaCiencia/Quadro 9.gif';
-import img10 from '../assets/HistoriaCiencia/Quadro 10.gif';
-import img11 from '../assets/HistoriaCiencia/Quadro 11.gif';
-import img12 from '../assets/HistoriaCiencia/Quadro 12.gif';
-import img13 from '../assets/HistoriaCiencia/Quadro 13.gif';
-import img14 from '../assets/HistoriaCiencia/Quadro 14.gif';
-import img15 from '../assets/HistoriaCiencia/Quadro 15.gif';
-import img16 from '../assets/HistoriaCiencia/Quadro 16.gif';
-import img17 from '../assets/HistoriaCiencia/Quadro 17.gif';
-import img18 from '../assets/HistoriaCiencia/Quadro 18.gif';
-import img19 from '../assets/HistoriaCiencia/Quadro 19.gif';
-import img20 from '../assets/HistoriaCiencia/Quadro 20.gif';
-import img21 from '../assets/HistoriaCiencia/Quadro 21.gif';
-import img22 from '../assets/HistoriaCiencia/Quadro 22.gif';
-import img23 from '../assets/HistoriaCiencia/Quadro 23.gif';
-import img24 from '../assets/HistoriaCiencia/Quadro 28.gif';
-import img25 from '../assets/HistoriaCiencia/Quadro 23.gif';
-import img26 from '../assets/HistoriaCiencia/Quadro 28.gif';
+import img1 from '../assets/HistoriaCiencia/Quadro_1_Ciencias.gif';
+import img2 from '../assets/HistoriaCiencia/Quadro_2_Ciencias.gif';
+import img3 from '../assets/HistoriaCiencia/Quadro_3_Ciencias.gif';
+import img4 from '../assets/HistoriaCiencia/Quadro_4_Ciencias.gif';
+import img5 from '../assets/HistoriaCiencia/Quadro_5_Ciencias.gif';
+import img6 from '../assets/HistoriaCiencia/Quadro_6_Ciencias.gif';
+import img7 from '../assets/HistoriaCiencia/Quadro_7_Ciencias.gif';
+import img8 from '../assets/HistoriaCiencia/Quadro_8_Ciencias.gif';
+import img9 from '../assets/HistoriaCiencia/Quadro_9_Ciencias.gif';
+import img10 from '../assets/HistoriaCiencia/Quadro_10_Ciencias.gif';
+import img11 from '../assets/HistoriaCiencia/Quadro_11_Ciencias.gif';
+import img12 from '../assets/HistoriaCiencia/Quadro_12_Ciencias.gif';
+import img13 from '../assets/HistoriaCiencia/Quadro_13_Ciencias.gif';
+import img14 from '../assets/HistoriaCiencia/Quadro_14_Ciencias.gif';
+import img15 from '../assets/HistoriaCiencia/Quadro_15_Ciencias.gif';
+import img16 from '../assets/HistoriaCiencia/Quadro_16_Ciencias.gif';
+import img17 from '../assets/HistoriaCiencia/Quadro_17_Ciencias.gif';
+import img18 from '../assets/HistoriaCiencia/Quadro_18_Ciencias.gif';
+import img19 from '../assets/HistoriaCiencia/Quadro_19_Ciencias.gif';
+import img20 from '../assets/HistoriaCiencia/Quadro_20_Ciencias.gif';
+import img21 from '../assets/HistoriaCiencia/Quadro_21_Ciencias.gif';
+import img22 from '../assets/HistoriaCiencia/Quadro_22_Ciencias.gif';
+import img23 from '../assets/HistoriaCiencia/Quadro_23_Ciencias.gif';
+import img24 from '../assets/HistoriaCiencia/Quadro_24_Ciencias.gif';
+import img25 from '../assets/HistoriaCiencia/Quadro_25_Ciencias.gif';
+import img26 from '../assets/HistoriaCiencia/Quadro_26_Ciencias.gif';
+import img27 from '../assets/HistoriaCiencia/Quadro_27_Ciencias.gif';
 
 // Array com todas as imagens em ordem (filtra apenas as que foram importadas com sucesso)
 const imagens = [
   img1, img2, img3, img4, img5, img6, img7, img8, img9, img10,
   img11, img12, img13, img14, img15, img16, img17, img18, img19, img20,
-  img21, img22, img23, img24, img25, img26
+  img21, img22, img23, img24, img25, img26, img27
 ].filter(img => img !== undefined);
 
 // --- Componente: Tela Jogo Ciência ---
@@ -101,6 +102,10 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       setImagemAtual(prev => prev - 1);
       // Não inicia timer para voltar - deixa livre
     }
+  };
+
+  const irParaConectaCiencia = () => {
+    setMostrarConectaCiencia(true);
   };
 
   // Se deve mostrar a tela ConectaCiencia, renderizar ConectaCiencia
@@ -202,6 +207,16 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
           alt="Seta próxima" 
           className="w-full h-full object-contain"
         />
+      </button>
+
+      {/* Botão para ir direto ao Conecta Ciência */}
+      <button
+        onClick={irParaConectaCiencia}
+        className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 z-20 flex items-center gap-3"
+      >
+        <span className="text-lg">🧪</span>
+        <span className="text-xl">Ir para Conecta Ciência</span>
+        <span className="text-lg">🔬</span>
       </button>
     </main>
   );

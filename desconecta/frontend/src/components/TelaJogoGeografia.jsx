@@ -172,6 +172,18 @@ const TelaJogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => 
         )}
       </div>
 
+      {/* Botão para ir direto ao JogoGeografia (Debug/Teste) */}
+      <button
+        onClick={() => setMostrarJogoGeografia(true)}
+        className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-all duration-300 z-30 flex items-center gap-2"
+        style={{
+          fontSize: 'clamp(14px, 2vw, 18px)'
+        }}
+      >
+        <span>🎮</span>
+        <span>Ir para Caça-Palavras</span>
+      </button>
+
       {/* Botão Anterior - Extremo esquerdo */}
       {/* Desabilitado apenas na imagem 23 (índice 22) - imediatamente após o jogo */}
       <button
