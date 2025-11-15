@@ -109,7 +109,7 @@ public class ControladorIlhas {
             // 6. Verifica se o aluno já está na última ilha.
             EnumNomeIlha[] todasAsIlhas = EnumNomeIlha.values();
             if (posicaoAtual >= todasAsIlhas.length - 1) {
-                System.out.println("Aluno já está na última ilha, não pode avançar.");
+                //System.out.println("Aluno já está na última ilha, não pode avançar.");
                 // Mesmo estando na última ilha, ainda salvamos a alteração de 'foiJogada'.
                 acessoBDProgressoAluno.salvarProgressoAluno(progresso);
                 return -1;

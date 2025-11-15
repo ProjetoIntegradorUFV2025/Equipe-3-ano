@@ -25,8 +25,8 @@ public class ControladorClassificacao {
   public List<ClassificacaoDTO> buscarClassificacaoGeral() {
     List<ClassificacaoDTO> listaClassificacaoGeral = acessoBDProgressoAluno.obterClassificacaoGeralOrdenada();
     for (ClassificacaoDTO progresso : listaClassificacaoGeral) {
-      System.out.println("Nome: " + progresso.getNomeAluno() +
-          " Pontuação: " + progresso.getPontuacaoTotalAluno());
+      //System.out.println("Nome: " + progresso.getNomeAluno() +
+      //    " Pontuação: " + progresso.getPontuacaoTotalAluno());
     }
     return listaClassificacaoGeral;
   }
@@ -45,8 +45,8 @@ public class ControladorClassificacao {
         resultado.put("nomeAluno", classificacao.getNomeAluno());
         resultado.put("pontuacaoTotalAluno", classificacao.getPontuacaoTotalAluno());
 
-        System.out.println("Classificação do aluno '" + apelidoAluno + "': " +
-            "Posição: " + (i + 1) + ", Pontuação: " + classificacao.getPontuacaoTotalAluno());
+        //System.out.println("Classificação do aluno '" + apelidoAluno + "': " +
+        //    "Posição: " + (i + 1) + ", Pontuação: " + classificacao.getPontuacaoTotalAluno());
 
         return resultado;
       }

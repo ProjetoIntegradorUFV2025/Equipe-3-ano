@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MenuNavegacao from './ui/MenuNavegacao';
 import TelaPontuacao from './TelaPontuacao';
-// import MinijogoMatematica from './MinijogoMatematica'; // TODO: Descomentar quando o minijogo for criado
+import JogoMatematica from './JogoMatematica';
 
 // Importar imagem da seta
 import arrowLeftCircle from '../assets/Arrow - Left Circle.png';
@@ -48,12 +48,12 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) =>
   const [podeNavegar, setPodeNavegar] = useState(true);
   const [tempoRestante, setTempoRestante] = useState(0);
   const [mostrarPontuacao, setMostrarPontuacao] = useState(false);
-  const [mostrarMinijogo, setMostrarMinijogo] = useState(false);
+  const [mostrarJogoMatematica, setMostrarJogoMatematica] = useState(false);
   const [jogoMatematicaConcluido, setJogoMatematicaConcluido] = useState(false);
 
   // Debug: verificar se as imagens foram carregadas
-  console.log('Total de imagens carregadas:', imagens.length);
-  console.log('Imagem atual:', imagens[imagemAtual]);
+  // console.log('Total de imagens carregadas:', imagens.length);
+  // console.log('Imagem atual:', imagens[imagemAtual]);
 
   // Cleanup dos timers quando o componente for desmontado
   useEffect(() => {
@@ -82,46 +82,47 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) =>
 
   const proximaImagem = () => {
     if (podeNavegar && imagemAtual < imagens.length - 1) {
-      // TODO: Ajustar o índice quando souber em qual imagem o jogo deve aparecer
-      // Por enquanto, não há redirecionamento para o jogo no meio das imagens
-      setImagemAtual(prev => prev + 1);
-      iniciarTimer();
+      // Se estamos na imagem 25 (índice 24), ir para JogoMatematica
+      if (imagemAtual === 24) {
+        setMostrarJogoMatematica(true);
+      } else {
+        setImagemAtual(prev => prev + 1);
+        iniciarTimer();
+      }
     } else if (podeNavegar && imagemAtual === imagens.length - 1) {
-      // Última imagem - redirecionar para o Minijogo
-      setMostrarMinijogo(true);
+      // Última imagem - redirecionar para pontuação
+      setMostrarPontuacao(true);
     }
   };
 
   const imagemAnterior = () => {
-    // TODO: Quando o jogo for implementado, adicionar lógica para bloquear
-    // o botão voltar na imagem imediatamente após o jogo
-    // Exemplo: if (imagemAtual > 0 && imagemAtual !== imagemAposJogo)
-    if (imagemAtual > 0) {
+    // Permite voltar em todas as imagens, EXCETO na imagem 26 (índice 25)
+    // que é a imagem imediatamente após o jogo JogoMatematica
+    if (imagemAtual > 0 && imagemAtual !== 25) {
       setImagemAtual(prev => prev - 1);
       // Não inicia timer para voltar - deixa livre
     }
   };
 
-  // TODO: Quando o minijogo for criado, descomentar este bloco
-  // Se deve mostrar o minijogo, renderizar MinijogoMatematica
-  // if (mostrarMinijogo) {
-  //   return (
-  //     <MinijogoMatematica 
-  //       onVoltarTrilha={onVoltarTrilha} 
-  //       onVoltarMenu={onVoltarMenu}
-  //       onAbrirRanking={onAbrirRanking}
-  //       onConcluido={() => {
-  //         // Após concluir o jogo, voltar para a próxima imagem após o jogo
-  //         setImagemAtual(imagemAposJogo); // TODO: definir índice correto
-  //         setMostrarMinijogo(false);
-  //         setJogoMatematicaConcluido(true);
-  //       }}
-  //     />
-  //   );
-  // }
+  // Se deve mostrar a tela JogoMatematica, renderizar JogoMatematica
+  if (mostrarJogoMatematica) {
+    return (
+      <JogoMatematica 
+        onVoltarTrilha={onVoltarTrilha} 
+        onVoltarMenu={onVoltarMenu}
+        onAbrirRanking={onAbrirRanking}
+        onConcluido={() => {
+          // Após concluir o jogo, voltar para img26 (índice 25)
+          setImagemAtual(25);
+          setMostrarJogoMatematica(false);
+          setJogoMatematicaConcluido(true);
+        }}
+      />
+    );
+  }
 
-  // TEMPORÁRIO: Enquanto o minijogo não existe, vai direto para pontuação
-  if (mostrarMinijogo || mostrarPontuacao) {
+  // Se deve mostrar a tela de pontuação, renderizar TelaPontuacao
+  if (mostrarPontuacao) {
     // Matemática corresponde ao enum posição 2 (0=DADOLANDIA, 1=CIENCIAS, 2=MATEMATICA, 3=GEOGRAFIA, 4=HISTORIA)
     return <TelaPontuacao 
       onVoltarTrilha={onVoltarTrilha} 
@@ -169,6 +170,18 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) =>
         )}
       </div>
 
+      {/* Botão para ir direto ao JogoMatematica (Debug/Teste) */}
+      {/* <button */}
+      {/*   onClick={() => setMostrarJogoMatematica(true)} */}
+      {/*   className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-all duration-300 z-30 flex items-center gap-2" */}
+      {/*   style={{ */}
+      {/*     fontSize: 'clamp(14px, 2vw, 18px)' */}
+      {/*   }} */}
+      {/* > */}
+      {/*   <span>🎮</span> */}
+      {/*   <span>Ir para Caça-Palavras</span> */}
+      {/* </button> */}
+
       {/* Botão Anterior - Extremo esquerdo */}
       <button
         onClick={imagemAnterior}
@@ -202,20 +215,6 @@ const TelaJogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) =>
           className="w-full h-full object-contain"
         />
       </button>
-
-      {/* Botão para ir direto para o Minijogo */}
-      {/* <button */}
-      {/*   onClick={() => setMostrarMinijogo(true)} */}
-      {/*   className="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl z-20 border-2 border-blue-400" */}
-      {/*   style={{  */}
-      {/*     backgroundColor: '#2563EB', */}
-      {/*     boxShadow: '0 10px 30px rgba(37, 99, 235, 0.3)' */}
-      {/*   }} */}
-      {/*   onMouseEnter={(e) => e.target.style.backgroundColor = '#1D4ED8'} */}
-      {/*   onMouseLeave={(e) => e.target.style.backgroundColor = '#2563EB'} */}
-      {/* > */}
-      {/*   🎯 Ir para o Jogo */}
-      {/* </button> */}
     </main>
   );
 };

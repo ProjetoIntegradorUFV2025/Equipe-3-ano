@@ -12,7 +12,7 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
   const [mostrarPopupErro, setMostrarPopupErro] = useState(false);
 
   const handleLogin = async () => {
-    console.log('Dados do login:', { apelido, senha });
+    // console.log('Dados do login:', { apelido, senha });
     
     // Validação básica
     if (!apelido || !senha) {
@@ -23,13 +23,13 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
     // --- MODO DE TESTE ---
     // Se o apelido for "teste" e a senha "123", o login é bem-sucedido
     // e a chamada para a API é ignorada.
-    if (apelido === 'teste' && senha === '123') {
-      console.log('Login de teste realizado com sucesso!');
-      setApelido('');
-      setSenha('');
-      irParaJogo(); // Navega para a próxima tela
-      return; // Para a execução da função aqui
-    } 
+    // if (apelido === 'teste' && senha === '123') {
+    //   // console.log('Login de teste realizado com sucesso!');
+    //   setApelido('');
+    //   setSenha('');
+    //   irParaJogo(); // Navega para a próxima tela
+    //   return; // Para a execução da função aqui
+    // } 
     
 
     try {
@@ -53,7 +53,7 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
       if (response.ok) {
         const alunoId = await response.json();
         if (alunoId !== 0) {
-          console.log('Login realizado com sucesso! ID do aluno:', alunoId);
+          // console.log('Login realizado com sucesso! ID do aluno:', alunoId);
           
           // Armazenar o ID do aluno no localStorage para uso em outras telas
           localStorage.setItem('alunoId', alunoId.toString());
@@ -66,7 +66,7 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
           // Redireciona diretamente para a tela do jogo
           irParaJogo();
         } else {
-          console.log('Credenciais inválidas');
+          // console.log('Credenciais inválidas');
           setMostrarPopupErro(true);
         }
       } else {
@@ -79,7 +79,7 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
   };
 
   const handleIrParaCadastro = () => {
-    console.log('Indo para tela de cadastro...');
+    // console.log('Indo para tela de cadastro...');
     irParaCadastro();
   };
 

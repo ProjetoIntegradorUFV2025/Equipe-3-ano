@@ -88,15 +88,12 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
     definirLetraPorCoordenada(6, 5, 'L');
     
     // Exemplo: inserir "MUNDO" verticalmente
-    definirLetraPorCoordenada(0, 2, 'F');
-    definirLetraPorCoordenada(0, 3, 'L');
-    definirLetraPorCoordenada(0, 4, 'O');
-    definirLetraPorCoordenada(0, 5, 'R');
-    definirLetraPorCoordenada(0, 6, 'E');
-    definirLetraPorCoordenada(0, 7, 'S');
-    definirLetraPorCoordenada(0, 8, 'T');
-    definirLetraPorCoordenada(0, 9, 'A');
-    definirLetraPorCoordenada(0, 10, 'L');
+    definirLetraPorCoordenada(0, 2, 'J');
+    definirLetraPorCoordenada(0, 3, 'A');
+    definirLetraPorCoordenada(0, 4, 'T');
+    definirLetraPorCoordenada(0, 5, 'O');
+    definirLetraPorCoordenada(0, 6, 'B');
+    definirLetraPorCoordenada(0, 7, 'A');
 
     definirLetraPorCoordenada(4, 0, 'G');
     definirLetraPorCoordenada(4, 1, 'O');
@@ -159,9 +156,9 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
     setBotoesClicados(novosBotoesClicados);
     setStringIndices(novaStringOrdenada);
     
-    console.log(`Botão ${index} ${botoesClicados.has(index) ? 'desmarcado' : 'marcado'}`);
-    console.log(`Total selecionados: ${novosBotoesClicados.size}`);
-    console.log(`String ordenada: ${novaStringOrdenada}`);
+    // console.log(`Botão ${index} ${botoesClicados.has(index) ? 'desmarcado' : 'marcado'}`);
+    // console.log(`Total selecionados: ${novosBotoesClicados.size}`);
+    // console.log(`String ordenada: ${novaStringOrdenada}`);
   };
 
   // Função para verificar resposta na API
@@ -170,7 +167,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
     if (stringIndices === '') return;
 
     try {
-      console.log('Enviando string de índices para a API:', stringIndices);
+      // console.log('Enviando string de índices para a API:', stringIndices);
 
       const params = new URLSearchParams();
       params.append('tipoDesafio', 'JogoPalavras');
@@ -184,7 +181,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
       });
       
       const resultado = await response.text();
-      console.log('Resposta da API:', resultado);
+      // console.log('Resposta da API:', resultado);
 
       if (resultado === 'True') {
         // Resposta correta - transformar botões vermelhos em azuis e bloquear
@@ -200,7 +197,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
           
           // Verificar se completou todas as palavras
           if (novaQuantidade >= totalPalavras) {
-            console.log('Jogo completo! Salvando pontuação e redirecionando...');
+            // console.log('Jogo completo! Salvando pontuação e redirecionando...');
             
             setTimeout(async () => {
               // Calcular tempo final em segundos
@@ -211,7 +208,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                 
                 if (alunoId) {
                   // PRIMEIRO: Verificar se o desafio já foi concluído
-                  console.log('🔍 Verificando se desafio já foi concluído...');
+                  // console.log('🔍 Verificando se desafio já foi concluído...');
                   const responseVerificar = await fetch(
                     // `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA`
                     `${window.location.origin}/desconecta/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA`
@@ -222,13 +219,13 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                   }
                   
                   const desafioConcluido = await responseVerificar.json();
-                  console.log('Status do desafio:', desafioConcluido ? '✅ Já concluído' : '⏳ Não concluído');
+                  // console.log('Status do desafio:', desafioConcluido ? '✅ Já concluído' : '⏳ Não concluído');
                   
                   let pontuacaoCalculada = 0;
                   
                   // SEGUNDO: Salvar pontuação APENAS se o desafio NÃO foi concluído
                   if (!desafioConcluido) {
-                    console.log('💾 Salvando pontuação (primeira vez)...');
+                    // console.log('💾 Salvando pontuação (primeira vez)...');
                     const responsePontuacao = await fetch(
                       // `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
                       `${window.location.origin}/desconecta/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
@@ -242,7 +239,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                     
                     if (responsePontuacao.ok) {
                       pontuacaoCalculada = await responsePontuacao.json();
-                      console.log('✅ Pontuação calculada e salva:', pontuacaoCalculada);
+                      // console.log('✅ Pontuação calculada e salva:', pontuacaoCalculada);
 
                       // Calcular pontuação total do aluno
                       const apelidoAluno = localStorage.getItem('apelidoAluno');
@@ -261,14 +258,14 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                       console.error('Resposta do servidor:', errorText);
                       
                       if (errorText === '-2') {
-                        console.log('⚠️ Desafio já estava concluído (código -2)');
+                        // console.log('⚠️ Desafio já estava concluído (código -2)');
                         pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
                         pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
                       }
                     }
                   } else {
-                    console.log('⚠️ Desafio já foi concluído anteriormente. Pontuação NÃO será salva.');
-                    console.log('Calculando pontuação apenas para exibição...');
+                    // console.log('⚠️ Desafio já foi concluído anteriormente. Pontuação NÃO será salva.');
+                    // console.log('Calculando pontuação apenas para exibição...');
                     pontuacaoCalculada = 1000 - (tempoFinal * 2) - (numeroErros * 50);
                     pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
                   }

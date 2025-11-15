@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MenuNavegacao from './ui/MenuNavegacao';
 import TelaPontuacao from './TelaPontuacao';
+import { useAudio } from '../contexts/AudioContext';
 
 // Importar imagem da seta
 import arrowLeftCircle from '../assets/Arrow - Left Circle.png';
@@ -28,6 +29,8 @@ import img19 from '../assets/Dadolandia/Dadolandia Quadro 19.gif';
 import img20 from '../assets/Dadolandia/Dadolandia Quadro 20.gif';
 import img21 from '../assets/Dadolandia/Dadolandia Quadro 21.gif';
 import img22 from '../assets/Dadolandia/Dadolandia Quadro 22.gif';
+import img23 from '../assets/Dadolandia/Dadolandia Quadro 23.gif';
+import img24 from '../assets/Dadolandia/Dadolandia Quadro 24.gif';
 
 // Importar vídeos dos tutoriais
 import tutorialConecta from '../assets/Dadolandia/Tutorial Conecta Dadolandia  .mp4';
@@ -37,7 +40,7 @@ import tutorialCacaPalavras from '../assets/Dadolandia/Tutorial Caça-palavras.m
 const imagens = [
   img1, img2, img3, img4, img5, img6, img7, img8, img9, img10,
   img11, img12, img13, img14, img15, img16, img17, img18, img19, img20,
-  img21, img22
+  img21, img22, img23, img24
 ].filter(img => img !== undefined);
 
 // Estados para as fases
@@ -57,15 +60,20 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const [mostrarPontuacao, setMostrarPontuacao] = useState(false);
   const [tutorialConectaConcluido, setTutorialConectaConcluido] = useState(false);
   const [tutorialCacaPalavrasConcluido, setTutorialCacaPalavrasConcluido] = useState(false);
+  const [videoConectaJaTocou, setVideoConectaJaTocou] = useState(false);
+  const [videoCacaPalavrasJaTocou, setVideoCacaPalavrasJaTocou] = useState(false);
 
   // Refs para os vídeos
   const videoConectaRef = useRef(null);
   const videoCacaPalavrasRef = useRef(null);
 
+  // Hook para controlar áudio de fundo
+  const { pauseMusic, resumeMusic } = useAudio();
+
   // Debug: verificar se as imagens foram carregadas
-  console.log('Total de imagens carregadas:', imagens.length);
-  console.log('Imagem atual:', imagens[imagemAtual]);
-  console.log('Fase atual:', faseAtual);
+  // console.log('Total de imagens carregadas:', imagens.length);
+  // console.log('Imagem atual:', imagens[imagemAtual]);
+  // console.log('Fase atual:', faseAtual);
 
   // Cleanup dos timers quando o componente for desmontado
   useEffect(() => {
@@ -75,6 +83,36 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       setTempoRestante(0);
     };
   }, []);
+
+  // Controlar música baseado na fase atual
+  useEffect(() => {
+    // console.log('TelaDadolandia: Fase mudou para', faseAtual);
+    if (faseAtual === FASES.TUTORIAL_CONECTA) {
+      // Pausar música ao entrar em fase de tutorial
+      // console.log('TelaDadolandia: Chamando pauseMusic()');
+      pauseMusic();
+      
+      // Tocar vídeo automaticamente apenas na primeira vez
+      if (!videoConectaJaTocou && videoConectaRef.current) {
+        setTimeout(() => {
+          videoConectaRef.current?.play().catch(err => console.error('Erro ao tocar vídeo:', err));
+          setVideoConectaJaTocou(true);
+        }, 100);
+      }
+    } else if (faseAtual === FASES.TUTORIAL_CACAPALAVRAS) {
+      // Pausar música ao entrar em fase de tutorial
+      // console.log('TelaDadolandia: Chamando pauseMusic()');
+      pauseMusic();
+      
+      // Tocar vídeo automaticamente apenas na primeira vez
+      if (!videoCacaPalavrasJaTocou && videoCacaPalavrasRef.current) {
+        setTimeout(() => {
+          videoCacaPalavrasRef.current?.play().catch(err => console.error('Erro ao tocar vídeo:', err));
+          setVideoCacaPalavrasJaTocou(true);
+        }, 100);
+      }
+    }
+  }, [faseAtual, pauseMusic, videoConectaJaTocou, videoCacaPalavrasJaTocou]);
 
   const iniciarTimer = () => {
     setPodeNavegar(false);
@@ -95,10 +133,10 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const handleVideoConcluido = (tipoVideo) => {
     if (tipoVideo === 'conecta') {
       setTutorialConectaConcluido(true);
-      console.log('Tutorial Conecta concluído!');
+      // console.log('Tutorial Conecta concluído!');
     } else if (tipoVideo === 'cacaPalavras') {
       setTutorialCacaPalavrasConcluido(true);
-      console.log('Tutorial Caça-palavras concluído!');
+      // console.log('Tutorial Caça-palavras concluído!');
     }
   };
 
@@ -129,6 +167,7 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
         setFaseAtual(FASES.IMAGENS);
         setImagemAtual(20);
         setPodeNavegar(true);
+        resumeMusic(); // Retomar música ao voltar para imagens
       }
     }
   };
@@ -149,6 +188,7 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       // Voltar do Tutorial Conecta para a imagem 20 (índice 19)
       setFaseAtual(FASES.IMAGENS);
       setImagemAtual(19);
+      resumeMusic(); // Retomar música ao voltar para imagens
     }
   };
 
@@ -248,14 +288,25 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
               ref={videoConectaRef}
               src={tutorialConecta}
               controls
-              autoPlay
               className="max-w-full max-h-full object-contain"
               style={{
                 width: '100vw',
                 height: '100vh',
                 objectFit: 'contain'
               }}
-              onEnded={() => handleVideoConcluido('conecta')}
+              onLoadedData={() => {
+                // console.log('Vídeo Conecta carregado - pausando música');
+                pauseMusic();
+              }}
+              onPlay={() => {
+                // console.log('Vídeo Conecta iniciou - pausando música');
+                pauseMusic();
+              }}
+              onEnded={() => {
+                // console.log('Vídeo Conecta terminou - retomando música');
+                handleVideoConcluido('conecta');
+                resumeMusic();
+              }}
               onError={(e) => {
                 console.error('Erro ao carregar vídeo:', e.target.src);
               }}
@@ -305,14 +356,25 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
               ref={videoCacaPalavrasRef}
               src={tutorialCacaPalavras}
               controls
-              autoPlay
               className="max-w-full max-h-full object-contain"
               style={{
                 width: '100vw',
                 height: '100vh',
                 objectFit: 'contain'
               }}
-              onEnded={() => handleVideoConcluido('cacaPalavras')}
+              onLoadedData={() => {
+                // console.log('Vídeo Caça-palavras carregado - pausando música');
+                pauseMusic();
+              }}
+              onPlay={() => {
+                // console.log('Vídeo Caça-palavras iniciou - pausando música');
+                pauseMusic();
+              }}
+              onEnded={() => {
+                // console.log('Vídeo Caça-palavras terminou - retomando música');
+                handleVideoConcluido('cacaPalavras');
+                resumeMusic();
+              }}
               onError={(e) => {
                 console.error('Erro ao carregar vídeo:', e.target.src);
               }}

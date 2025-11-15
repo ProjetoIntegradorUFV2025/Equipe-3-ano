@@ -10,6 +10,8 @@ import TelaJogoCiencia from './TelaJogoCiencia';
 import TelaDadolandia from './TelaDadolandia';
 import TelaJogoGeografia from './TelaJogoGeografia';
 import TelaJogoMatematica from './TelaJogoMatematica';
+import TelaJogoHistoria from './TelaJogoHistoria';
+import ConectaHistoria from './ConectaHistoria';
 import TelaPontuacao from './TelaPontuacao';
 import useAlunoLogado from '../hooks/useAlunoLogado';
 import MenuNavegacao from './ui/MenuNavegacao';
@@ -18,7 +20,7 @@ import MenuNavegacao from './ui/MenuNavegacao';
 // --- Componente: Tela Trilha ---
 const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
-  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', ou 'pontuacao'
+  const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', 'historia', ou 'pontuacao'
   const [nomeIlhaJogada, setNomeIlhaJogada] = useState(null); // Rastreia qual ilha foi jogada
   const [popupDadolandiaAberto, setPopupDadolandiaAberto] = useState(false);
   const [popupCienciaAberto, setPopupCienciaAberto] = useState(false);
@@ -61,7 +63,7 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
             if (posicoesIlhas && posicoesIlhas.length > 0) {
               const posicaoMaisAvancada = posicoesIlhas[posicoesIlhas.length - 1];
               setPosicaoIlhaAtual(posicaoMaisAvancada);
-              console.log('Posição da ilha mais avançada:', posicaoMaisAvancada);
+              // console.log('Posição da ilha mais avançada:', posicaoMaisAvancada);
             }
           }
         }
@@ -165,6 +167,12 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
     setTelaAtiva('historia');
   };
 
+  // Função para ir direto ao ConectaHistoria (Debug/Teste)
+  // const handleIrParaConectaHistoria = () => {
+  //   setNomeIlhaJogada('HISTORIA');
+  //   setTelaAtiva('conecta-historia');
+  // };
+
   const handleVoltarTrilha = () => {
     // Limpa o nome da ilha jogada ao voltar para a trilha
     setNomeIlhaJogada(null);
@@ -248,6 +256,21 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
   // Se estiver na tela de matemática, renderizar TelaJogoMatematica
   if (telaAtiva === 'matematica') {
     return <TelaJogoMatematica onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
+  }
+
+  // Se estiver na tela de história, renderizar TelaJogoHistoria
+  if (telaAtiva === 'historia') {
+    return <TelaJogoHistoria onVoltarTrilha={handleVoltarTrilha} onVoltarMenu={onVoltar} onAbrirRanking={onAbrirRanking} />;
+  }
+
+  // Se estiver na tela de ConectaHistoria (acesso direto para teste), renderizar ConectaHistoria
+  if (telaAtiva === 'conecta-historia') {
+    return <ConectaHistoria 
+      onVoltarTrilha={handleVoltarTrilha} 
+      onVoltarMenu={onVoltar} 
+      onAbrirRanking={onAbrirRanking}
+      onConcluido={handleVoltarTrilha}
+    />;
   }
 
   // Se estiver na tela de pontuação, renderizar TelaPontuacao

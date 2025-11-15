@@ -27,19 +27,19 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
   // Função para avançar a ilha do aluno APENAS se for a primeira conclusão
   const avancarIlhaAluno = async () => {
     if (!alunoId || !isLogado) {
-      console.log('⚠️ Aluno não logado, não avançará ilha');
+      // console.log('⚠️ Aluno não logado, não avançará ilha');
       return false;
     }
 
     // Se não temos o nome da ilha, não podemos verificar
     if (!nomeIlhaJogada) {
-      console.log('⚠️ Nome da ilha não fornecido. Não avançará ilha.');
+      // console.log('⚠️ Nome da ilha não fornecido. Não avançará ilha.');
       return false;
     }
 
     try {
-      console.log('🔍 Verificando se deve avançar ilha...');
-      console.log('Ilha jogada:', nomeIlhaJogada);
+      // console.log('🔍 Verificando se deve avançar ilha...');
+      // console.log('Ilha jogada:', nomeIlhaJogada);
       
       // Buscar o ID do progresso do aluno primeiro
       // const responseIdProgresso = await fetch(`http://localhost:8080/api/progresso-aluno/id/${alunoId}`);
@@ -51,7 +51,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
       }
       
       const idProgressoAluno = await responseIdProgresso.json();
-      console.log('ID do progresso do aluno:', idProgressoAluno);
+      // console.log('ID do progresso do aluno:', idProgressoAluno);
       
       if (!idProgressoAluno) {
         console.error('❌ ID do progresso não encontrado');
@@ -59,7 +59,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
       }
       
       // VERIFICAÇÃO UNIFICADA: Verificar se a ilha já foi jogada (para TODAS as ilhas)
-      console.log(`ℹ️ Verificando se ${nomeIlhaJogada} já foi jogada...`);
+      // console.log(`ℹ️ Verificando se ${nomeIlhaJogada} já foi jogada...`);
       
       const responseFoiJogada = await fetch(
         // `http://localhost:8080/api/ilhas/verificar-foi-jogada?idProgressoAluno=${idProgressoAluno}&nomeIlha=${nomeIlhaJogada}`
@@ -72,18 +72,18 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
       }
       
       const foiJogada = await responseFoiJogada.json();
-      console.log(`${nomeIlhaJogada} já foi jogada?`, foiJogada);
+      // console.log(`${nomeIlhaJogada} já foi jogada?`, foiJogada);
       
       // Só avança se a ilha NÃO foi jogada (foiJogada === false)
       if (foiJogada) {
-        console.log(`⚠️ ${nomeIlhaJogada} já foi jogada anteriormente. Não avançará para próxima ilha.`);
+        // console.log(`⚠️ ${nomeIlhaJogada} já foi jogada anteriormente. Não avançará para próxima ilha.`);
         return false;
       }
       
-      console.log(`✅ Primeira vez jogando ${nomeIlhaJogada}! Avançando ilha...`);
+      // console.log(`✅ Primeira vez jogando ${nomeIlhaJogada}! Avançando ilha...`);
       
       // Chamar diretamente avancarIlha - ele já faz todas as validações necessárias
-      console.log('Chamando avancar-ilha com PUT...');
+      // console.log('Chamando avancar-ilha com PUT...');
       // const responseAvancar = await fetch(`http://localhost:8080/api/ilhas/avancar-ilha/${idProgressoAluno}`, {
         const responseAvancar = await fetch(`${window.location.origin}/desconecta/api/ilhas/avancar-ilha/${idProgressoAluno}`, {
         method: 'PUT',
@@ -92,17 +92,17 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
         }
       });
       
-      console.log('Status da resposta:', responseAvancar.status);
+      // console.log('Status da resposta:', responseAvancar.status);
       
       if (responseAvancar.ok) {
         const novaPosicao = await responseAvancar.json();
         
         if (novaPosicao !== -1) {
-          console.log('✅ Ilha avançada para posição:', novaPosicao);
-          console.log('✅ Próxima ilha foi criada e desbloqueada automaticamente');
+          // console.log('✅ Ilha avançada para posição:', novaPosicao);
+          // console.log('✅ Próxima ilha foi criada e desbloqueada automaticamente');
           return true;
         } else {
-          console.log('⚠️ Não foi possível avançar (última ilha ou ilha já avançada)');
+          // console.log('⚠️ Não foi possível avançar (última ilha ou ilha já avançada)');
           return false;
         }
       } else {

@@ -14,7 +14,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
   const [mostrarPopupSucesso, setMostrarPopupSucesso] = useState(false);
 
   const handleCadastro = async () => {
-    console.log('Dados do cadastro:', { apelido, senha });
+    // console.log('Dados do cadastro:', { apelido, senha });
     
     // Validação simples
     if (!apelido || !senha) {
@@ -38,7 +38,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
       if (response.ok) {
         const resultado = await response.json(); // Pega o valor booleano retornado
         if (resultado === true) {
-          console.log('Cadastro realizado com sucesso!');
+          // console.log('Cadastro realizado com sucesso!');
           setMostrarPopupSucesso(true); // Mostra popup de sucesso
           // Limpa os campos
           setApelido('');
@@ -59,7 +59,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
   };
 
   const handleIrParaLogin = () => {
-    console.log('Indo para tela de login...');
+    // console.log('Indo para tela de login...');
     irParaLogin();
   };
 

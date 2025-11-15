@@ -45,7 +45,7 @@ public class ControladorProgressoAluno {
 
   @PostMapping("/calcularPontuacaoTotal")
   public int calcularPontuacaoTotal(@RequestParam String apelidoAluno) {
-    System.out.println(apelidoAluno);
+    // System.out.println(apelidoAluno);
 
     Aluno aluno = acessoBDAluno.buscarApelido(apelidoAluno);
     if (aluno == null) {
@@ -69,7 +69,8 @@ public class ControladorProgressoAluno {
     progresso.setPontuacaoTotalAluno(pontuacaoTotal);
     acessoBDProgressoAluno.salvarProgressoAluno(progresso);
 
-    System.out.println("Nova pontuação total para '" + apelidoAluno + "': " + pontuacaoTotal);
+    // System.out.println("Nova pontuação total para '" + apelidoAluno + "': " +
+    // pontuacaoTotal);
 
     return 1;
   }
