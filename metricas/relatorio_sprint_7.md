@@ -76,7 +76,7 @@
 | cristinaleticia | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | ProjetoIntegradorUFV2025 | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | caioomenezes | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
-| Eufrausino | 2 | 2 | 100.0% | 0 | 6 | 6 | 100.0% |
+| Eufrausino | 2 | 2 | 100.0% | 1 | 6 | 6 | 100.0% |
 | Tatiana0357 | 0 | 0 | 0% | 0 | 0 | 0 | 0% |
 | GuilhermePianetti | 2 | 2 | 100.0% | 0 | 0 | 0 | 0% |
 
