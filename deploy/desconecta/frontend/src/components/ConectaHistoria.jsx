@@ -463,12 +463,12 @@ const ConectaHistoria = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRan
       </div>
 
       {/* Indicador de Progresso - Canto superior direito */}
-      <div className="fixed top-24 right-8 bg-white bg-opacity-90 rounded-lg p-4 shadow-lg">
-        <div className="text-2xl font-bold text-purple-800">
-          {palavrasEncontradas}/{totalPalavras}
-        </div>
-        <div className="text-sm text-gray-600">Grupos encontrados</div>
-      </div>
+      {/* <div className="fixed top-24 right-8 bg-white bg-opacity-90 rounded-lg p-4 shadow-lg"> */}
+      {/*   <div className="text-2xl font-bold text-purple-800"> */}
+      {/*     {palavrasEncontradas}/{totalPalavras} */}
+      {/*   </div> */}
+      {/*   <div className="text-sm text-gray-600">Grupos encontrados</div> */}
+      {/* </div> */}
 
       {/* Botão Confirmar com Imagem - Lado Direito */}
       <button

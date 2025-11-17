@@ -153,9 +153,9 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
       setStringPosicoes(novaString);
     } else {
       // Verifica se já há 3 botões selecionados
-      // if (botoesClicados.size >= 3) {
-      //   console.log("Máximo de 3 botões já selecionados!");
-      //   return; // Não permite selecionar mais
+      if (botoesClicados.size >= 3) {
+        console.log("Máximo de 3 botões já selecionados!");
+        return; // Não permite selecionar mais
       }
 
       // Se não foi clicado e há espaço, adiciona à seleção
@@ -165,19 +165,19 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
     }
 
     setBotoesClicados(novosBotoesClicados);
-    // console.log(
-    //   `Botão ${index} (${letra}) ${
-    //     botoesClicados.has(index) ? "desmarcado" : "marcado"
-    //   }`
-    // );
-    // console.log(
-    //   "String de letras atual:",
-    //   botoesClicados.has(index)
-    //     ? stringPosicoes.replace(letra, "")
-    //     : stringPosicoes + letra
-    // );
-    // console.log(`Total selecionados: ${novosBotoesClicados.size}/3`);
-  // };
+    console.log(
+      `Botão ${index} (${letra}) ${
+        botoesClicados.has(index) ? "desmarcado" : "marcado"
+      }`
+    );
+    console.log(
+      "String de letras atual:",
+      botoesClicados.has(index)
+        ? stringPosicoes.replace(letra, "")
+        : stringPosicoes + letra
+    );
+    console.log(`Total selecionados: ${novosBotoesClicados.size}/3`);
+  };
 
   // Se deve mostrar a tela de pontuação, renderizar TelaPontuacao
   if (mostrarPontuacao) {
@@ -337,7 +337,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
 
             // final da adaptação para novo endpoint unificado (Gabriel)
 
-            // console.log("Resposta da API:", resultado);
+            console.log("Resposta da API:", resultado);
 
             if (resultado === "True") {
               setRespostaCorreta(true);
@@ -352,10 +352,10 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
               const novasRespostasCorretas = respostasCorretas + 1;
               setRespostasCorretas(novasRespostasCorretas);
 
-              // console.log(
-              //   "Resposta correta! Mostrando imagens de resolvidoção."
-              // );
-              // console.log(`Respostas corretas: ${novasRespostasCorretas}/4`);
+              console.log(
+                "Resposta correta! Mostrando imagens de resolvidoção."
+              );
+              console.log(`Respostas corretas: ${novasRespostasCorretas}/4`);
 
               // Se chegou a 4 respostas corretas, chamar callback de conclusão
               if (novasRespostasCorretas >= 4) {
@@ -367,9 +367,9 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
 
                   try {
                     // PRIMEIRO: Verificar se o desafio já foi concluído
-                    // console.log(
-                    //   "🔍 Verificando se desafio já foi concluído..."
-                    // );
+                    console.log(
+                      "🔍 Verificando se desafio já foi concluído..."
+                    );
                     const responseVerificar = await fetch(
                       // `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=CIENCIAS`
                       `${window.location.origin}/desconecta/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=CIENCIAS`
@@ -380,16 +380,16 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                     }
 
                     const desafioConcluido = await responseVerificar.json();
-                    // console.log(
-                    //   "Status do desafio:",
-                    //   desafioConcluido ? "✅ Já concluído" : "⏳ Não concluído"
-                    // );
-                    //
+                    console.log(
+                      "Status do desafio:",
+                      desafioConcluido ? "✅ Já concluído" : "⏳ Não concluído"
+                    );
+
                     let pontuacaoCalculada = 0;
 
                     // SEGUNDO: Salvar pontuação APENAS se o desafio NÃO foi concluído
                     if (!desafioConcluido) {
-                      // console.log("💾 Salvando pontuação (primeira vez)...");
+                      console.log("💾 Salvando pontuação (primeira vez)...");
                       const responsePontuacao = await fetch(
                         // `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
                         `${window.location.origin}/desconecta/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
@@ -403,11 +403,11 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
 
                       if (responsePontuacao.ok) {
                         pontuacaoCalculada = await responsePontuacao.json();
-                        // console.log(
-                        //   "✅ Pontuação calculada e salva:",
-                        //   pontuacaoCalculada
-                        // );
-                        //
+                        console.log(
+                          "✅ Pontuação calculada e salva:",
+                          pontuacaoCalculada
+                        );
+
                         // Calcular pontuação total do aluno
                         const apelidoAluno = localStorage.getItem('apelidoAluno');
                         if (apelidoAluno) {
@@ -429,22 +429,22 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
 
                         // Se erro for -2 (já concluído), calcular pontuação localmente para exibir
                         if (errorText === "-2") {
-                          // console.log(
-                          //   "⚠️ Desafio já estava concluído (código -2)"
-                          // );
-                          // pontuacaoCalculada =
+                          console.log(
+                            "⚠️ Desafio já estava concluído (código -2)"
+                          );
+                          pontuacaoCalculada =
                             1000 - tempoFinal * 2 - numeroErros * 50;
                           pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
                         }
                       }
                     } else {
-                      // console.log(
-                      //   "⚠️ Desafio já foi concluído anteriormente. Pontuação NÃO será salva."
-                      // );
-                      // console.log(
-                      //   "Calculando pontuação apenas para exibição..."
-                      // );
-                      // // Calcular pontuação localmente apenas para exibir
+                      console.log(
+                        "⚠️ Desafio já foi concluído anteriormente. Pontuação NÃO será salva."
+                      );
+                      console.log(
+                        "Calculando pontuação apenas para exibição..."
+                      );
+                      // Calcular pontuação localmente apenas para exibir
                       pontuacaoCalculada =
                         1000 - tempoFinal * 2 - numeroErros * 50;
                       pontuacaoCalculada = Math.max(pontuacaoCalculada, 0);
@@ -475,7 +475,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                 }, 1500); // Aguarda 1.5 segundos para mostrar a imagem resolvida antes de retornar
               }
             } else {
-              // console.log("Resposta incorreta.");
+              console.log("Resposta incorreta.");
               // Incrementar contador de erros
               setNumeroErros((prev) => prev + 1);
 
