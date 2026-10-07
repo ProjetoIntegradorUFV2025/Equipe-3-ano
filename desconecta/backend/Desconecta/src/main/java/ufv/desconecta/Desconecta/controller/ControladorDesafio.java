@@ -95,7 +95,7 @@ public class ControladorDesafio {
             System.out.println("Enum da ilha: " + enumIlha);
 
             // Buscar o progresso do aluno
-            ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno((int) pkAluno);
+            ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno(pkAluno);
 
             if (progressoAluno == null) {
                 System.out.println("❌ Progresso do aluno não encontrado!");
@@ -185,7 +185,7 @@ public class ControladorDesafio {
             EnumNomeIlha enumIlha = EnumNomeIlha.valueOf(nomeIlha.toUpperCase());
 
             // Buscar o progresso do aluno
-            ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno((int) pkAluno);
+            ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno(pkAluno);
 
             if (progressoAluno == null) {
                 System.out.println("❌ Progresso do aluno não encontrado!");

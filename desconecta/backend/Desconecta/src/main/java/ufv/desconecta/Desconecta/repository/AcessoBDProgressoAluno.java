@@ -38,8 +38,8 @@ public class AcessoBDProgressoAluno  {
     }
 
     //Método para recuperar o progresso de um aluno
-    public ProgressoAluno getProgressoAluno(int idProgressoAluno) {
-        return entityManager.find(ProgressoAluno.class, (long) idProgressoAluno);
+    public ProgressoAluno getProgressoAluno(long idProgressoAluno) {
+        return entityManager.find(ProgressoAluno.class, idProgressoAluno);
     }
 
     // Método para recuperar as ilhas associadas a um progresso de aluno
