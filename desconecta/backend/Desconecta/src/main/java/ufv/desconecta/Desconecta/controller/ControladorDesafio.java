@@ -1,5 +1,7 @@
 package ufv.desconecta.Desconecta.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ufv.desconecta.Desconecta.model.EnumNomeIlha;
@@ -20,6 +22,8 @@ import java.util.Map; // Importe a classe Map
 @RequestMapping("/api/desafio")
 @CrossOrigin(origins = "*")
 public class ControladorDesafio {
+
+    private static final Logger log = LoggerFactory.getLogger(ControladorDesafio.class);
 
     private final AcessoBDDesafio acessoBDDesafio;
     private final PontuacaoService pontuacaoService;
@@ -78,35 +82,30 @@ public class ControladorDesafio {
                                       @RequestParam int tempo,
                                       @RequestParam int numErros) {
 
-        System.out.println("=== ENDPOINT SALVAR PONTUAÇÃO ===");
-        System.out.println("PK Aluno: " + pkAluno);
-        System.out.println("Nome Ilha: " + nomeIlha);
-        System.out.println("Tempo: " + tempo + "s");
-        System.out.println("Erros: " + numErros);
+        log.debug("Salvar pontuação: pkAluno={}, ilha={}, tempo={}s, erros={}", pkAluno, nomeIlha, tempo, numErros);
 
         if (pkAluno <= 0 || nomeIlha == null || nomeIlha.isEmpty()) {
-            System.out.println("❌ Dados de entrada inválidos!");
+            log.warn("Salvar pontuação: dados de entrada inválidos");
             return -1; // Dados de entrada inválidos
         }
 
         try {
             // Converter nome da ilha para enum
             EnumNomeIlha enumIlha = EnumNomeIlha.valueOf(nomeIlha.toUpperCase());
-            System.out.println("Enum da ilha: " + enumIlha);
 
             // Buscar o progresso do aluno
             ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno(pkAluno);
 
             if (progressoAluno == null) {
-                System.out.println("❌ Progresso do aluno não encontrado!");
+                log.warn("Salvar pontuação: progresso do aluno não encontrado");
                 return -3; // Progresso não encontrado
             }
 
-            System.out.println("ID Progresso: " + progressoAluno.getPK_ProgressoAluno());
+            log.debug("ID do progresso: {}", progressoAluno.getPK_ProgressoAluno());
 
             // Buscar todas as ilhas do progresso do aluno
             List<Ilha> ilhas = acessoBDIlha.recuperarIlhasPorProgressoId(progressoAluno.getPK_ProgressoAluno().intValue());
-            System.out.println("Total de ilhas encontradas: " + ilhas.size());
+            log.debug("Total de ilhas encontradas: {}", ilhas.size());
 
             // Encontrar a ilha específica pelo enum
             Ilha ilhaEncontrada = null;
@@ -118,29 +117,29 @@ public class ControladorDesafio {
             }
 
             if (ilhaEncontrada == null) {
-                System.out.println("❌ Ilha não encontrada: " + nomeIlha);
+                log.warn("Salvar pontuação: ilha não encontrada: {}", nomeIlha);
                 return -4; // Ilha não encontrada
             }
 
             int idIlha = ilhaEncontrada.getPK_Ilha();
-            System.out.println("ID da ilha encontrada: " + idIlha);
+            log.debug("ID da ilha encontrada: {}", idIlha);
 
             // Buscar desafio da ilha
             Desafio desafioASerPontuado = acessoBDDesafio.getDesafioByIlhaId(idIlha);
 
             if (desafioASerPontuado == null) {
-                System.out.println("❌ Desafio não encontrado para a ilha!");
+                log.warn("Salvar pontuação: desafio não encontrado para a ilha");
                 return -5; // Desafio não encontrado
             }
 
             if (desafioASerPontuado.isConcluido()) {
-                System.out.println("⚠️ Desafio já foi concluído!");
+                log.debug("Desafio já foi concluído");
                 return -2; // Desafio já concluído
             }
 
             // Calcular pontuação
             int pontuacao = pontuacaoService.calcularPontuacao(tempo, numErros);
-            System.out.println("Pontuação calculada: " + pontuacao);
+            log.debug("Pontuação calculada: {}", pontuacao);
 
             // Salvar pontuação
             pontuacaoService.salvarPontuacaoDesafio(pontuacao, desafioASerPontuado);
@@ -149,20 +148,19 @@ public class ControladorDesafio {
             int novaPontuacaoTotal = progressoAluno.getPontuacaoTotalAluno() + pontuacao;
             progressoAluno.setPontuacaoTotalAluno(novaPontuacaoTotal);
             acessoBDProgressoAluno.salvarProgressoAluno(progressoAluno);
-            System.out.println("Nova pontuação total do aluno: " + novaPontuacaoTotal);
+            log.debug("Nova pontuação total do aluno: {}", novaPontuacaoTotal);
 
             // Marcar desafio como concluído
             concluirDesafio(desafioASerPontuado.getId());
 
-            System.out.println("✅ Pontuação salva com sucesso!");
+            log.debug("Pontuação salva com sucesso");
             return pontuacao;
 
         } catch (IllegalArgumentException e) {
-            System.out.println("❌ Nome de ilha inválido: " + nomeIlha);
+            log.warn("Salvar pontuação: nome de ilha inválido: {}", nomeIlha);
             return -6; // Nome de ilha inválido
         } catch (Exception e) {
-            System.out.println("❌ Erro ao salvar pontuação: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Erro ao salvar pontuação", e);
             return -7; // Erro genérico
         }
     }
@@ -171,12 +169,10 @@ public class ControladorDesafio {
     public boolean verificarDesafioConcluido(@RequestParam long pkAluno,
                                              @RequestParam String nomeIlha) {
 
-        System.out.println("=== VERIFICAR SE DESAFIO ESTÁ CONCLUÍDO ===");
-        System.out.println("PK Aluno: " + pkAluno);
-        System.out.println("Nome Ilha: " + nomeIlha);
+        log.debug("Verificar desafio concluído: pkAluno={}, ilha={}", pkAluno, nomeIlha);
 
         if (pkAluno <= 0 || nomeIlha == null || nomeIlha.isEmpty()) {
-            System.out.println("❌ Dados de entrada inválidos!");
+            log.warn("Verificar desafio concluído: dados de entrada inválidos");
             return false;
         }
 
@@ -188,7 +184,7 @@ public class ControladorDesafio {
             ProgressoAluno progressoAluno = acessoBDProgressoAluno.getProgressoAluno(pkAluno);
 
             if (progressoAluno == null) {
-                System.out.println("❌ Progresso do aluno não encontrado!");
+                log.warn("Verificar desafio concluído: progresso do aluno não encontrado");
                 return false;
             }
 
@@ -205,7 +201,7 @@ public class ControladorDesafio {
             }
 
             if (ilhaEncontrada == null) {
-                System.out.println("❌ Ilha não encontrada: " + nomeIlha);
+                log.warn("Verificar desafio concluído: ilha não encontrada: {}", nomeIlha);
                 return false;
             }
 
@@ -215,21 +211,20 @@ public class ControladorDesafio {
             Desafio desafio = acessoBDDesafio.getDesafioByIlhaId(idIlha);
 
             if (desafio == null) {
-                System.out.println("❌ Desafio não encontrado para a ilha!");
+                log.warn("Verificar desafio concluído: desafio não encontrado para a ilha");
                 return false;
             }
 
             boolean concluido = desafio.isConcluido();
-            System.out.println("Status do desafio: " + (concluido ? "✅ Concluído" : "⏳ Não concluído"));
+            log.debug("Status do desafio: {}", concluido ? "concluído" : "não concluído");
 
             return concluido;
 
         } catch (IllegalArgumentException e) {
-            System.out.println("❌ Nome de ilha inválido: " + nomeIlha);
+            log.warn("Verificar desafio concluído: nome de ilha inválido: {}", nomeIlha);
             return false;
         } catch (Exception e) {
-            System.out.println("❌ Erro ao verificar desafio: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Erro ao verificar desafio", e);
             return false;
         }
     }

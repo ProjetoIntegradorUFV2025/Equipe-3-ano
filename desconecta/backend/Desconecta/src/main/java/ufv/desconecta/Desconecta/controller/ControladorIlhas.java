@@ -1,5 +1,7 @@
 package ufv.desconecta.Desconecta.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ufv.desconecta.Desconecta.model.EnumNomeIlha;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/ilhas")
 @CrossOrigin(origins = "*")
 public class ControladorIlhas {
+
+    private static final Logger log = LoggerFactory.getLogger(ControladorIlhas.class);
 
     private final AcessoBDIlha acessoBDIlha;
     private final AcessoBDProgressoAluno acessoBDProgressoAluno;
@@ -64,7 +68,7 @@ public class ControladorIlhas {
 
         } catch (Exception e) {
             // Em caso de erro, loga a mensagem e retorna uma lista vazia.
-            System.err.println("Erro ao recuperar posições das ilhas: " + e.getMessage());
+            log.error("Erro ao recuperar posições das ilhas", e);
             return Collections.emptyList();
         }
     }
@@ -80,7 +84,7 @@ public class ControladorIlhas {
             // 1. Busca o progresso do aluno.
             ProgressoAluno progresso = acessoBDProgressoAluno.getProgressoAluno(idProgressoAluno);
             if (progresso == null) {
-                System.err.println("Progresso com ID " + idProgressoAluno + " não encontrado.");
+                log.warn("Avançar ilha: progresso do aluno não encontrado");
                 return -1;
             }
 
@@ -92,7 +96,7 @@ public class ControladorIlhas {
                     .max(Comparator.comparing(ilha -> ilha.getNomeIlha().ordinal()));
 
             if (ilhaMaisRecenteOpt.isEmpty()) {
-                System.err.println("Aluno não possui nenhuma ilha para poder avançar.");
+                log.warn("Avançar ilha: aluno não possui nenhuma ilha para poder avançar");
                 return -1;
             }
 
@@ -109,7 +113,7 @@ public class ControladorIlhas {
             // 6. Verifica se o aluno já está na última ilha.
             EnumNomeIlha[] todasAsIlhas = EnumNomeIlha.values();
             if (posicaoAtual >= todasAsIlhas.length - 1) {
-                System.out.println("Aluno já está na última ilha, não pode avançar.");
+                log.debug("Aluno já está na última ilha, não pode avançar");
                 // Mesmo estando na última ilha, ainda salvamos a alteração de 'foiJogada'.
                 acessoBDProgressoAluno.salvarProgressoAluno(progresso);
                 return -1;
@@ -148,8 +152,7 @@ public class ControladorIlhas {
             return proximaIlhaEnum.ordinal();
 
         } catch (Exception e) {
-            System.err.println("Erro genérico ao avançar ilha: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Erro genérico ao avançar ilha", e);
             return -1;
         }
     }
@@ -175,11 +178,10 @@ public class ControladorIlhas {
             return foiJogada.orElse(false);
             
         } catch (IllegalArgumentException e) {
-            System.err.println("Nome de ilha inválido: " + nomeIlha);
+            log.warn("Verificar ilha jogada: nome de ilha inválido: {}", nomeIlha);
             return false;
         } catch (Exception e) {
-            System.err.println("Erro ao verificar se ilha foi jogada: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Erro ao verificar se ilha foi jogada", e);
             return false;
         }
     }
