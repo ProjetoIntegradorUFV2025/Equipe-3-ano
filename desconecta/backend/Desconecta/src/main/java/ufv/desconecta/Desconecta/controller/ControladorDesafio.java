@@ -3,6 +3,7 @@ package ufv.desconecta.Desconecta.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.*;
 import ufv.desconecta.Desconecta.model.EnumNomeIlha;
 import ufv.desconecta.Desconecta.model.EnumTiposDesafios;
@@ -104,7 +105,7 @@ public class ControladorDesafio {
             log.debug("ID do progresso: {}", progressoAluno.getPK_ProgressoAluno());
 
             // Buscar todas as ilhas do progresso do aluno
-            List<Ilha> ilhas = acessoBDIlha.recuperarIlhasPorProgressoId(progressoAluno.getPK_ProgressoAluno().intValue());
+            List<Ilha> ilhas = acessoBDIlha.recuperarIlhasPorProgressoId(progressoAluno.getPK_ProgressoAluno());
             log.debug("Total de ilhas encontradas: {}", ilhas.size());
 
             // Encontrar a ilha específica pelo enum
@@ -159,8 +160,11 @@ public class ControladorDesafio {
         } catch (IllegalArgumentException e) {
             log.warn("Salvar pontuação: nome de ilha inválido: {}", nomeIlha);
             return -6; // Nome de ilha inválido
-        } catch (Exception e) {
-            log.error("Erro ao salvar pontuação", e);
+        } catch (DataAccessException e) {
+            log.error("Erro de banco ao salvar pontuação", e);
+            return -7; // Erro genérico
+        } catch (RuntimeException e) {
+            log.error("Erro inesperado ao salvar pontuação", e);
             return -7; // Erro genérico
         }
     }
@@ -189,7 +193,7 @@ public class ControladorDesafio {
             }
 
             // Buscar todas as ilhas do progresso do aluno
-            List<Ilha> ilhas = acessoBDIlha.recuperarIlhasPorProgressoId(progressoAluno.getPK_ProgressoAluno().intValue());
+            List<Ilha> ilhas = acessoBDIlha.recuperarIlhasPorProgressoId(progressoAluno.getPK_ProgressoAluno());
 
             // Encontrar a ilha específica pelo enum
             Ilha ilhaEncontrada = null;
@@ -223,8 +227,11 @@ public class ControladorDesafio {
         } catch (IllegalArgumentException e) {
             log.warn("Verificar desafio concluído: nome de ilha inválido: {}", nomeIlha);
             return false;
-        } catch (Exception e) {
-            log.error("Erro ao verificar desafio", e);
+        } catch (DataAccessException e) {
+            log.error("Erro de banco ao verificar desafio", e);
+            return false;
+        } catch (RuntimeException e) {
+            log.error("Erro inesperado ao verificar desafio", e);
             return false;
         }
     }

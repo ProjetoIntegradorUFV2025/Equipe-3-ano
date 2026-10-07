@@ -49,12 +49,12 @@ public class ControladorIlhas {
 
 
     @GetMapping("/recuperar/{idProgressoAluno}")
-    public List<Ilha> recuperarIlhas(@PathVariable int idProgressoAluno) {
+    public List<Ilha> recuperarIlhas(@PathVariable long idProgressoAluno) {
         return acessoBDIlha.recuperarIlhasPorProgressoId(idProgressoAluno);
     }
 
     @GetMapping("/posicoes-ilhas/{idProgressoAluno}")
-    public List<Integer> recuperarPosicoesIlhas(@PathVariable int idProgressoAluno) {
+    public List<Integer> recuperarPosicoesIlhas(@PathVariable long idProgressoAluno) {
         try {
             // 1. Busca a lista de ilhas (ela virá desordenada do banco).
             List<Ilha> ilhasDoProgresso = acessoBDIlha.recuperarIlhasPorProgressoId(idProgressoAluno);
@@ -79,7 +79,7 @@ public class ControladorIlhas {
      * @return Nova posição da ilha ou -1 se erro
      */
     @PutMapping("/avancar-ilha/{idProgressoAluno}")
-    public int avancarIlha(@PathVariable int idProgressoAluno) {
+    public int avancarIlha(@PathVariable long idProgressoAluno) {
         try {
             // 1. Busca o progresso do aluno.
             ProgressoAluno progresso = acessoBDProgressoAluno.getProgressoAluno(idProgressoAluno);
@@ -165,7 +165,7 @@ public class ControladorIlhas {
      */
     @GetMapping("/verificar-foi-jogada")
     public boolean verificarSeIlhaFoiJogada(
-            @RequestParam int idProgressoAluno,
+            @RequestParam long idProgressoAluno,
             @RequestParam String nomeIlha) {
         try {
             // Converte a string para o enum

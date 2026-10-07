@@ -26,8 +26,8 @@ public class AcessoBDProgressoAluno  {
     }
     // Método para armazenar a pontuação
     @Transactional
-    public boolean armazenarPontuacaoAluno(int idProgressoAluno, int pontuacao) {
-        ProgressoAluno progresso = entityManager.find(ProgressoAluno.class, (long) idProgressoAluno);
+    public boolean armazenarPontuacaoAluno(long idProgressoAluno, int pontuacao) {
+        ProgressoAluno progresso = entityManager.find(ProgressoAluno.class, idProgressoAluno);
         if (progresso != null) {
             progresso.setPontuacaoTotalAluno(pontuacao); // supondo que ProgressoAluno tenha o atributo pontuacao
             entityManager.merge(progresso); // atualiza o registro no banco
@@ -43,11 +43,11 @@ public class AcessoBDProgressoAluno  {
     }
 
     // Método para recuperar as ilhas associadas a um progresso de aluno
-    public List<Ilha> getIlhasDoProgresso(int idProgressoAluno) {
+    public List<Ilha> getIlhasDoProgresso(long idProgressoAluno) {
         try {
             TypedQuery<Ilha> query = entityManager.createQuery(
                     "SELECT i FROM Ilha i WHERE i.progressoAluno.PK_ProgressoAluno = :idProgresso", Ilha.class);
-            query.setParameter("idProgresso", (long) idProgressoAluno);
+            query.setParameter("idProgresso", idProgressoAluno);
             return query.getResultList();
         } catch (Exception e) {
             // Em caso de erro (ex: progresso não encontrado), retorna uma lista vazia para evitar erros.

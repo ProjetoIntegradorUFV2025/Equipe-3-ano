@@ -34,12 +34,12 @@ public class ControladorProgressoAluno {
 
 
     @GetMapping("/{idAluno}")
-    public ProgressoAluno recuperarProgressoAluno(@PathVariable  int idAluno){
+    public ProgressoAluno recuperarProgressoAluno(@PathVariable long idAluno){
         return acessoBDProgressoAluno.getProgressoAluno(idAluno);
     }
 
     @GetMapping("/id/{idAluno}")
-    public Long recuperarIdProgressoAluno(@PathVariable int idAluno){
+    public Long recuperarIdProgressoAluno(@PathVariable long idAluno){
         ProgressoAluno progresso = acessoBDProgressoAluno.getProgressoAluno(idAluno);
         return progresso != null ? progresso.getPK_ProgressoAluno() : null;
     }
