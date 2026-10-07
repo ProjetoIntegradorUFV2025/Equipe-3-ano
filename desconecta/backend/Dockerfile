@@ -18,6 +18,8 @@ CMD ["mvn", "spring-boot:run"]
 # Etapa produção
 FROM eclipse-temurin:21-jre AS prod
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+RUN addgroup --system app && adduser --system --ingroup app app
+COPY --from=build --chown=app:app /app/target/*.jar app.jar
+USER app
 ENTRYPOINT ["java","-jar","app.jar"]
 
