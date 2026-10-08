@@ -3,7 +3,7 @@ FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY Desconecta/pom.xml .
 RUN mvn dependency:go-offline
-COPY . .
+COPY Desconecta/src ./src
 RUN mvn package -DskipTests
 
 # Etapa desenvolvimento
