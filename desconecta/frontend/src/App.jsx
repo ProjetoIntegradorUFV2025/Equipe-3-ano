@@ -28,6 +28,7 @@ function App() {
         <TelaCadastro
           voltarParaInicial={() => setTela("inicial")}
           irParaLogin={() => setTela("login")}
+          irParaJogo={() => setTela("jogo")}
         />
       )}
       {tela === "jogo" && (
