@@ -1,5 +1,6 @@
 package ufv.desconecta.Desconecta.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,8 @@ public class Aluno {
     @Column(nullable = false)
     private String apelido;
 
+    // WRITE_ONLY: a senha pode ser recebida em login/cadastro, mas nunca e devolvida nas respostas
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String senha;
 
