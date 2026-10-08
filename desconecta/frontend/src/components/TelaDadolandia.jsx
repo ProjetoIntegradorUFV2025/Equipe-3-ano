@@ -51,6 +51,69 @@ const FASES = {
   CONCLUSAO: 'conclusao'
 };
 
+// --- Componente: Vídeo de tutorial ---
+// Exibe o vídeo em tela cheia com botão de play grande e, quando está pausado, o aviso
+// de que é preciso assistir até o fim enquanto o avanço está bloqueado
+const VideoTutorial = ({ videoRef, concluido, onPlay, onPause, ...videoProps }) => {
+  // Começa true: se o navegador bloquear o autoplay, nenhum evento de pause é disparado
+  const [pausado, setPausado] = useState(true);
+
+  return (
+    <div className="w-full h-screen flex items-center justify-center relative">
+      <video
+        ref={videoRef}
+        controls
+        className="max-w-full max-h-full object-contain"
+        style={{
+          width: '100vw',
+          height: '100vh',
+          objectFit: 'contain'
+        }}
+        {...videoProps}
+        onPlay={(e) => {
+          setPausado(false);
+          onPlay?.(e);
+        }}
+        onPause={(e) => {
+          setPausado(true);
+          onPause?.(e);
+        }}
+      />
+
+      {/* Botão de play grande: aparece quando o vídeo está pausado */}
+      {pausado && (
+        <button
+          onClick={() => videoRef.current?.play()?.catch(() => {})}
+          aria-label="Reproduzir vídeo"
+          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300"
+          style={{
+            width: 'min(120px, 14vw)',
+            height: 'min(120px, 14vw)',
+            fontSize: 'min(52px, 6vw)',
+            backgroundColor: '#563066'
+          }}
+        >
+          ▶
+        </button>
+      )}
+
+      {/* Aviso: só aparece com o vídeo pausado e o botão de avançar bloqueado */}
+      {pausado && !concluido && (
+        <div
+          className="absolute left-1/2 transform -translate-x-1/2 text-white font-bold rounded-full px-6 py-2 pointer-events-none"
+          style={{
+            bottom: '72px',
+            fontSize: 'min(24px, 2.5vw)',
+            backgroundColor: 'rgba(86, 48, 102, 0.9)'
+          }}
+        >
+          Assista ao vídeo até o fim para continuar
+        </div>
+      )}
+    </div>
+  );
+};
+
 // --- Componente: Tela Dadolandia ---
 const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const [imagemAtual, setImagemAtual] = useState(0);
@@ -283,35 +346,27 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       {faseAtual === FASES.TUTORIAL_CONECTA && (
         <>
           {/* Vídeo do Tutorial Conecta em tela cheia */}
-          <div className="w-full h-screen flex items-center justify-center relative">
-            <video
-              ref={videoConectaRef}
-              src={tutorialConecta}
-              controls
-              className="max-w-full max-h-full object-contain"
-              style={{
-                width: '100vw',
-                height: '100vh',
-                objectFit: 'contain'
-              }}
-              onLoadedData={() => {
-                console.log('Vídeo Conecta carregado - pausando música');
-                pauseMusic();
-              }}
-              onPlay={() => {
-                console.log('Vídeo Conecta iniciou - pausando música');
-                pauseMusic();
-              }}
-              onEnded={() => {
-                console.log('Vídeo Conecta terminou - retomando música');
-                handleVideoConcluido('conecta');
-                resumeMusic();
-              }}
-              onError={(e) => {
-                console.error('Erro ao carregar vídeo:', e.target.src);
-              }}
-            />
-          </div>
+          <VideoTutorial
+            videoRef={videoConectaRef}
+            src={tutorialConecta}
+            concluido={tutorialConectaConcluido}
+            onLoadedData={() => {
+              console.log('Vídeo Conecta carregado - pausando música');
+              pauseMusic();
+            }}
+            onPlay={() => {
+              console.log('Vídeo Conecta iniciou - pausando música');
+              pauseMusic();
+            }}
+            onEnded={() => {
+              console.log('Vídeo Conecta terminou - retomando música');
+              handleVideoConcluido('conecta');
+              resumeMusic();
+            }}
+            onError={(e) => {
+              console.error('Erro ao carregar vídeo:', e.target.src);
+            }}
+          />
 
           {/* Botão Anterior - Extremo esquerdo */}
           <button
@@ -351,35 +406,27 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       {faseAtual === FASES.TUTORIAL_CACAPALAVRAS && (
         <>
           {/* Vídeo do Tutorial Caça-palavras em tela cheia */}
-          <div className="w-full h-screen flex items-center justify-center relative">
-            <video
-              ref={videoCacaPalavrasRef}
-              src={tutorialCacaPalavras}
-              controls
-              className="max-w-full max-h-full object-contain"
-              style={{
-                width: '100vw',
-                height: '100vh',
-                objectFit: 'contain'
-              }}
-              onLoadedData={() => {
-                console.log('Vídeo Caça-palavras carregado - pausando música');
-                pauseMusic();
-              }}
-              onPlay={() => {
-                console.log('Vídeo Caça-palavras iniciou - pausando música');
-                pauseMusic();
-              }}
-              onEnded={() => {
-                console.log('Vídeo Caça-palavras terminou - retomando música');
-                handleVideoConcluido('cacaPalavras');
-                resumeMusic();
-              }}
-              onError={(e) => {
-                console.error('Erro ao carregar vídeo:', e.target.src);
-              }}
-            />
-          </div>
+          <VideoTutorial
+            videoRef={videoCacaPalavrasRef}
+            src={tutorialCacaPalavras}
+            concluido={tutorialCacaPalavrasConcluido}
+            onLoadedData={() => {
+              console.log('Vídeo Caça-palavras carregado - pausando música');
+              pauseMusic();
+            }}
+            onPlay={() => {
+              console.log('Vídeo Caça-palavras iniciou - pausando música');
+              pauseMusic();
+            }}
+            onEnded={() => {
+              console.log('Vídeo Caça-palavras terminou - retomando música');
+              handleVideoConcluido('cacaPalavras');
+              resumeMusic();
+            }}
+            onError={(e) => {
+              console.error('Erro ao carregar vídeo:', e.target.src);
+            }}
+          />
 
           {/* Botão Anterior - Extremo esquerdo */}
           <button
