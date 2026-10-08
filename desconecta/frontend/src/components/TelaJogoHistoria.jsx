@@ -167,17 +167,19 @@ const TelaJogoHistoria = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
         )}
       </div>
 
-      {/* Botão para ir direto ao ConectaHistoria (Debug/Teste) */}
-      <button
-        onClick={() => setMostrarConectaHistoria(true)}
-        className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-all duration-300 z-30 flex items-center gap-2"
-        style={{
-          fontSize: 'clamp(14px, 2vw, 18px)'
-        }}
-      >
-        <span>🎮</span>
-        <span>Ir para Conecta História</span>
-      </button>
+      {/* Botão para ir direto ao ConectaHistoria (apenas em desenvolvimento; não vai para o build de produção) */}
+      {import.meta.env.DEV && (
+        <button
+          onClick={() => setMostrarConectaHistoria(true)}
+          className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-all duration-300 z-30 flex items-center gap-2"
+          style={{
+            fontSize: 'clamp(14px, 2vw, 18px)'
+          }}
+        >
+          <span>🎮</span>
+          <span>Ir para Conecta História</span>
+        </button>
+      )}
 
       {/* Botão Anterior - Extremo esquerdo */}
       {/* Desabilitado apenas na imagem 21 (índice 20) - imediatamente após o jogo */}

@@ -209,15 +209,17 @@ const TelaJogoCiencia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
         />
       </button>
 
-      {/* Botão para ir direto ao Conecta Ciência */}
-      <button
-        onClick={irParaConectaCiencia}
-        className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 z-20 flex items-center gap-3"
-      >
-        <span className="text-lg">🧪</span>
-        <span className="text-xl">Ir para Conecta Ciência</span>
-        <span className="text-lg">🔬</span>
-      </button>
+      {/* Botão para ir direto ao Conecta Ciência (apenas em desenvolvimento; não vai para o build de produção) */}
+      {import.meta.env.DEV && (
+        <button
+          onClick={irParaConectaCiencia}
+          className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 z-20 flex items-center gap-3"
+        >
+          <span className="text-lg">🧪</span>
+          <span className="text-xl">Ir para Conecta Ciência</span>
+          <span className="text-lg">🔬</span>
+        </button>
+      )}
     </main>
   );
 };

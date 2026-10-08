@@ -429,22 +429,24 @@ const JogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
         </div>
       </div>
 
-      {/* Componente Debug - Índices Selecionados */}
-      <div className="fixed left-4 bottom-4 bg-black bg-opacity-80 text-white p-4 rounded-lg shadow-2xl max-w-md z-30 border-2 border-blue-500">
-        <h3 className="text-sm font-bold mb-2 text-blue-300">📊 Debug - Índices Selecionados:</h3>
-        <div className="bg-gray-900 p-3 rounded border border-blue-400">
-          <p className="text-lg font-mono break-words text-green-400">
-            {stringIndices || 'Nenhum botão selecionado'}
-          </p>
+      {/* Componente Debug - Índices Selecionados (apenas em desenvolvimento; não vai para o build de produção) */}
+      {import.meta.env.DEV && (
+        <div className="fixed left-4 bottom-4 bg-black bg-opacity-80 text-white p-4 rounded-lg shadow-2xl max-w-md z-30 border-2 border-blue-500">
+          <h3 className="text-sm font-bold mb-2 text-blue-300">📊 Debug - Índices Selecionados:</h3>
+          <div className="bg-gray-900 p-3 rounded border border-blue-400">
+            <p className="text-lg font-mono break-words text-green-400">
+              {stringIndices || 'Nenhum botão selecionado'}
+            </p>
+          </div>
+          <div className="mt-2 flex justify-between items-center text-xs text-gray-400">
+            <span>Total: {botoesClicados.size} botões</span>
+            <span>Formato: índice/índice/...</span>
+          </div>
+          <div className="mt-2 text-xs text-yellow-300">
+            💡 Copie esta string para usar no SQL!
+          </div>
         </div>
-        <div className="mt-2 flex justify-between items-center text-xs text-gray-400">
-          <span>Total: {botoesClicados.size} botões</span>
-          <span>Formato: índice/índice/...</span>
-        </div>
-        <div className="mt-2 text-xs text-yellow-300">
-          💡 Copie esta string para usar no SQL!
-        </div>
-      </div>
+      )}
 
       {/* Botão Confirmar - Canto inferior direito */}
       <button

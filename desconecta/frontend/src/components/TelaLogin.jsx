@@ -20,10 +20,10 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
       return;
     }
 
-    // --- MODO DE TESTE ---
+    // --- MODO DE TESTE (apenas em desenvolvimento) ---
     // Se o apelido for "teste" e a senha "123", o login é bem-sucedido
-    // e a chamada para a API é ignorada.
-    if (apelido === 'teste' && senha === '123') {
+    // e a chamada para a API é ignorada. Não existe no build de produção.
+    if (import.meta.env.DEV && apelido === 'teste' && senha === '123') {
       console.log('Login de teste realizado com sucesso!');
       setApelido('');
       setSenha('');
