@@ -1,5 +1,6 @@
 package ufv.desconecta.Desconecta.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,8 @@ public class Aluno {
     @Column(nullable = false)
     private String senha;
 
+    // Lado inverso da relacao com ProgressoAluno: fora do JSON para evitar referencia circular
+    @JsonIgnore
     @OneToOne(mappedBy = "aluno", cascade = CascadeType.ALL)
     private ProgressoAluno progresso;
 
