@@ -57,6 +57,13 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
     }
   };
 
+  // Envia o cadastro ao pressionar Enter, sem repetir enquanto a tecla é mantida
+  // pressionada nem enquanto algum popup estiver aberto
+  const handleKeyDown = (e) => {
+    if (e.key !== 'Enter' || e.repeat || mostrarPopup || mostrarPopupSucesso) return;
+    handleCadastro();
+  };
+
   const handleIrParaLogin = () => {
     console.log('Indo para tela de login...');
     irParaLogin();
@@ -108,6 +115,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
             placeholder="Nome"
             value={apelido}
             onChange={(e) => setApelido(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="px-8 py-4 text-gray-800 font-bold text-2xl rounded-2xl shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
             style={{ backgroundColor: '#dbedee' }}
           />
@@ -118,6 +126,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
             placeholder="Senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="px-8 py-4 text-gray-800 font-bold text-2xl rounded-2xl shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
             style={{ backgroundColor: '#dbedee' }}
           />
