@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MenuNavegacao from './ui/MenuNavegacao';
 import TelaPontuacao from './TelaPontuacao';
+import { useAudio } from '../contexts/AudioContext';
 
 // Importar imagem da seta
 import arrowLeftCircle from '../assets/Arrow - Left Circle.png';
@@ -28,6 +29,8 @@ import img19 from '../assets/Dadolandia/Dadolandia Quadro 19.gif';
 import img20 from '../assets/Dadolandia/Dadolandia Quadro 20.gif';
 import img21 from '../assets/Dadolandia/Dadolandia Quadro 21.gif';
 import img22 from '../assets/Dadolandia/Dadolandia Quadro 22.gif';
+import img23 from '../assets/Dadolandia/Dadolandia Quadro 23.gif';
+import img24 from '../assets/Dadolandia/Dadolandia Quadro 24.gif';
 
 // Importar vídeos dos tutoriais
 import tutorialConecta from '../assets/Dadolandia/Tutorial Conecta Dadolandia  .mp4';
@@ -37,7 +40,7 @@ import tutorialCacaPalavras from '../assets/Dadolandia/Tutorial Caça-palavras.m
 const imagens = [
   img1, img2, img3, img4, img5, img6, img7, img8, img9, img10,
   img11, img12, img13, img14, img15, img16, img17, img18, img19, img20,
-  img21, img22
+  img21, img22, img23, img24
 ].filter(img => img !== undefined);
 
 // Estados para as fases
@@ -46,6 +49,69 @@ const FASES = {
   TUTORIAL_CONECTA: 'tutorialConecta',
   TUTORIAL_CACAPALAVRAS: 'tutorialCacaPalavras',
   CONCLUSAO: 'conclusao'
+};
+
+// --- Componente: Vídeo de tutorial ---
+// Exibe o vídeo em tela cheia com botão de play grande e, quando está pausado, o aviso
+// de que é preciso assistir até o fim enquanto o avanço está bloqueado
+const VideoTutorial = ({ videoRef, concluido, onPlay, onPause, ...videoProps }) => {
+  // Começa true: se o navegador bloquear o autoplay, nenhum evento de pause é disparado
+  const [pausado, setPausado] = useState(true);
+
+  return (
+    <div className="w-full h-screen flex items-center justify-center relative">
+      <video
+        ref={videoRef}
+        controls
+        className="max-w-full max-h-full object-contain"
+        style={{
+          width: '100vw',
+          height: '100vh',
+          objectFit: 'contain'
+        }}
+        {...videoProps}
+        onPlay={(e) => {
+          setPausado(false);
+          onPlay?.(e);
+        }}
+        onPause={(e) => {
+          setPausado(true);
+          onPause?.(e);
+        }}
+      />
+
+      {/* Botão de play grande: aparece quando o vídeo está pausado */}
+      {pausado && (
+        <button
+          onClick={() => videoRef.current?.play()?.catch(() => {})}
+          aria-label="Reproduzir vídeo"
+          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300"
+          style={{
+            width: 'min(120px, 14vw)',
+            height: 'min(120px, 14vw)',
+            fontSize: 'min(52px, 6vw)',
+            backgroundColor: '#563066'
+          }}
+        >
+          ▶
+        </button>
+      )}
+
+      {/* Aviso: só aparece com o vídeo pausado e o botão de avançar bloqueado */}
+      {pausado && !concluido && (
+        <div
+          className="absolute left-1/2 transform -translate-x-1/2 text-white font-bold rounded-full px-6 py-2 pointer-events-none"
+          style={{
+            bottom: '72px',
+            fontSize: 'min(24px, 2.5vw)',
+            backgroundColor: 'rgba(86, 48, 102, 0.9)'
+          }}
+        >
+          Assista ao vídeo até o fim para continuar
+        </div>
+      )}
+    </div>
+  );
 };
 
 // --- Componente: Tela Dadolandia ---
@@ -57,10 +123,15 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
   const [mostrarPontuacao, setMostrarPontuacao] = useState(false);
   const [tutorialConectaConcluido, setTutorialConectaConcluido] = useState(false);
   const [tutorialCacaPalavrasConcluido, setTutorialCacaPalavrasConcluido] = useState(false);
+  const [videoConectaJaTocou, setVideoConectaJaTocou] = useState(false);
+  const [videoCacaPalavrasJaTocou, setVideoCacaPalavrasJaTocou] = useState(false);
 
   // Refs para os vídeos
   const videoConectaRef = useRef(null);
   const videoCacaPalavrasRef = useRef(null);
+
+  // Hook para controlar áudio de fundo
+  const { pauseMusic, resumeMusic } = useAudio();
 
   // Debug: verificar se as imagens foram carregadas
   console.log('Total de imagens carregadas:', imagens.length);
@@ -75,6 +146,36 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       setTempoRestante(0);
     };
   }, []);
+
+  // Controlar música baseado na fase atual
+  useEffect(() => {
+    console.log('TelaDadolandia: Fase mudou para', faseAtual);
+    if (faseAtual === FASES.TUTORIAL_CONECTA) {
+      // Pausar música ao entrar em fase de tutorial
+      console.log('TelaDadolandia: Chamando pauseMusic()');
+      pauseMusic();
+      
+      // Tocar vídeo automaticamente apenas na primeira vez
+      if (!videoConectaJaTocou && videoConectaRef.current) {
+        setTimeout(() => {
+          videoConectaRef.current?.play().catch(err => console.error('Erro ao tocar vídeo:', err));
+          setVideoConectaJaTocou(true);
+        }, 100);
+      }
+    } else if (faseAtual === FASES.TUTORIAL_CACAPALAVRAS) {
+      // Pausar música ao entrar em fase de tutorial
+      console.log('TelaDadolandia: Chamando pauseMusic()');
+      pauseMusic();
+      
+      // Tocar vídeo automaticamente apenas na primeira vez
+      if (!videoCacaPalavrasJaTocou && videoCacaPalavrasRef.current) {
+        setTimeout(() => {
+          videoCacaPalavrasRef.current?.play().catch(err => console.error('Erro ao tocar vídeo:', err));
+          setVideoCacaPalavrasJaTocou(true);
+        }, 100);
+      }
+    }
+  }, [faseAtual, pauseMusic, videoConectaJaTocou, videoCacaPalavrasJaTocou]);
 
   const iniciarTimer = () => {
     setPodeNavegar(false);
@@ -129,6 +230,7 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
         setFaseAtual(FASES.IMAGENS);
         setImagemAtual(20);
         setPodeNavegar(true);
+        resumeMusic(); // Retomar música ao voltar para imagens
       }
     }
   };
@@ -149,6 +251,7 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       // Voltar do Tutorial Conecta para a imagem 20 (índice 19)
       setFaseAtual(FASES.IMAGENS);
       setImagemAtual(19);
+      resumeMusic(); // Retomar música ao voltar para imagens
     }
   };
 
@@ -243,24 +346,27 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       {faseAtual === FASES.TUTORIAL_CONECTA && (
         <>
           {/* Vídeo do Tutorial Conecta em tela cheia */}
-          <div className="w-full h-screen flex items-center justify-center relative">
-            <video
-              ref={videoConectaRef}
-              src={tutorialConecta}
-              controls
-              autoPlay
-              className="max-w-full max-h-full object-contain"
-              style={{
-                width: '100vw',
-                height: '100vh',
-                objectFit: 'contain'
-              }}
-              onEnded={() => handleVideoConcluido('conecta')}
-              onError={(e) => {
-                console.error('Erro ao carregar vídeo:', e.target.src);
-              }}
-            />
-          </div>
+          <VideoTutorial
+            videoRef={videoConectaRef}
+            src={tutorialConecta}
+            concluido={tutorialConectaConcluido}
+            onLoadedData={() => {
+              console.log('Vídeo Conecta carregado - pausando música');
+              pauseMusic();
+            }}
+            onPlay={() => {
+              console.log('Vídeo Conecta iniciou - pausando música');
+              pauseMusic();
+            }}
+            onEnded={() => {
+              console.log('Vídeo Conecta terminou - retomando música');
+              handleVideoConcluido('conecta');
+              resumeMusic();
+            }}
+            onError={(e) => {
+              console.error('Erro ao carregar vídeo:', e.target.src);
+            }}
+          />
 
           {/* Botão Anterior - Extremo esquerdo */}
           <button
@@ -300,24 +406,27 @@ const TelaDadolandia = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking }) => {
       {faseAtual === FASES.TUTORIAL_CACAPALAVRAS && (
         <>
           {/* Vídeo do Tutorial Caça-palavras em tela cheia */}
-          <div className="w-full h-screen flex items-center justify-center relative">
-            <video
-              ref={videoCacaPalavrasRef}
-              src={tutorialCacaPalavras}
-              controls
-              autoPlay
-              className="max-w-full max-h-full object-contain"
-              style={{
-                width: '100vw',
-                height: '100vh',
-                objectFit: 'contain'
-              }}
-              onEnded={() => handleVideoConcluido('cacaPalavras')}
-              onError={(e) => {
-                console.error('Erro ao carregar vídeo:', e.target.src);
-              }}
-            />
-          </div>
+          <VideoTutorial
+            videoRef={videoCacaPalavrasRef}
+            src={tutorialCacaPalavras}
+            concluido={tutorialCacaPalavrasConcluido}
+            onLoadedData={() => {
+              console.log('Vídeo Caça-palavras carregado - pausando música');
+              pauseMusic();
+            }}
+            onPlay={() => {
+              console.log('Vídeo Caça-palavras iniciou - pausando música');
+              pauseMusic();
+            }}
+            onEnded={() => {
+              console.log('Vídeo Caça-palavras terminou - retomando música');
+              handleVideoConcluido('cacaPalavras');
+              resumeMusic();
+            }}
+            onError={(e) => {
+              console.error('Erro ao carregar vídeo:', e.target.src);
+            }}
+          />
 
           {/* Botão Anterior - Extremo esquerdo */}
           <button

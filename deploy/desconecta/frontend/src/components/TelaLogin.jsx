@@ -20,10 +20,10 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
       return;
     }
 
-    // --- MODO DE TESTE ---
+    // --- MODO DE TESTE (apenas em desenvolvimento) ---
     // Se o apelido for "teste" e a senha "123", o login é bem-sucedido
-    // e a chamada para a API é ignorada.
-    if (apelido === 'teste' && senha === '123') {
+    // e a chamada para a API é ignorada. Não existe no build de produção.
+    if (import.meta.env.DEV && apelido === 'teste' && senha === '123') {
       console.log('Login de teste realizado com sucesso!');
       setApelido('');
       setSenha('');
@@ -40,7 +40,6 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
       };
 
       // Requisição para o endpoint de login
-      // const response = await fetch('http://localhost:8080/api/aluno/login', {
       const response = await fetch(`${window.location.origin}/desconecta/api/aluno/login`, {
         method: 'POST',
         headers: {
@@ -76,6 +75,13 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
       console.error('Erro ao realizar login:', error);
       setMostrarPopupErro(true);
     }
+  };
+
+  // Envia o login ao pressionar Enter, sem repetir enquanto a tecla é mantida
+  // pressionada nem enquanto o popup de erro estiver aberto
+  const handleKeyDown = (e) => {
+    if (e.key !== 'Enter' || e.repeat || mostrarPopupErro) return;
+    handleLogin();
   };
 
   const handleIrParaCadastro = () => {
@@ -130,6 +136,7 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
           placeholder="Nome"
           value={apelido}
           onChange={(e) => setApelido(e.target.value)}
+          onKeyDown={handleKeyDown}
           className="px-8 py-4 text-gray-800 font-bold text-2xl rounded-2xl shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
           style={{ backgroundColor: '#dbedee' }}
         />
@@ -140,6 +147,7 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
           placeholder="Senha"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
+          onKeyDown={handleKeyDown}
           className="px-8 py-4 text-gray-800 font-bold text-2xl rounded-2xl shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
           style={{ backgroundColor: '#dbedee' }}
         />

@@ -88,15 +88,12 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
     definirLetraPorCoordenada(6, 5, 'L');
     
     // Exemplo: inserir "MUNDO" verticalmente
-    definirLetraPorCoordenada(0, 2, 'F');
-    definirLetraPorCoordenada(0, 3, 'L');
-    definirLetraPorCoordenada(0, 4, 'O');
-    definirLetraPorCoordenada(0, 5, 'R');
-    definirLetraPorCoordenada(0, 6, 'E');
-    definirLetraPorCoordenada(0, 7, 'S');
-    definirLetraPorCoordenada(0, 8, 'T');
-    definirLetraPorCoordenada(0, 9, 'A');
-    definirLetraPorCoordenada(0, 10, 'L');
+    definirLetraPorCoordenada(0, 2, 'J');
+    definirLetraPorCoordenada(0, 3, 'A');
+    definirLetraPorCoordenada(0, 4, 'T');
+    definirLetraPorCoordenada(0, 5, 'O');
+    definirLetraPorCoordenada(0, 6, 'B');
+    definirLetraPorCoordenada(0, 7, 'A');
 
     definirLetraPorCoordenada(4, 0, 'G');
     definirLetraPorCoordenada(4, 1, 'O');
@@ -177,7 +174,6 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
       params.append('id', '1'); // ID do Caça-Palavras de Geografia
       params.append('tentativa', stringIndices); // Enviando a string de índices
 
-      // const response = await fetch('http://localhost:8080/api/desafio/verificar', {
       const response = await fetch(`${window.location.origin}/desconecta/api/desafio/verificar`, {
         method: 'POST',
         body: params,
@@ -213,7 +209,6 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                   // PRIMEIRO: Verificar se o desafio já foi concluído
                   console.log('🔍 Verificando se desafio já foi concluído...');
                   const responseVerificar = await fetch(
-                    // `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA`
                     `${window.location.origin}/desconecta/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA`
                   );
                   
@@ -230,7 +225,6 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                   if (!desafioConcluido) {
                     console.log('💾 Salvando pontuação (primeira vez)...');
                     const responsePontuacao = await fetch(
-                      // `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
                       `${window.location.origin}/desconecta/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
                       {
                         method: 'POST',
@@ -249,7 +243,6 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                       if (apelidoAluno) {
                         const paramsCalculo = new URLSearchParams();
                         paramsCalculo.append('apelidoAluno', apelidoAluno);
-                        // await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
                         await fetch(`${window.location.origin}/desconecta/api/progresso-aluno/calcularPontuacaoTotal`, {
                           method: 'POST',
                           body: paramsCalculo

@@ -325,7 +325,6 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
 
             // 2. Fazer a requisição para o novo endpoint unificado
             const response = await fetch(
-              // "http://localhost:8080/api/desafio/verificar",
               `${window.location.origin}/desconecta/api/desafio/verificar`,
               {
                 method: "POST",
@@ -371,7 +370,6 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                       "🔍 Verificando se desafio já foi concluído..."
                     );
                     const responseVerificar = await fetch(
-                      // `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=CIENCIAS`
                       `${window.location.origin}/desconecta/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=CIENCIAS`
                     );
 
@@ -391,7 +389,6 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                     if (!desafioConcluido) {
                       console.log("💾 Salvando pontuação (primeira vez)...");
                       const responsePontuacao = await fetch(
-                        // `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
                         `${window.location.origin}/desconecta/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
                         {
                           method: "POST",
@@ -413,7 +410,6 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                         if (apelidoAluno) {
                           const paramsCalculo = new URLSearchParams();
                           paramsCalculo.append('apelidoAluno', apelidoAluno);
-                          // await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
                           await fetch(`${window.location.origin}/desconecta/api/progresso-aluno/calcularPontuacaoTotal`, {
                             method: 'POST',
                             body: paramsCalculo

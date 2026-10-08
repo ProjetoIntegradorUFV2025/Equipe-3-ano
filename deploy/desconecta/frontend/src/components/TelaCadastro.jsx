@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import useAlunoLogado from '../hooks/useAlunoLogado';
 import fundoTelaLogin from '../assets/fundo-tela-login.png';
 import logoDesconecta from "../assets/Titulo nome do jogo.png";
 import mascoteImg from "../assets/Dadinho sentado segurando quebra-cabeca.png";
@@ -7,11 +8,37 @@ import popupCadastroSucesso from '../assets/popup-cadastro-sucesso.png';
 
 // --- Componente Principal: Tela de Cadastro ---
 // Tela de cadastro com fundo e dois campos de entrada centralizados
-const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
+const TelaCadastro = ({ voltarParaInicial, irParaLogin, irParaJogo }) => {
   const [apelido, setApelido] = useState('');
   const [senha, setSenha] = useState('');
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [mostrarPopupSucesso, setMostrarPopupSucesso] = useState(false);
+  // Evita enviar o cadastro mais de uma vez enquanto uma requisição está em andamento
+  const enviandoRef = useRef(false);
+  const { logarAluno } = useAlunoLogado();
+
+  // Faz o login com os dados recém-cadastrados; retorna true se a sessão foi iniciada
+  const entrarAutomaticamente = async () => {
+    try {
+      const response = await fetch(`${window.location.origin}/desconecta/api/aluno/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ apelido: apelido, senha: senha }),
+      });
+      if (!response.ok) return false;
+
+      const alunoId = await response.json();
+      if (!alunoId) return false;
+
+      logarAluno(alunoId, apelido);
+      return true;
+    } catch (error) {
+      console.error('Erro ao entrar automaticamente após o cadastro:', error);
+      return false;
+    }
+  };
 
   const handleCadastro = async () => {
     console.log('Dados do cadastro:', { apelido, senha });
@@ -22,8 +49,10 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
       return;
     }
 
+    if (enviandoRef.current) return;
+    enviandoRef.current = true;
+
     try {
-      // const response = await fetch('http://localhost:8080/api/aluno/cadastro', {
       const response = await fetch(`${window.location.origin}/desconecta/api/aluno/cadastro`, {
         method: 'POST',
         headers: {
@@ -39,11 +68,16 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
         const resultado = await response.json(); // Pega o valor booleano retornado
         if (resultado === true) {
           console.log('Cadastro realizado com sucesso!');
-          setMostrarPopupSucesso(true); // Mostra popup de sucesso
-          // Limpa os campos
+          const entrou = await entrarAutomaticamente();
+          if (entrou) {
+            irParaJogo(); // Segue direto para o jogo, sem pedir login
+            return;
+          }
+          // Se o login automático falhar, o cadastro continua válido: mostra o
+          // popup de sucesso, cujo X leva à tela de login
+          setMostrarPopupSucesso(true);
           setApelido('');
           setSenha('');
-          // Popup só fecha quando usuário clicar no X
         } else {
           console.error('Erro no cadastro - Apelido já existe ou dados inválidos');
           setMostrarPopup(true); // Mostra popup de erro quando retorna false
@@ -55,7 +89,16 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
     } catch (error) {
       console.error('Erro na requisição:', error);
       setMostrarPopup(true);
+    } finally {
+      enviandoRef.current = false;
     }
+  };
+
+  // Envia o cadastro ao pressionar Enter, sem repetir enquanto a tecla é mantida
+  // pressionada nem enquanto algum popup estiver aberto
+  const handleKeyDown = (e) => {
+    if (e.key !== 'Enter' || e.repeat || mostrarPopup || mostrarPopupSucesso) return;
+    handleCadastro();
   };
 
   const handleIrParaLogin = () => {
@@ -109,6 +152,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
             placeholder="Nome"
             value={apelido}
             onChange={(e) => setApelido(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="px-8 py-4 text-gray-800 font-bold text-2xl rounded-2xl shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
             style={{ backgroundColor: '#dbedee' }}
           />
@@ -119,6 +163,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin }) => {
             placeholder="Senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="px-8 py-4 text-gray-800 font-bold text-2xl rounded-2xl shadow-lg border-2 border-purple-800 focus:outline-none focus:border-purple-900 transition-all duration-300"
             style={{ backgroundColor: '#dbedee' }}
           />

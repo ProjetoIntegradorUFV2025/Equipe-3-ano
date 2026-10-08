@@ -3,12 +3,13 @@ import TelaInicial from "./components/TelaInicial";
 import TelaCadastro from "./components/TelaCadastro";
 import TelaLogin from "./components/TelaLogin";
 import TelaJogo from "./components/TelaJogo"; // Importa a nova tela do jogo
+import { AudioProvider } from "./contexts/AudioContext";
 
 function App() {
   const [tela, setTela] = useState("inicial");
 
   return (
-    <>
+    <AudioProvider>
       {tela === "inicial" && (
         <TelaInicial
           irParaLogin={() => setTela("login")}
@@ -27,6 +28,7 @@ function App() {
         <TelaCadastro
           voltarParaInicial={() => setTela("inicial")}
           irParaLogin={() => setTela("login")}
+          irParaJogo={() => setTela("jogo")}
         />
       )}
       {tela === "jogo" && (
@@ -34,7 +36,7 @@ function App() {
           voltarParaInicial={() => setTela("inicial")}
         />
       )}
-    </>
+    </AudioProvider>
   );
 }
 

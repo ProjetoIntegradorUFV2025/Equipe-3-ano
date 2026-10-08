@@ -42,7 +42,6 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
       console.log('Ilha jogada:', nomeIlhaJogada);
       
       // Buscar o ID do progresso do aluno primeiro
-      // const responseIdProgresso = await fetch(`http://localhost:8080/api/progresso-aluno/id/${alunoId}`);
       const responseIdProgresso = await fetch(`${window.location.origin}/desconecta/api/progresso-aluno/id/${alunoId}`);
       
       if (!responseIdProgresso.ok) {
@@ -62,7 +61,6 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
       console.log(`ℹ️ Verificando se ${nomeIlhaJogada} já foi jogada...`);
       
       const responseFoiJogada = await fetch(
-        // `http://localhost:8080/api/ilhas/verificar-foi-jogada?idProgressoAluno=${idProgressoAluno}&nomeIlha=${nomeIlhaJogada}`
         `${window.location.origin}/desconecta/api/ilhas/verificar-foi-jogada?idProgressoAluno=${idProgressoAluno}&nomeIlha=${nomeIlhaJogada}`
       );
       
@@ -84,8 +82,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
       
       // Chamar diretamente avancarIlha - ele já faz todas as validações necessárias
       console.log('Chamando avancar-ilha com PUT...');
-      // const responseAvancar = await fetch(`http://localhost:8080/api/ilhas/avancar-ilha/${idProgressoAluno}`, {
-        const responseAvancar = await fetch(`${window.location.origin}/desconecta/api/ilhas/avancar-ilha/${idProgressoAluno}`, {
+      const responseAvancar = await fetch(`${window.location.origin}/desconecta/api/ilhas/avancar-ilha/${idProgressoAluno}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

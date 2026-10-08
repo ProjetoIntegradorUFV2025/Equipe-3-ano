@@ -29,7 +29,6 @@ const TelaRanking = ({ onVoltar }) => {
       setCarregando(true);
       
       // Buscar ranking geral
-      // const response = await fetch('http://localhost:8080/api/classificacao/classificacaoGeral');
       const response = await fetch(`${window.location.origin}/desconecta/api/classificacao/classificacaoGeral`);
       
       if (!response.ok) {
@@ -65,7 +64,6 @@ const TelaRanking = ({ onVoltar }) => {
 
     try {
       const response = await fetch(
-        // `http://localhost:8080/api/classificacao/classificacaoAluno?apelidoAluno=${encodeURIComponent(apelidoAluno)}`
         `${window.location.origin}/desconecta/api/classificacao/classificacaoAluno?apelidoAluno=${encodeURIComponent(apelidoAluno)}`
       );
       
