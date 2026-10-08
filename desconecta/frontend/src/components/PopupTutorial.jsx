@@ -9,6 +9,8 @@ import tutorialCacaPalavras from '../assets/Dadolandia/Tutorial Caça-palavras.m
 // --- Componente: Popup de Tutorial ---
 const PopupTutorial = ({ isOpen, onClose, tipoTutorial = "todos" }) => {
   const [tutorialAtual, setTutorialAtual] = useState(0);
+  // Começa true: se o navegador bloquear o autoplay, nenhum evento de pause é disparado
+  const [pausado, setPausado] = useState(true);
   const videoRef = useRef(null);
   const { pauseMusic, resumeMusic } = useAudio();
 
@@ -56,7 +58,7 @@ const PopupTutorial = ({ isOpen, onClose, tipoTutorial = "todos" }) => {
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
-      videoRef.current.play();
+      videoRef.current.play()?.catch(() => {});
     }
   }, [tutorialAtual]);
 
@@ -118,13 +120,34 @@ const PopupTutorial = ({ isOpen, onClose, tipoTutorial = "todos" }) => {
             autoPlay
             loop
             className="max-w-full max-h-full object-contain"
-            onPlay={() => pauseMusic()}
+            onPlay={() => {
+              setPausado(false);
+              pauseMusic();
+            }}
+            onPause={() => setPausado(true)}
             onEnded={() => resumeMusic()}
             onError={(e) => {
               console.error('Erro ao carregar vídeo:', e.target.src);
             }}
           />
         </div>
+
+        {/* Botão de play grande: aparece quando o vídeo está pausado */}
+        {pausado && (
+          <button
+            onClick={() => videoRef.current?.play()?.catch(() => {})}
+            aria-label="Reproduzir vídeo"
+            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300"
+            style={{
+              width: 'min(110px, 14vw)',
+              height: 'min(110px, 14vw)',
+              fontSize: 'min(48px, 6vw)',
+              backgroundColor: '#563066'
+            }}
+          >
+            ▶
+          </button>
+        )}
 
         {/* Botão Fechar (X) */}
         <button
