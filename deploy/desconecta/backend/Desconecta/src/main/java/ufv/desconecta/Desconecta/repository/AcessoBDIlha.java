@@ -39,13 +39,13 @@ public class AcessoBDIlha {
         }).orElse(false); // Retorna false se a ilha não foi encontrada
     }
 
-    public List<Ilha> recuperarIlhasPorProgressoId(int idProgressoAluno) {
-        return repositorioIlha.buscarTodasAsIlhasDeUmProgresso((long) idProgressoAluno);
+    public List<Ilha> recuperarIlhasPorProgressoId(long idProgressoAluno) {
+        return repositorioIlha.buscarTodasAsIlhasDeUmProgresso(idProgressoAluno);
     }
 
     // Método para verificar se uma ilha específica foi jogada
-    public Optional<Boolean> verificarSeIlhaFoiJogada(int idProgressoAluno, EnumNomeIlha nomeIlha) {
-        Optional<Ilha> ilhaOpt = repositorioIlha.buscarIlhaPorProgressoENome((long) idProgressoAluno, nomeIlha);
+    public Optional<Boolean> verificarSeIlhaFoiJogada(long idProgressoAluno, EnumNomeIlha nomeIlha) {
+        Optional<Ilha> ilhaOpt = repositorioIlha.buscarIlhaPorProgressoENome(idProgressoAluno, nomeIlha);
         return ilhaOpt.map(Ilha::isFoiJogada);
     }
 }

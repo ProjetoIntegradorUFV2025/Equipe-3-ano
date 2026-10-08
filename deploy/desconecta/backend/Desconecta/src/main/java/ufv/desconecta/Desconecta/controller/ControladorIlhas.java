@@ -1,6 +1,9 @@
 package ufv.desconecta.Desconecta.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ufv.desconecta.Desconecta.model.EnumNomeIlha;
 import ufv.desconecta.Desconecta.model.EnumTiposDesafios;
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/ilhas")
 @CrossOrigin(origins = "*")
 public class ControladorIlhas {
+
+    private static final Logger log = LoggerFactory.getLogger(ControladorIlhas.class);
 
     private final AcessoBDIlha acessoBDIlha;
     private final AcessoBDProgressoAluno acessoBDProgressoAluno;
@@ -45,12 +50,12 @@ public class ControladorIlhas {
 
 
     @GetMapping("/recuperar/{idProgressoAluno}")
-    public List<Ilha> recuperarIlhas(@PathVariable int idProgressoAluno) {
+    public List<Ilha> recuperarIlhas(@PathVariable long idProgressoAluno) {
         return acessoBDIlha.recuperarIlhasPorProgressoId(idProgressoAluno);
     }
 
     @GetMapping("/posicoes-ilhas/{idProgressoAluno}")
-    public List<Integer> recuperarPosicoesIlhas(@PathVariable int idProgressoAluno) {
+    public List<Integer> recuperarPosicoesIlhas(@PathVariable long idProgressoAluno) {
         try {
             // 1. Busca a lista de ilhas (ela virá desordenada do banco).
             List<Ilha> ilhasDoProgresso = acessoBDIlha.recuperarIlhasPorProgressoId(idProgressoAluno);
@@ -64,7 +69,7 @@ public class ControladorIlhas {
 
         } catch (Exception e) {
             // Em caso de erro, loga a mensagem e retorna uma lista vazia.
-            System.err.println("Erro ao recuperar posições das ilhas: " + e.getMessage());
+            log.error("Erro ao recuperar posições das ilhas", e);
             return Collections.emptyList();
         }
     }
@@ -72,16 +77,17 @@ public class ControladorIlhas {
     /**
      * Avança a ilha do aluno para a próxima posição no enum
      * @param idProgressoAluno ID do progresso do aluno
-     * @return Nova posição da ilha ou -1 se erro
+     * @return 200 com a nova posição da ilha, ou -1 se não for possível avançar; 404 se o progresso
+     *         do aluno não existe; 500 em caso de erro interno
      */
     @PutMapping("/avancar-ilha/{idProgressoAluno}")
-    public int avancarIlha(@PathVariable int idProgressoAluno) {
+    public ResponseEntity<Integer> avancarIlha(@PathVariable long idProgressoAluno) {
         try {
             // 1. Busca o progresso do aluno.
             ProgressoAluno progresso = acessoBDProgressoAluno.getProgressoAluno(idProgressoAluno);
             if (progresso == null) {
-                System.err.println("Progresso com ID " + idProgressoAluno + " não encontrado.");
-                return -1;
+                log.warn("Avançar ilha: progresso do aluno não encontrado");
+                return ResponseEntity.notFound().build();
             }
 
             // 2. Busca a lista de ilhas que o aluno já possui.
@@ -92,8 +98,8 @@ public class ControladorIlhas {
                     .max(Comparator.comparing(ilha -> ilha.getNomeIlha().ordinal()));
 
             if (ilhaMaisRecenteOpt.isEmpty()) {
-                System.err.println("Aluno não possui nenhuma ilha para poder avançar.");
-                return -1;
+                log.warn("Avançar ilha: aluno não possui nenhuma ilha para poder avançar");
+                return ResponseEntity.ok(-1);
             }
 
             // 4. Pega o objeto da ilha anterior (a mais avançada até agora).
@@ -109,10 +115,10 @@ public class ControladorIlhas {
             // 6. Verifica se o aluno já está na última ilha.
             EnumNomeIlha[] todasAsIlhas = EnumNomeIlha.values();
             if (posicaoAtual >= todasAsIlhas.length - 1) {
-                System.out.println("Aluno já está na última ilha, não pode avançar.");
+                log.debug("Aluno já está na última ilha, não pode avançar");
                 // Mesmo estando na última ilha, ainda salvamos a alteração de 'foiJogada'.
                 acessoBDProgressoAluno.salvarProgressoAluno(progresso);
-                return -1;
+                return ResponseEntity.ok(-1);
             }
 
             // 7. Determina qual é a próxima ilha na sequência.
@@ -137,7 +143,7 @@ public class ControladorIlhas {
                     novaIlha.getDesafios().add(desafio2);
                 }
                 default -> {
-                    return  -1;
+                    return ResponseEntity.ok(-1);
                 }
             }
             // 9. Adiciona a nova ilha à lista do progresso e salva TUDO no banco.
@@ -145,12 +151,11 @@ public class ControladorIlhas {
             acessoBDProgressoAluno.salvarProgressoAluno(progresso);
 
             // 10. Retorna o ordinal da nova ilha criada.
-            return proximaIlhaEnum.ordinal();
+            return ResponseEntity.ok(proximaIlhaEnum.ordinal());
 
         } catch (Exception e) {
-            System.err.println("Erro genérico ao avançar ilha: " + e.getMessage());
-            e.printStackTrace();
-            return -1;
+            log.error("Erro genérico ao avançar ilha", e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -158,29 +163,29 @@ public class ControladorIlhas {
      * Verifica se uma ilha específica já foi jogada
      * @param idProgressoAluno ID do progresso do aluno
      * @param nomeIlha Nome da ilha (DADOLANDIA, CIENCIAS, MATEMATICA, GEOGRAFIA, HISTORIA)
-     * @return true se foi jogada, false caso contrário
+     * @return 200 com true se foi jogada e false caso contrário; 400 se o nome da ilha é inválido;
+     *         404 se a ilha não existe para o progresso; 500 em caso de erro interno
      */
     @GetMapping("/verificar-foi-jogada")
-    public boolean verificarSeIlhaFoiJogada(
-            @RequestParam int idProgressoAluno,
+    public ResponseEntity<Boolean> verificarSeIlhaFoiJogada(
+            @RequestParam long idProgressoAluno,
             @RequestParam String nomeIlha) {
         try {
             // Converte a string para o enum
             EnumNomeIlha enumNomeIlha = EnumNomeIlha.valueOf(nomeIlha.toUpperCase());
-            
-            // Busca e retorna o status foiJogada
+
+            // Busca o status foiJogada; ilha inexistente para o progresso resulta em 404
             Optional<Boolean> foiJogada = acessoBDIlha.verificarSeIlhaFoiJogada(idProgressoAluno, enumNomeIlha);
-            
-            // Se a ilha não foi encontrada, retorna false
-            return foiJogada.orElse(false);
-            
+
+            return foiJogada.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+
         } catch (IllegalArgumentException e) {
-            System.err.println("Nome de ilha inválido: " + nomeIlha);
-            return false;
+            log.warn("Verificar ilha jogada: nome de ilha inválido: {}", nomeIlha);
+            return ResponseEntity.badRequest().build();
         } catch (Exception e) {
-            System.err.println("Erro ao verificar se ilha foi jogada: " + e.getMessage());
-            e.printStackTrace();
-            return false;
+            log.error("Erro ao verificar se ilha foi jogada", e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

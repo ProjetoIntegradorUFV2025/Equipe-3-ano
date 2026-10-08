@@ -1,5 +1,6 @@
 package ufv.desconecta.Desconecta.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,6 +29,8 @@ public class ProgressoAluno {
     private int pontuacaoTotalAluno = 0;
 
 
+    // LAZY: o Hibernate entrega um proxy cujas propriedades internas nao sao serializaveis em JSON
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_Aluno", referencedColumnName = "PK_Aluno")
     private Aluno aluno;

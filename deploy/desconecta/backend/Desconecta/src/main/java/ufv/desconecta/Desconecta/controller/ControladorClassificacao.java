@@ -1,5 +1,7 @@
 package ufv.desconecta.Desconecta.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ufv.desconecta.Desconecta.dto.ClassificacaoDTO;
 import ufv.desconecta.Desconecta.model.ProgressoAluno;
@@ -15,46 +17,42 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class ControladorClassificacao {
 
-  private AcessoBDProgressoAluno acessoBDProgressoAluno;
+    private static final Logger log = LoggerFactory.getLogger(ControladorClassificacao.class);
 
-  public ControladorClassificacao(AcessoBDProgressoAluno acessoBDProgressoAluno) {
-    this.acessoBDProgressoAluno = acessoBDProgressoAluno;
-  }
-
-  @GetMapping("/classificacaoGeral")
-  public List<ClassificacaoDTO> buscarClassificacaoGeral() {
-    List<ClassificacaoDTO> listaClassificacaoGeral = acessoBDProgressoAluno.obterClassificacaoGeralOrdenada();
-    for (ClassificacaoDTO progresso : listaClassificacaoGeral) {
-      System.out.println("Nome: " + progresso.getNomeAluno() +
-          " Pontuação: " + progresso.getPontuacaoTotalAluno());
+    private AcessoBDProgressoAluno acessoBDProgressoAluno;
+    public ControladorClassificacao(AcessoBDProgressoAluno acessoBDProgressoAluno) {
+        this.acessoBDProgressoAluno = acessoBDProgressoAluno;
     }
-    return listaClassificacaoGeral;
-  }
+    @GetMapping("/classificacaoGeral")
+        public List<ClassificacaoDTO> buscarClassificacaoGeral() {
+        List<ClassificacaoDTO> listaClassificacaoGeral  = acessoBDProgressoAluno.obterClassificacaoGeralOrdenada();
+        return listaClassificacaoGeral;
+    }
 
-  @GetMapping("/classificacaoAluno")
-  public Map<String, Object> buscarClassificacaoAluno(@RequestParam String apelidoAluno) {
-    List<ClassificacaoDTO> listaClassificacaoGeral = acessoBDProgressoAluno.obterClassificacaoGeralOrdenada();
-
-    Map<String, Object> resultado = new HashMap<>();
-
-    // Procurar o aluno na lista ordenada
-    for (int i = 0; i < listaClassificacaoGeral.size(); i++) {
-      ClassificacaoDTO classificacao = listaClassificacaoGeral.get(i);
-      if (classificacao.getNomeAluno().equalsIgnoreCase(apelidoAluno)) {
-        resultado.put("posicao", i + 1);
-        resultado.put("nomeAluno", classificacao.getNomeAluno());
-        resultado.put("pontuacaoTotalAluno", classificacao.getPontuacaoTotalAluno());
-
-        System.out.println("Classificação do aluno '" + apelidoAluno + "': " +
-            "Posição: " + (i + 1) + ", Pontuação: " + classificacao.getPontuacaoTotalAluno());
-
+    @GetMapping("/classificacaoAluno")
+    public Map<String, Object> buscarClassificacaoAluno(@RequestParam String apelidoAluno) {
+        List<ClassificacaoDTO> listaClassificacaoGeral = acessoBDProgressoAluno.obterClassificacaoGeralOrdenada();
+        
+        Map<String, Object> resultado = new HashMap<>();
+        
+        // Procurar o aluno na lista ordenada
+        for (int i = 0; i < listaClassificacaoGeral.size(); i++) {
+            ClassificacaoDTO classificacao = listaClassificacaoGeral.get(i);
+            if (classificacao.getNomeAluno().equalsIgnoreCase(apelidoAluno)) {
+                resultado.put("posicao", i + 1);
+                resultado.put("nomeAluno", classificacao.getNomeAluno());
+                resultado.put("pontuacaoTotalAluno", classificacao.getPontuacaoTotalAluno());
+                
+                log.debug("Classificação do aluno '{}': posição {}, pontuação {}",
+                        apelidoAluno, i + 1, classificacao.getPontuacaoTotalAluno());
+                
+                return resultado;
+            }
+        }
+        
+        // Se não encontrar o aluno
+        log.warn("Aluno não encontrado no ranking");
+        resultado.put("erro", "Aluno não encontrado");
         return resultado;
-      }
     }
-
-    // Se não encontrar o aluno
-    System.err.println("Aluno '" + apelidoAluno + "' não encontrado no ranking.");
-    resultado.put("erro", "Aluno não encontrado");
-    return resultado;
-  }
 }
