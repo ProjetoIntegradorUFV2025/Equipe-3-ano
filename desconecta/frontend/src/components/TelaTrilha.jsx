@@ -6,6 +6,7 @@ import ilhaCiencias from '../assets/imgTelaTrilha/Ilha-Ciencias.png';
 import ilhaGeografia from '../assets/imgTelaTrilha/Ilha-geografia.png';
 import ilhaMatematica from '../assets/imgTelaTrilha/Ilha-Matematica.png';
 import popupJogarIlha from '../assets/imgTelaTrilha/popup-jogar-ilha.png';
+import estrela from '../assets/Estrela.png';
 import TelaJogoCiencia from './TelaJogoCiencia';
 import TelaDadolandia from './TelaDadolandia';
 import TelaJogoGeografia from './TelaJogoGeografia';
@@ -17,9 +18,30 @@ import useAlunoLogado from '../hooks/useAlunoLogado';
 import MenuNavegacao from './ui/MenuNavegacao';
 
 
+// Nomes das ilhas na mesma ordem do enum EnumNomeIlha do backend
+const NOMES_ILHAS = ['DADOLANDIA', 'CIENCIAS', 'MATEMATICA', 'GEOGRAFIA', 'HISTORIA'];
+
+// --- Componente: Selo de fase concluída ---
+// Estrela no canto superior direito da ilha; o elemento pai precisa ser posicionado
+const SeloConcluida = () => (
+  <img
+    src={estrela}
+    alt="Fase concluída"
+    className="absolute pointer-events-none drop-shadow-lg"
+    style={{
+      top: '-3%',
+      right: '-6%',
+      width: 'min(120px, 15vw)', // a imagem é larga (997x485): mantém a proporção
+      height: 'auto',
+      zIndex: 5
+    }}
+  />
+);
+
 // --- Componente: Tela Trilha ---
 const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
+  const [ilhasConcluidas, setIlhasConcluidas] = useState(new Set()); // nomes das ilhas já jogadas
   const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', 'historia', ou 'pontuacao'
   const [nomeIlhaJogada, setNomeIlhaJogada] = useState(null); // Rastreia qual ilha foi jogada
   const [popupDadolandiaAberto, setPopupDadolandiaAberto] = useState(false);
@@ -35,6 +57,23 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
   const { alunoId, isLogado } = useAlunoLogado();
 
   // Função para buscar a posição da ilha do aluno
+  // Consulta quais das ilhas desbloqueadas já foram jogadas (falhas só omitem a marca)
+  const carregarIlhasConcluidas = async (idProgressoAluno, posicoesIlhas) => {
+    const nomes = posicoesIlhas.map((posicao) => NOMES_ILHAS[posicao]).filter(Boolean);
+    const resultados = await Promise.all(nomes.map(async (nome) => {
+      try {
+        const resposta = await fetch(
+          `http://localhost:8080/api/ilhas/verificar-foi-jogada?idProgressoAluno=${idProgressoAluno}&nomeIlha=${nome}`
+        );
+        return resposta.ok && (await resposta.json()) === true ? nome : null;
+      } catch (error) {
+        console.error('Erro ao verificar se a ilha foi jogada:', error);
+        return null;
+      }
+    }));
+    setIlhasConcluidas(new Set(resultados.filter(Boolean)));
+  };
+
   const buscarPosicaoIlha = async () => {
     if (!alunoId || !isLogado) {
       setCarregandoProgresso(false);
@@ -62,6 +101,11 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
               const posicaoMaisAvancada = posicoesIlhas[posicoesIlhas.length - 1];
               setPosicaoIlhaAtual(posicaoMaisAvancada);
               console.log('Posição da ilha mais avançada:', posicaoMaisAvancada);
+            }
+
+            // Marca as fases concluídas sem atrasar a exibição da trilha
+            if (posicoesIlhas) {
+              carregarIlhasConcluidas(idProgressoAluno, posicoesIlhas);
             }
           }
         }
@@ -362,6 +406,7 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
               left: '50%', 
               transform: 'translate(-45%, -40%)' 
             }}>
+            {ilhasConcluidas.has('CIENCIAS') && <SeloConcluida />}
             <button
               onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 1) ? handleAbrirPopupCiencia : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 1}
@@ -414,6 +459,7 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
   }}
 >
   {/* Botão redondo */}
+  {ilhasConcluidas.has('DADOLANDIA') && <SeloConcluida />}
   <button
     onClick={handleAbrirPopupDadolandia}
     className="rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 border-8"
@@ -464,6 +510,7 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
               left: '75%', 
               transform: 'translate(30%, -110%)' 
             }}>
+            {ilhasConcluidas.has('MATEMATICA') && <SeloConcluida />}
             <button
               onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 2) ? handleAbrirPopupMatematica : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 2}
@@ -516,6 +563,7 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
               left: '30%', 
               transform: 'translate(-30%, -15%)' 
             }}>
+            {ilhasConcluidas.has('GEOGRAFIA') && <SeloConcluida />}
             <button
               onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 3) ? handleAbrirPopupGeografia : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 3}
@@ -565,6 +613,7 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
               left: '65%', 
               transform: 'translate(20%, 20%)' 
             }}>
+            {ilhasConcluidas.has('HISTORIA') && <SeloConcluida />}
             <button
               onClick={(posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4) ? handleAbrirPopupHistoria : undefined}
               disabled={posicaoIlhaAtual === null || posicaoIlhaAtual < 4}
