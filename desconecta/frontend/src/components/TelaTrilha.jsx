@@ -42,6 +42,7 @@ const SeloConcluida = () => (
 const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
   const [posicaoIlhaAtual, setPosicaoIlhaAtual] = useState(null);
   const [ilhasConcluidas, setIlhasConcluidas] = useState(new Set()); // nomes das ilhas já jogadas
+  const [mostrarDicaRolagem, setMostrarDicaRolagem] = useState(true); // some assim que a trilha é rolada
   const [telaAtiva, setTelaAtiva] = useState('trilha'); // 'trilha', 'dadolandia', 'ciencia', 'geografia', 'matematica', 'historia', ou 'pontuacao'
   const [nomeIlhaJogada, setNomeIlhaJogada] = useState(null); // Rastreia qual ilha foi jogada
   const [popupDadolandiaAberto, setPopupDadolandiaAberto] = useState(false);
@@ -354,7 +355,40 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
       onMouseLeave={handleMouseLeave}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
+      onScroll={(e) => {
+        if (e.currentTarget.scrollLeft > 20) setMostrarDicaRolagem(false);
+      }}
+      onWheel={(e) => {
+        // A trilha só rola na horizontal: converte a roda do mouse (vertical) em rolagem lateral
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          e.currentTarget.scrollLeft += e.deltaY;
+        }
+      }}
     >
+      {/* Dica de que a trilha continua para o lado: só depois que a ilha de História é desbloqueada */}
+      {mostrarDicaRolagem && posicaoIlhaAtual !== null && posicaoIlhaAtual >= 4 && (
+        <div
+          className="fixed z-10 pointer-events-none flex items-center gap-2 text-white font-bold animate-pulse"
+          style={{
+            right: 'min(24px, 2vw)',
+            top: '38%',
+            transform: 'translateY(-50%)'
+          }}
+        >
+          <span
+            className="rounded-full shadow-lg"
+            style={{
+              backgroundColor: '#563066',
+              padding: 'min(10px, 1.5vh) min(20px, 2.5vw)',
+              fontSize: 'min(22px, 2.2vw)'
+            }}
+          >
+            Arraste para ver mais
+          </span>
+          <span className="drop-shadow-lg" style={{ fontSize: 'min(48px, 5vw)' }}>➜</span>
+        </div>
+      )}
+
       {/* Menu de Navegação */}
       <MenuNavegacao 
         onVoltarTrilha={() => {}} // Já está na trilha
