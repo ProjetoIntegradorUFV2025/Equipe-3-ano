@@ -1,5 +1,7 @@
 package ufv.desconecta.Desconecta.repository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -17,6 +19,8 @@ import java.util.List;
 
 @Repository
 public class AcessoBDProgressoAluno  {
+
+    private static final Logger log = LoggerFactory.getLogger(AcessoBDProgressoAluno.class);
 
     private final RepositorioProgressoAluno repositorioProgressoAluno;
 
@@ -51,7 +55,7 @@ public class AcessoBDProgressoAluno  {
             return query.getResultList();
         } catch (Exception e) {
             // Em caso de erro (ex: progresso não encontrado), retorna uma lista vazia para evitar erros.
-            System.err.println("Erro ao buscar ilhas do progresso: " + e.getMessage());
+            log.error("Erro ao buscar ilhas do progresso", e);
             return Collections.emptyList();
         }
     }

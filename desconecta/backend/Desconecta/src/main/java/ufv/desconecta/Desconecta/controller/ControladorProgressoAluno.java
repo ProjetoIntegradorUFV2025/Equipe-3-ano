@@ -1,5 +1,7 @@
 package ufv.desconecta.Desconecta.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ufv.desconecta.Desconecta.model.Aluno;
@@ -17,6 +19,8 @@ import java.util.List;
 @RequestMapping("/api/progresso-aluno")
 @CrossOrigin(origins = "*")
 public class ControladorProgressoAluno {
+
+    private static final Logger log = LoggerFactory.getLogger(ControladorProgressoAluno.class);
 
     private final AcessoBDProgressoAluno acessoBDProgressoAluno;
 
@@ -49,17 +53,15 @@ public class ControladorProgressoAluno {
 
     @PostMapping("/calcularPontuacaoTotal")
     public int calcularPontuacaoTotal(@RequestParam String apelidoAluno) {
-        System.out.println(apelidoAluno);
-
         Aluno aluno = acessoBDAluno.buscarApelido(apelidoAluno);
         if (aluno == null) {
-            System.err.println("Erro ao calcular pontuação: Aluno '" + apelidoAluno + "' não encontrado.");
+            log.warn("Calcular pontuação: aluno não encontrado");
             return 0;
         }
 
         ProgressoAluno progresso = acessoBDProgressoAluno.getProgressoPeloAlunoId(aluno.getPK_Aluno());
         if (progresso == null) {
-            System.err.println("Erro ao calcular pontuação: Progresso não encontrado para o aluno: " + apelidoAluno);
+            log.warn("Calcular pontuação: progresso não encontrado para o aluno");
             return -1;
         }
 
@@ -75,7 +77,7 @@ public class ControladorProgressoAluno {
         progresso.setPontuacaoTotalAluno(pontuacaoTotal);
         acessoBDProgressoAluno.salvarProgressoAluno(progresso);
 
-        System.out.println("Nova pontuação total para '" + apelidoAluno + "': " + pontuacaoTotal);
+        log.debug("Nova pontuação total para '{}': {}", apelidoAluno, pontuacaoTotal);
 
         return 1;
     }

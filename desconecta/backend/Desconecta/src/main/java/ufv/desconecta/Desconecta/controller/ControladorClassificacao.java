@@ -1,5 +1,7 @@
 package ufv.desconecta.Desconecta.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ufv.desconecta.Desconecta.dto.ClassificacaoDTO;
 import ufv.desconecta.Desconecta.model.ProgressoAluno;
@@ -15,6 +17,8 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class ControladorClassificacao {
 
+    private static final Logger log = LoggerFactory.getLogger(ControladorClassificacao.class);
+
     private AcessoBDProgressoAluno acessoBDProgressoAluno;
     public ControladorClassificacao(AcessoBDProgressoAluno acessoBDProgressoAluno) {
         this.acessoBDProgressoAluno = acessoBDProgressoAluno;
@@ -22,10 +26,6 @@ public class ControladorClassificacao {
     @GetMapping("/classificacaoGeral")
         public List<ClassificacaoDTO> buscarClassificacaoGeral() {
         List<ClassificacaoDTO> listaClassificacaoGeral  = acessoBDProgressoAluno.obterClassificacaoGeralOrdenada();
-        for (ClassificacaoDTO progresso : listaClassificacaoGeral) {
-            System.out.println( "Nome: " + progresso.getNomeAluno()+
-                    " Pontuação: " + progresso.getPontuacaoTotalAluno());
-        }
         return listaClassificacaoGeral;
     }
 
@@ -43,15 +43,15 @@ public class ControladorClassificacao {
                 resultado.put("nomeAluno", classificacao.getNomeAluno());
                 resultado.put("pontuacaoTotalAluno", classificacao.getPontuacaoTotalAluno());
                 
-                System.out.println("Classificação do aluno '" + apelidoAluno + "': " +
-                        "Posição: " + (i + 1) + ", Pontuação: " + classificacao.getPontuacaoTotalAluno());
+                log.debug("Classificação do aluno '{}': posição {}, pontuação {}",
+                        apelidoAluno, i + 1, classificacao.getPontuacaoTotalAluno());
                 
                 return resultado;
             }
         }
         
         // Se não encontrar o aluno
-        System.err.println("Aluno '" + apelidoAluno + "' não encontrado no ranking.");
+        log.warn("Aluno não encontrado no ranking");
         resultado.put("erro", "Aluno não encontrado");
         return resultado;
     }

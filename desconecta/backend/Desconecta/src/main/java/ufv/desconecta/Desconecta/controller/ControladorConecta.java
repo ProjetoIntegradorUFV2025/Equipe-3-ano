@@ -1,5 +1,7 @@
 package ufv.desconecta.Desconecta.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,8 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ControladorConecta implements SolucionarDesafio { // Implemente a interface
 
+    private static final Logger log = LoggerFactory.getLogger(ControladorConecta.class);
+
     @Autowired
     private AcessoBDConecta acessoBDConecta;
 
@@ -23,7 +27,7 @@ public class ControladorConecta implements SolucionarDesafio { // Implemente a i
         // 1. Pega a lista de respostas do banco
         List<String> respostasCertas = new ArrayList<>(acessoBDConecta.getRespostas(idDesafio));
 
-        System.out.println(respostaAluno);
+        log.debug("Resposta do aluno recebida: {}", respostaAluno);
 
         if (respostasCertas.isEmpty()) {
             return "False"; // ID não encontrado
@@ -34,7 +38,7 @@ public class ControladorConecta implements SolucionarDesafio { // Implemente a i
 
         // 3. Junta a lista ordenada em uma única string (ex: "CachorroGatoPássaroPeixe")
         String respostaCorretaConcatenada = String.join("", respostasCertas);
-        System.out.println(respostaCorretaConcatenada);
+        log.debug("Resposta correta concatenada: {}", respostaCorretaConcatenada);
 
         // 4. Compara a resposta correta concatenada com a tentativa do aluno
         if (respostaCorretaConcatenada.contains(respostaAluno)) {
@@ -50,9 +54,7 @@ public class ControladorConecta implements SolucionarDesafio { // Implemente a i
             @PathVariable("id") int PK_Conecta,
             @RequestParam("novaResposta") String novaResposta,
             @RequestParam("idResposta") int idResposta) {
-        System.out.println("ID Resposta: " + idResposta);
-        System.out.println("Nova Resposta: " + novaResposta);
-        System.out.println("PK_Conecta: " + PK_Conecta);
+        log.debug("Atualizar resposta certa: PK_Conecta={}, idResposta={}, novaResposta={}", PK_Conecta, idResposta, novaResposta);
         return acessoBDConecta.atualizarRespostaCerta(PK_Conecta, novaResposta, idResposta);
     }
 }

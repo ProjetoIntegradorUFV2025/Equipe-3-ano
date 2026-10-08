@@ -1,5 +1,7 @@
 package ufv.desconecta.Desconecta.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service; // Adicione esta importação
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,8 @@ import java.util.List;
 @CrossOrigin("*")
 public class ControladorCacaPalavra implements SolucionarDesafio { // Implemente a interface
 
+    private static final Logger log = LoggerFactory.getLogger(ControladorCacaPalavra.class);
+
     @Autowired
     private AcessoBDCacaPalavras acessoBDCacaPalavras;
 
@@ -20,11 +24,11 @@ public class ControladorCacaPalavra implements SolucionarDesafio { // Implemente
 
     @Override
     public String verificarAgrupamento(int id, String tentativa) {
-        System.out.println("Tentativa recebida: " + tentativa);
+        log.debug("Tentativa recebida: {}", tentativa);
 
         // 1. Pega a lista de respostas do banco
         List<String> respostas = acessoBDCacaPalavras.getRespostas(id);
-        System.out.println("Respostas corretas do banco: " + respostas);
+        log.debug("Respostas corretas do banco: {}", respostas);
 
         // 2. Verifica se a tentativa do jogador (a string de índices) está na lista
         if (respostas != null && respostas.contains(tentativa)) {
@@ -38,7 +42,7 @@ public class ControladorCacaPalavra implements SolucionarDesafio { // Implemente
     @GetMapping("/getList/{id}")
     public List<String> getListaRespostas(@PathVariable("id") int PK_CacaPalavras){
         List<String> respostas = acessoBDCacaPalavras.getRespostas(PK_CacaPalavras);
-        System.out.println(respostas);
+        log.debug("Respostas corretas: {}", respostas);
         return respostas;
     }
 }
