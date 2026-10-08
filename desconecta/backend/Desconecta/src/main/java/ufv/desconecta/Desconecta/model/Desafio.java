@@ -1,5 +1,6 @@
 package ufv.desconecta.Desconecta.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class Desafio {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_Ilha") // Esta será a coluna da chave estrangeira.
+    @JsonBackReference("ilha-desafios")
     private Ilha ilha;
 
     public Desafio() {

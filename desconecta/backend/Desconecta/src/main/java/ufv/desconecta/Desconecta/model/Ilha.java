@@ -1,6 +1,7 @@
 package ufv.desconecta.Desconecta.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +26,7 @@ public class Ilha {
     private boolean foiJogada; // true se o aluno já jogou
 
     @OneToMany(mappedBy = "ilha", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("ilha-desafios")
     private List<Desafio> desafios = new ArrayList<>();
     public EnumNomeIlha buscaIlha(int idIlha) {
         if(idIlha < 0 ||idIlha > 4) {
