@@ -5,6 +5,7 @@ import logoDesconecta from "../assets/Titulo nome do jogo.png";
 import mascoteImg from "../assets/Dadinho sentado segurando quebra-cabeca.png";
 import popupErroCadastro from '../assets/popup-erro-cadastro.png';
 import popupCadastroSucesso from '../assets/popup-cadastro-sucesso.png';
+import { API_URL } from '../config/api';
 
 // --- Componente Principal: Tela de Cadastro ---
 // Tela de cadastro com fundo e dois campos de entrada centralizados
@@ -20,7 +21,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin, irParaJogo }) => {
   // Faz o login com os dados recém-cadastrados; retorna true se a sessão foi iniciada
   const entrarAutomaticamente = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/aluno/login', {
+      const response = await fetch(`${API_URL}/api/aluno/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +54,7 @@ const TelaCadastro = ({ voltarParaInicial, irParaLogin, irParaJogo }) => {
     enviandoRef.current = true;
 
     try {
-      const response = await fetch('http://localhost:8080/api/aluno/cadastro', {
+      const response = await fetch(`${API_URL}/api/aluno/cadastro`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

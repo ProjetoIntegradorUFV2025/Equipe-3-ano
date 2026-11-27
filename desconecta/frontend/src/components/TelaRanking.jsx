@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import fundoRanking from '../assets/imgTelaRanking/FundoCruClassificação.svg';
 import letreiroClassificacao from '../assets/imgTelaRanking/Letreiro classificacao.svg';
 import MenuNavegacao from './ui/MenuNavegacao';
+import { API_URL } from '../config/api';
 
 // --- Componente Principal: Tela de Ranking ---
 const TelaRanking = ({ onVoltar }) => {
@@ -29,7 +30,7 @@ const TelaRanking = ({ onVoltar }) => {
       setCarregando(true);
       
       // Buscar ranking geral
-      const response = await fetch('http://localhost:8080/api/classificacao/classificacaoGeral');
+      const response = await fetch(`${API_URL}/api/classificacao/classificacaoGeral`);
       
       if (!response.ok) {
         throw new Error('Erro ao carregar rankings');
@@ -64,7 +65,7 @@ const TelaRanking = ({ onVoltar }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/classificacao/classificacaoAluno?apelidoAluno=${encodeURIComponent(apelidoAluno)}`
+        `${API_URL}/api/classificacao/classificacaoAluno?apelidoAluno=${encodeURIComponent(apelidoAluno)}`
       );
       
       if (response.ok) {

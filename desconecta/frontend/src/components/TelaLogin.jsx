@@ -3,6 +3,7 @@ import fundoTelaLogin from '../assets/fundo-tela-login.png';
 import logoDesconecta from "../assets/Titulo nome do jogo.png";
 import mascoteImg from "../assets/Dadinho sentado segurando quebra-cabeca.png";
 import popupErroEntrar from '../assets/popup-erro-entrar.png';
+import { API_URL } from '../config/api';
 
 // --- Componente Principal: Tela de Login ---
 // Tela de login com fundo e dois campos de entrada centralizados
@@ -40,7 +41,7 @@ const TelaLogin = ({ voltarParaInicial, irParaCadastro, irParaJogo }) => {
       };
 
       // Requisição para o endpoint de login
-      const response = await fetch('http://localhost:8080/api/aluno/login', {
+      const response = await fetch(`${API_URL}/api/aluno/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

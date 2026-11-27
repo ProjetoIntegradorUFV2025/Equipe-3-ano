@@ -43,6 +43,7 @@ import imagemShopping from '../assets/Sprites_Historinha_Historia/Sprites_Conect
 import imagemShoppingAcertou from '../assets/Sprites_Historinha_Historia/Sprites_Conecta_Historia/Historia_Conecta_Shopping_Acertou.png';
 import imagemTrator from '../assets/Sprites_Historinha_Historia/Sprites_Conecta_Historia/Historia_Conecta_Trator.png';
 import imagemTratorAcertou from '../assets/Sprites_Historinha_Historia/Sprites_Conecta_Historia/Historia_Conecta_Trator_Acertou.png';
+import { API_URL } from '../config/api';
 
 // Array com as imagens e nomes dos botões em ordem
 const botoesData = [
@@ -165,7 +166,7 @@ const ConectaHistoria = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRan
 
       // Fazer a requisição para o novo endpoint unificado
       const response = await fetch(
-        'http://localhost:8080/api/desafio/verificar',
+        `${API_URL}/api/desafio/verificar`,
         {
           method: 'POST',
           body: params,
@@ -202,7 +203,7 @@ const ConectaHistoria = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRan
                   // PRIMEIRO: Verificar se o desafio já foi concluído
                   console.log('🔍 Verificando se desafio já foi concluído...');
                   const responseVerificar = await fetch(
-                    `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=HISTORIA`
+                    `${API_URL}/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=HISTORIA`
                   );
 
                   if (!responseVerificar.ok) {
@@ -221,7 +222,7 @@ const ConectaHistoria = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRan
                   if (!desafioConcluido) {
                     console.log('💾 Salvando pontuação (primeira vez)...');
                     const responsePontuacao = await fetch(
-                      `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=HISTORIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
+                      `${API_URL}/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=HISTORIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
                       {
                         method: 'POST',
                         headers: {
@@ -242,7 +243,7 @@ const ConectaHistoria = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRan
                       if (apelidoAluno) {
                         const paramsCalculo = new URLSearchParams();
                         paramsCalculo.append('apelidoAluno', apelidoAluno);
-                        await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
+                        await fetch(`${API_URL}/api/progresso-aluno/calcularPontuacaoTotal`, {
                           method: 'POST',
                           body: paramsCalculo
                         });

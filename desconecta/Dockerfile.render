@@ -1,0 +1,32 @@
+# Imagem de producao unica: o Spring Boot serve a API (/api/...) e o frontend compilado.
+# Build local:  docker build -f Dockerfile.render -t desconecta .
+
+# 1) Build do frontend (Vite)
+FROM node:20 AS front
+WORKDIR /front
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+# API na mesma origem do site -> URLs relativas (/api/...)
+ENV VITE_API_URL=""
+RUN npm run build
+
+# 2) Build do backend (Maven), com o frontend embutido em /static
+FROM maven:3.9.9-eclipse-temurin-21 AS back
+WORKDIR /app
+COPY backend/Desconecta/pom.xml .
+RUN mvn -q dependency:go-offline
+COPY backend/Desconecta/src ./src
+COPY --from=front /front/dist ./src/main/resources/static
+RUN mvn -q package -DskipTests
+
+# 3) Imagem final enxuta
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+RUN addgroup --system app && adduser --system --ingroup app app
+COPY --from=back --chown=app:app /app/target/*.jar app.jar
+USER app
+# Limites de memoria para caber no plano gratuito (512 MB)
+ENV JAVA_OPTS="-Xmx320m -Xss512k -XX:MaxMetaspaceSize=128m -XX:+UseSerialGC"
+EXPOSE 8080
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

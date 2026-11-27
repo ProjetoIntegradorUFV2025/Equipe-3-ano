@@ -17,6 +17,7 @@ import popupErro from '../assets/HistoriaGeografia/JogoGeografia/PopUpErro.png';
 
 // Importar componente de pontuação
 import TelaPontuacao from './TelaPontuacao';
+import { API_URL } from '../config/api';
 
 // --- Componente: Jogo Geografia ---
 const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanking }) => {
@@ -174,7 +175,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
       params.append('id', '1'); // ID do Caça-Palavras de Geografia
       params.append('tentativa', stringIndices); // Enviando a string de índices
 
-      const response = await fetch('http://localhost:8080/api/desafio/verificar', {
+      const response = await fetch(`${API_URL}/api/desafio/verificar`, {
         method: 'POST',
         body: params,
       });
@@ -209,7 +210,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                   // PRIMEIRO: Verificar se o desafio já foi concluído
                   console.log('🔍 Verificando se desafio já foi concluído...');
                   const responseVerificar = await fetch(
-                    `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA`
+                    `${API_URL}/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA`
                   );
                   
                   if (!responseVerificar.ok) {
@@ -225,7 +226,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                   if (!desafioConcluido) {
                     console.log('💾 Salvando pontuação (primeira vez)...');
                     const responsePontuacao = await fetch(
-                      `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
+                      `${API_URL}/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=GEOGRAFIA&tempo=${tempoFinal}&numErros=${numeroErros}`,
                       {
                         method: 'POST',
                         headers: {
@@ -243,7 +244,7 @@ const JogoGeografia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanki
                       if (apelidoAluno) {
                         const paramsCalculo = new URLSearchParams();
                         paramsCalculo.append('apelidoAluno', apelidoAluno);
-                        await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
+                        await fetch(`${API_URL}/api/progresso-aluno/calcularPontuacaoTotal`, {
                           method: 'POST',
                           body: paramsCalculo
                         });

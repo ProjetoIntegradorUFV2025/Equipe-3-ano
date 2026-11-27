@@ -16,6 +16,7 @@ import ConectaHistoria from './ConectaHistoria';
 import TelaPontuacao from './TelaPontuacao';
 import useAlunoLogado from '../hooks/useAlunoLogado';
 import MenuNavegacao from './ui/MenuNavegacao';
+import { API_URL } from '../config/api';
 
 
 // Nomes das ilhas na mesma ordem do enum EnumNomeIlha do backend
@@ -64,7 +65,7 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
     const resultados = await Promise.all(nomes.map(async (nome) => {
       try {
         const resposta = await fetch(
-          `http://localhost:8080/api/ilhas/verificar-foi-jogada?idProgressoAluno=${idProgressoAluno}&nomeIlha=${nome}`
+          `${API_URL}/api/ilhas/verificar-foi-jogada?idProgressoAluno=${idProgressoAluno}&nomeIlha=${nome}`
         );
         return resposta.ok && (await resposta.json()) === true ? nome : null;
       } catch (error) {
@@ -85,14 +86,14 @@ const TelaTrilha = ({ onVoltar, onAbrirRanking }) => {
       setCarregandoProgresso(true);
       
       // Primeiro, buscar o ID do progresso do aluno usando o ID do aluno
-      const responseIdProgresso = await fetch(`http://localhost:8080/api/progresso-aluno/id/${alunoId}`);
+      const responseIdProgresso = await fetch(`${API_URL}/api/progresso-aluno/id/${alunoId}`);
       
       if (responseIdProgresso.ok) {
         const idProgressoAluno = await responseIdProgresso.json();
         
         if (idProgressoAluno) {
           // Agora buscar a lista de posições das ilhas usando o ID do progresso
-          const responsePosicoes = await fetch(`http://localhost:8080/api/ilhas/posicoes-ilhas/${idProgressoAluno}`);
+          const responsePosicoes = await fetch(`${API_URL}/api/ilhas/posicoes-ilhas/${idProgressoAluno}`);
           
           if (responsePosicoes.ok) {
             const posicoesIlhas = await responsePosicoes.json();

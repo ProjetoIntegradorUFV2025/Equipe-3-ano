@@ -16,6 +16,7 @@ import popupErro from '../assets/HistoriaMatematica/Sprites_Caca_Palavras_Matema
 
 // Importar componente de pontuação
 import TelaPontuacao from './TelaPontuacao';
+import { API_URL } from '../config/api';
 
 // --- Componente: Jogo Matemática ---
 const JogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRanking }) => {
@@ -154,7 +155,7 @@ const JogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
       params.append('id', '2'); // ID do Caça-Palavras de Matemática
       params.append('tentativa', stringIndices); // Enviando a string de índices
 
-      const response = await fetch('http://localhost:8080/api/desafio/verificar', {
+      const response = await fetch(`${API_URL}/api/desafio/verificar`, {
         method: 'POST',
         body: params,
       });
@@ -189,7 +190,7 @@ const JogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                   // PRIMEIRO: Verificar se o desafio já foi concluído
                   console.log('🔍 Verificando se desafio já foi concluído...');
                   const responseVerificar = await fetch(
-                    `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=MATEMATICA`
+                    `${API_URL}/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=MATEMATICA`
                   );
                   
                   if (!responseVerificar.ok) {
@@ -205,7 +206,7 @@ const JogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                   if (!desafioConcluido) {
                     console.log('💾 Salvando pontuação (primeira vez)...');
                     const responsePontuacao = await fetch(
-                      `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=MATEMATICA&tempo=${tempoFinal}&numErros=${numeroErros}`,
+                      `${API_URL}/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=MATEMATICA&tempo=${tempoFinal}&numErros=${numeroErros}`,
                       {
                         method: 'POST',
                         headers: {
@@ -223,7 +224,7 @@ const JogoMatematica = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                       if (apelidoAluno) {
                         const paramsCalculo = new URLSearchParams();
                         paramsCalculo.append('apelidoAluno', apelidoAluno);
-                        await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
+                        await fetch(`${API_URL}/api/progresso-aluno/calcularPontuacaoTotal`, {
                           method: 'POST',
                           body: paramsCalculo
                         });

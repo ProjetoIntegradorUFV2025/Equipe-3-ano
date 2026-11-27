@@ -43,6 +43,7 @@ import imagemEscamasresolvido from "../assets/HistoriaCiencia/JogoCiencia/Escama
 import imagemLeiteresolvido from "../assets/HistoriaCiencia/JogoCiencia/Leite-resolvido.png";
 import imagemBicoresolvido from "../assets/HistoriaCiencia/JogoCiencia/Bico-resolvido.png";
 import imagemCobraresolvido from "../assets/HistoriaCiencia/JogoCiencia/Cobra-resolvida.png";
+import { API_URL } from '../config/api';
 
 // Array com as imagens e nomes dos botões em ordem
 const botoesData = [
@@ -325,7 +326,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
 
             // 2. Fazer a requisição para o novo endpoint unificado
             const response = await fetch(
-              "http://localhost:8080/api/desafio/verificar",
+              `${API_URL}/api/desafio/verificar`,
               {
                 method: "POST",
                 body: params,
@@ -370,7 +371,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                       "🔍 Verificando se desafio já foi concluído..."
                     );
                     const responseVerificar = await fetch(
-                      `http://localhost:8080/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=CIENCIAS`
+                      `${API_URL}/api/desafio/verificarConcluido?pkAluno=${alunoId}&nomeIlha=CIENCIAS`
                     );
 
                     if (!responseVerificar.ok) {
@@ -389,7 +390,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                     if (!desafioConcluido) {
                       console.log("💾 Salvando pontuação (primeira vez)...");
                       const responsePontuacao = await fetch(
-                        `http://localhost:8080/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
+                        `${API_URL}/api/desafio/salvarPontuacao?pkAluno=${alunoId}&nomeIlha=CIENCIAS&tempo=${tempoFinal}&numErros=${numeroErros}`,
                         {
                           method: "POST",
                           headers: {
@@ -410,7 +411,7 @@ const ConectaCiencia = ({ onVoltarTrilha, onVoltarMenu, onConcluido, onAbrirRank
                         if (apelidoAluno) {
                           const paramsCalculo = new URLSearchParams();
                           paramsCalculo.append('apelidoAluno', apelidoAluno);
-                          await fetch('http://localhost:8080/api/progresso-aluno/calcularPontuacaoTotal', {
+                          await fetch(`${API_URL}/api/progresso-aluno/calcularPontuacaoTotal`, {
                             method: 'POST',
                             body: paramsCalculo
                           });

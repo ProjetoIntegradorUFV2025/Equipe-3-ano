@@ -4,6 +4,7 @@ import useAlunoLogado from '../hooks/useAlunoLogado';
 
 // Assets para o fundo
 import fundoPontuacao from '../assets/fundo-pontuacao.png';
+import { API_URL } from '../config/api';
 import estrelas from '../assets/Estrela.png'
 import parabens from '../assets/parabens.png'
 import dadinhoConfete from '../assets/dadinhoConfete.png'
@@ -42,7 +43,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
       console.log('Ilha jogada:', nomeIlhaJogada);
       
       // Buscar o ID do progresso do aluno primeiro
-      const responseIdProgresso = await fetch(`http://localhost:8080/api/progresso-aluno/id/${alunoId}`);
+      const responseIdProgresso = await fetch(`${API_URL}/api/progresso-aluno/id/${alunoId}`);
       
       if (!responseIdProgresso.ok) {
         console.error('❌ Erro ao buscar ID do progresso');
@@ -61,7 +62,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
       console.log(`ℹ️ Verificando se ${nomeIlhaJogada} já foi jogada...`);
       
       const responseFoiJogada = await fetch(
-        `http://localhost:8080/api/ilhas/verificar-foi-jogada?idProgressoAluno=${idProgressoAluno}&nomeIlha=${nomeIlhaJogada}`
+        `${API_URL}/api/ilhas/verificar-foi-jogada?idProgressoAluno=${idProgressoAluno}&nomeIlha=${nomeIlhaJogada}`
       );
       
       if (!responseFoiJogada.ok) {
@@ -82,7 +83,7 @@ const TelaPontuacao = ({ onVoltarTrilha, onVoltarMenu, onAbrirRanking, ilhaCompl
       
       // Chamar diretamente avancarIlha - ele já faz todas as validações necessárias
       console.log('Chamando avancar-ilha com PUT...');
-      const responseAvancar = await fetch(`http://localhost:8080/api/ilhas/avancar-ilha/${idProgressoAluno}`, {
+      const responseAvancar = await fetch(`${API_URL}/api/ilhas/avancar-ilha/${idProgressoAluno}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
