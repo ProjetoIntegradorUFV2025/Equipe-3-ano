@@ -4,9 +4,11 @@ services:
     name: desconecta
     runtime: docker
     plan: free
-    rootDir: desconecta
-    dockerfilePath: ./Dockerfile.render
-    dockerContext: .
+    dockerfilePath: ./desconecta/Dockerfile.render
+    dockerContext: ./desconecta
+    buildFilter:
+      paths:
+        - desconecta/**
     healthCheckPath: /
     envVars:
       - key: SPRING_DATASOURCE_URL
